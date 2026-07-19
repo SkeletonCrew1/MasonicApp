@@ -1,0 +1,22 @@
+.container {
+    width: 500px;
+    margin: 50px auto;
+    display: flex;
+    flex-direction: column;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input {
+    padding: 10px;
+}
+
+button {
+    margin-top: 20px;
+    padding: 12px;
+    cursor: pointer;
+}
