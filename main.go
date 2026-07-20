@@ -1,11 +1,15 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"math/rand/v2"
 	"net/http"
 	"net/mail"
 	_ "runtime/trace"
+
+	_ "github.com/jackc/pgx/v5"
+	_ "github.com/lib/pq"
 )
 
 type Login struct {
@@ -44,7 +48,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 	user_name := r.FormValue("user_name")
 	user_password := r.FormValue("user_password")
 	user_fake_name := fake_name_list[random_num]
-	//user_rank := "bronze"
+	user_rank := "bronze"
 	user_email := r.FormValue("user_email")
 	//user_secret_key=r.FormValue("user_secret_key")
 
@@ -79,7 +83,32 @@ func register(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+	connStr := "postgres://postgres:mysecretpassword@users_db:5432/auth_service?sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
 
+	if err != nil {
+		panic(err)
+	}
+
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
+
+	//if err = db.Ping(); err != nil {
+	//	log.Println("DB Ping Failed")
+	//	log.Fatal(err)
+	//}
+
+	query := `
+		INSERT INTO users (UserRealName,UserFakename,UserPassword,UserStatus,UserEmail)
+		VALUES ($1, $2, $3, $4, $5);
+	`
+	_, err = db.Exec(query, user_name, user_fake_name, hashedPassword, user_rank, user_email)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
 	fmt.Fprintf(w, "User %s registered successfully", user_name)
 
 }

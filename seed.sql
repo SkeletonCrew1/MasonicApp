@@ -1,4 +1,3 @@
-create database auth_service;
 
 \connect auth_service;
 
