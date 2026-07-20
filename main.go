@@ -6,6 +6,7 @@ import (
 	"math/rand/v2"
 	"net/http"
 	"net/mail"
+	"os"
 	_ "runtime/trace"
 
 	_ "github.com/jackc/pgx/v5"
@@ -83,7 +84,8 @@ func register(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	connStr := "postgres://postgres:mysecretpassword@users_db:5432/auth_service?sslmode=disable"
+	connStr := os.Getenv("DATABASE_URL")
+	print(connStr)
 	db, err := sql.Open("postgres", connStr)
 
 	if err != nil {

@@ -21,6 +21,8 @@ services:
       context: .
       dockerfile: AUTH_Dockerfile
     container_name: auth-service
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
 
     ports:
       - "8080:8080"
