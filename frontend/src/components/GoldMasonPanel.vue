@@ -1,64 +1,69 @@
 <template>
-    <div class="backdrop">
-        <div class="panel-grid">
+    <div class="backdrop" @click.self="$emit('close')">
+        <div class="panel-wrapper">
             <div class="title-bar">
-                <span>Gold mason control panel</span>
+                <h2>Gold mason control panel: G</h2>
                 <button class="close-btn" @click="$emit('close')">×</button>
             </div>
-            <div class="box broadcast-box">
-                <h3>Broadcast</h3>
-                <textarea v-model="broadcastMessage" rows="3" placeholder="Message" />
-                <label v-for="s in statuses" :key="s" class="checkbox-row">
-                    <input type="checkbox" :value="s" v-model="selectedStatuses" />
-                    {{ s[0].toUpperCase() + s.slice(1) }}
-                </label>
-                <button class="action-btn" :disabled="sendingBroadcast" @click="doBroadcast">
-                    {{ sendingBroadcast ? "Sending..." : "Send" }}
-                </button>
-                <p v-if="broadcastMsg" class="feedback">{{ broadcastMsg }}</p>
-            </div>
-            <div class="box promotion-box">
-                <h3>Promotion</h3>
-                <input v-model="userQuery" type="text" placeholder="username search" @input="doSearch" />
-                <ul v-if="searchResults.length" class="results">
-                    <li v-for="u in searchResults" :key="u.id"
-                        :class="{ selected: selectedUser && selectedUser.id === u.id }" @click="selectedUser = u">
-                        {{ u.username }}
-                    </li>
-                </ul>
-                <select v-model="chosenStatus">
-                    <option v-for="s in statuses" :key="s" :value="s">{{ s }}</option>
-                </select>
-                <button class="action-btn" :disabled="!selectedUser" @click="doPromote">
-                    Promote
-                </button>
-                <p v-if="promotionMsg" class="feedback">{{ promotionMsg }}</p>
-            </div>
-            <div class="box control-box">
-                <button class="link-btn ban-link" @click="showBan = !showBan">BAN</button>
-                <button class="link-btn" @click="showInvite = !showInvite">invite</button>
-                <button class="delete-btn" @click="doDeleteAll">Delete all data</button>
-                <BanWindow v-if="showBan" @close="showBan = false" />
-            </div>
-            <div v-if="showInvite" class="box invite-box">
-                <h3>Invite</h3>
-                <input v-model="inviteEmail" type="text" placeholder="Email" />
-                <button class="action-btn" :disabled="!inviteEmail" @click="doInvite">Send</button>
-                <p v-if="inviteMsg" class="feedback">{{ inviteMsg }}</p>
+            <div class="panel-layout">
+                <div class="col left-col">
+                    <div class="box">
+                        <div class="box-header">Broadcast <span>G</span></div>
+                        <div class="broadcast-body">
+                            <textarea v-model="broadcastMessage" placeholder="Message"></textarea>
+                            <div class="checkboxes">
+                                <label v-for="s in statuses" :key="s">
+                                    {{ s[0].toUpperCase() + s.slice(1) }}
+                                    <input type="checkbox" :value="s" v-model="selectedStatuses" />
+                                </label>
+                            </div>
+                        </div>
+                        <button class="action-btn" :disabled="sendingBroadcast" @click="doBroadcast">Send</button>
+                        <p v-if="broadcastMsg" class="feedback">{{ broadcastMsg }}</p>
+                    </div>
+                    <div class="box">
+                        <div class="box-header">Ban agent <span>G</span></div>
+                        <input v-model="banIpAddress" type="text" placeholder="Find somebody by IP" />
+                        <button class="action-btn right-align" :disabled="!banIpAddress" @click="doBan">BAN</button>
+                        <p v-if="banMsg" class="feedback">{{ banMsg }}</p>
+                    </div>
+                </div>
+                <div class="col center-col">
+                    <button class="delete-btn" @click="doDeleteAll">Delete all data</button>
+                </div>
+                <div class="col right-col">
+                    <div class="box">
+                        <div class="box-header">Promotion <span>G</span></div>
+                        <input v-model="userQuery" type="text" placeholder="username search" @input="doSearch" />
+                        <ul v-if="searchResults.length" class="results">
+                            <li v-for="u in searchResults" :key="u.id"
+                                :class="{ selected: selectedUser && selectedUser.id === u.id }"
+                                @click="selectedUser = u">
+                                {{ u.username }}
+                            </li>
+                        </ul>
+                        <select v-model="chosenStatus">
+                            <option v-for="s in statuses" :key="s" :value="s">{{ s }}</option>
+                        </select>
+                        <button class="action-btn right-align mt-auto" :disabled="!selectedUser"
+                            @click="doPromote">Promote</button>
+                        <p v-if="promotionMsg" class="feedback">{{ promotionMsg }}</p>
+                    </div>
+                    <div class="box">
+                        <div class="box-header">Invite <span>G</span></div>
+                        <input v-model="inviteEmail" type="text" placeholder="Email" />
+                        <button class="action-btn right-align" :disabled="!inviteEmail" @click="doInvite">Send</button>
+                        <p v-if="inviteMsg" class="feedback">{{ inviteMsg }}</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </template>
 <script setup>
 import { ref } from "vue";
-import {
-    deleteAllData,
-    inviteUser,
-    promoteUser,
-    searchUsers,
-    sendBroadcast,
-} from "../api/client";
-import BanWindow from "./BanWindow.vue";
+import { deleteAllData, inviteUser, promoteUser, searchUsers, sendBroadcast, banIp } from "../api/client";
+const emit = defineEmits(["close"]);
 const statuses = ["bronze", "silver", "golden"];
 const broadcastMessage = ref("");
 const selectedStatuses = ref([...statuses]);
@@ -67,16 +72,17 @@ const broadcastMsg = ref("");
 async function doBroadcast() {
     if (!broadcastMessage.value.trim()) return;
     sendingBroadcast.value = true;
-    broadcastMsg.value = "";
     try {
         await sendBroadcast(broadcastMessage.value, selectedStatuses.value);
-        broadcastMsg.value = "Broadcast sent";
-        broadcastMessage.value = "";
-    } catch (e) {
-        broadcastMsg.value = "Could not send broadcast";
-    } finally {
-        sendingBroadcast.value = false;
-    }
+        broadcastMsg.value = "Broadcast sent"; broadcastMessage.value = "";
+    } catch (e) { broadcastMsg.value = "Error sending"; }
+    finally { sendingBroadcast.value = false; }
+}
+const banIpAddress = ref("");
+const banMsg = ref("");
+async function doBan() {
+    try { await banIp(banIpAddress.value); banMsg.value = "IP Banned"; banIpAddress.value = ""; }
+    catch (e) { banMsg.value = "Error banning"; }
 }
 const userQuery = ref("");
 const searchResults = ref([]);
@@ -84,202 +90,206 @@ const selectedUser = ref(null);
 const chosenStatus = ref("bronze");
 const promotionMsg = ref("");
 async function doSearch() {
-    if (!userQuery.value) {
-        searchResults.value = [];
-        return;
-    }
-    try {
-        searchResults.value = await searchUsers(userQuery.value);
-    } catch (e) {
-        searchResults.value = [];
-    }
+    if (!userQuery.value) { searchResults.value = []; return; }
+    try { searchResults.value = await searchUsers(userQuery.value); } catch (e) { searchResults.value = []; }
 }
 async function doPromote() {
     if (!selectedUser.value) return;
-    try {
-        await promoteUser(selectedUser.value.id, chosenStatus.value);
-        promotionMsg.value = `${selectedUser.value.username} is now ${chosenStatus.value}`;
-    } catch (e) {
-        promotionMsg.value = "Could not promote user";
-    }
+    try { await promoteUser(selectedUser.value.id, chosenStatus.value); promotionMsg.value = "Promoted"; }
+    catch (e) { promotionMsg.value = "Error"; }
 }
-const showBan = ref(false);
-const showInvite = ref(false);
 const inviteEmail = ref("");
 const inviteMsg = ref("");
 async function doInvite() {
-    try {
-        await inviteUser(inviteEmail.value);
-        inviteMsg.value = `Invite sent to ${inviteEmail.value}`;
-        inviteEmail.value = "";
-    } catch (e) {
-        inviteMsg.value = "Could not send invite";
-    }
+    try { await inviteUser(inviteEmail.value); inviteMsg.value = "Sent"; inviteEmail.value = ""; }
+    catch (e) { inviteMsg.value = "Error"; }
 }
 async function doDeleteAll() {
-    if (!confirm("This will delete all posts. Are you sure?")) return;
-    try {
-        await deleteAllData();
-        alert("All data deleted");
-    } catch (e) {
-        alert("Could not delete data");
-    }
+    if (!confirm("Delete all data?")) return;
+    try { await deleteAllData(); alert("Deleted"); }
+    catch (e) { alert("Error"); }
 }
 </script>
 <style scoped>
 .backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+}
+
+.panel-wrapper {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    width: 900px;
+    max-width: 95vw;
+    border: 1px solid #777;
     font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-.panel-grid {
-    background: #f2f2f2;
-    border-radius: 14px;
-    padding: 20px;
-    width: min(90vw, 820px);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    position: relative;
-}
-
 .title-bar {
-    grid-column: 1 / -1;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.title-bar h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: normal;
     color: #1a1a1a;
-    margin-bottom: 4px;
 }
 
 .close-btn {
-    border: none;
     background: none;
-    font-size: 20px;
+    border: none;
+    font-size: 24px;
     cursor: pointer;
     color: #666;
 }
 
-.box {
-    background: #ffffff;
-    border: 1px solid #e2e2e2;
-    border-radius: 10px;
-    padding: 14px 16px;
+.panel-layout {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 40px;
 }
 
-.box h3 {
-    margin: 0 0 10px;
-    font-size: 14px;
+.col {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.center-col {
+    justify-content: center;
+    align-items: center;
+}
+
+.box {
+    background: #ffffff;
+    border: 1px solid #777;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    min-height: 140px;
+}
+
+.box-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 16px;
     color: #1a1a1a;
 }
 
-textarea,
+.box-header span {
+    font-weight: bold;
+}
+
+.broadcast-body {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.broadcast-body textarea {
+    flex: 1;
+    resize: none;
+    border-radius: 6px;
+    border: 1px solid #777;
+    padding: 8px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    font-size: 14px;
+    color: #333;
+}
+
+.checkboxes label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 80px;
+}
+
 input,
 select {
     width: 100%;
-    box-sizing: border-box;
-    padding: 8px 10px;
-    border: 1px solid #d7d7d7;
+    padding: 8px;
     border-radius: 6px;
-    font-size: 13px;
+    border: 1px solid #777;
+    background: #ffffff;
+    margin-bottom: 12px;
+    box-sizing: border-box;
     font-family: inherit;
-    margin-bottom: 8px;
-}
-
-.checkbox-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: #444;
-    margin-bottom: 4px;
-}
-
-.checkbox-row input {
-    width: auto;
-    margin: 0;
+    font-size: 14px;
 }
 
 .action-btn {
-    padding: 8px 14px;
-    border: none;
+    padding: 6px 16px;
     border-radius: 6px;
-    background: #4caf50;
-    color: white;
+    border: 1px solid #777;
+    background: #f0f0f0;
+    cursor: pointer;
+    align-self: flex-start;
+    font-size: 14px;
     font-weight: 600;
+}
+
+.right-align {
+    align-self: flex-end;
+}
+
+.mt-auto {
+    margin-top: auto;
+}
+
+.delete-btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    border: 1px solid #ff4d4f;
+    background: #ffd6d6;
+    color: #a80000;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.results {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px;
+    border: 1px solid #777;
+    border-radius: 6px;
+    max-height: 80px;
+    overflow-y: auto;
+    background: #ffffff;
+}
+
+.results li {
+    padding: 4px 8px;
     cursor: pointer;
     font-size: 13px;
 }
 
-.action-btn:disabled {
-    opacity: 0.5;
-    cursor: default;
+.results li.selected {
+    background: #e0e0e0;
 }
 
 .feedback {
     font-size: 12px;
     color: #555;
-    margin-top: 8px;
-}
-
-.results {
-    list-style: none;
-    margin: 0 0 8px;
-    padding: 0;
-    max-height: 90px;
-    overflow-y: auto;
-    border: 1px solid #eee;
-    border-radius: 6px;
-}
-
-.results li {
-    padding: 6px 8px;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.results li:hover,
-.results li.selected {
-    background: #eef6ee;
-}
-
-.control-box {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
-    position: relative;
-}
-
-.link-btn {
-    border: 1px solid #d7d7d7;
-    background: #fafafa;
-    border-radius: 6px;
-    padding: 8px 14px;
-    cursor: pointer;
-    font-size: 13px;
-}
-
-.ban-link {
-    font-weight: 700;
-    font-style: italic;
-}
-
-.delete-btn {
-    border: none;
-    background: #fbdada;
-    color: #b02a2a;
-    border-radius: 8px;
-    padding: 10px 14px;
-    cursor: pointer;
-    font-weight: 600;
-    width: 100%;
+    margin: 4px 0 0;
 }
 </style>
