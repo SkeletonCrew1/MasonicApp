@@ -46,6 +46,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 	user_fake_name := fake_name_list[random_num]
 	//user_rank := "bronze"
 	user_email := r.FormValue("user_email")
+	//user_secret_key=r.FormValue("user_secret_key")
 
 	if len(user_name) < 2 || len(user_password) < 8 {
 		er := http.StatusNotAcceptable
@@ -77,10 +78,10 @@ func register(w http.ResponseWriter, r *http.Request) {
 		} else {
 			break
 		}
-
 	}
 
 	fmt.Fprintf(w, "User %s registered successfully", user_name)
+
 }
 
 func login(w http.ResponseWriter, r *http.Request) {}

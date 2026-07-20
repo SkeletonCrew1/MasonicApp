@@ -1,0 +1,36 @@
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: DB_Dockerfile
+    container_name: users_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    networks:
+      - backend 
+    volumes:
+      - data_sql:/var/lib/postgresql
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: AUTH_Dockerfile
+    container_name: auth-service
+
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+    name: backend_net
+
+volumes:
+  data_sql:
