@@ -3,8 +3,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+<<<<<<< HEAD
 SECRET_KEY = "dev-secret-key-change-me"  # TODO: вынести в env для прода
 DEBUG = True
+=======
+SECRET_KEY = os.environ["SECRET_KEY"]
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+>>>>>>> fix/SKEL2-20-implement-broadcast-feature
 ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
     "django.contrib.admin",
