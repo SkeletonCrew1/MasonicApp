@@ -1,5 +1,5 @@
 services:
-  email-service:
+  mail-service:
     build:
       dockerfile: Dockerfile
     ports:
