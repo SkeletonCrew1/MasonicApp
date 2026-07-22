@@ -83,48 +83,26 @@ func register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	check_name_query := `
-		SELECT count(1) > 0
-		FROM users
-		WHERE UserFakename = $1;
-	`
 	defer db.Close()
 	db, err = sql.Open("postgres", connStr)
+	name_exists := UserExists(db, user_fake_name)
 	for {
-		rows, err := db.Query(check_name_query, user_fake_name)
-		if err != nil && err != sql.ErrNoRows {
-			er := http.StatusMethodNotAllowed
-			fmt.Fprintf(w, " %s ", err)
-			http.Error(w, "error3", er)
-			return
-		}
-		if err == sql.ErrNoRows {
+		name_exists = UserExists(db, user_fake_name)
+		if name_exists == true {
 			random_num = randRange(0, 30)
 			user_fake_name = fake_name_list[random_num]
 
 		} else {
 			break
 		}
-		rows.Close()
 	}
 
-	check_email_query := `
-		SELECT count(1) > 0
-		FROM users
-		WHERE UserEmail = $1;
-	`
-	rows, err := db.Query(check_email_query, user_fake_name)
-	if err != nil && err != sql.ErrNoRows {
+	email_exists := EmailExists(db, user_email)
+	if email_exists == true {
 		er := http.StatusMethodNotAllowed
-		http.Error(w, "error2", er)
+		http.Error(w, "email registered", er)
 		return
 	}
-	if err == sql.ErrNoRows {
-		er := http.StatusMethodNotAllowed
-		http.Error(w, "Email already registered", er)
-		return
-	}
-	rows.Close()
 
 	query := `
 		INSERT INTO users (UserFakename,UserPassword,UserStatus,UserEmail)
@@ -132,11 +110,9 @@ func register(w http.ResponseWriter, r *http.Request) {
 	`
 	_, err = db.Exec(query, user_fake_name, hashedPassword, user_rank, user_email)
 	if err != nil {
-		er := http.StatusMethodNotAllowed
-		http.Error(w, "error1", er)
-		return
+		panic(err)
 	}
-	rows.Close()
+
 	defer db.Close()
 	fmt.Fprintf(w, "User %s registered successfully", user_fake_name)
 
