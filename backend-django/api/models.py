@@ -10,10 +10,8 @@ POST_STATUS_CHOICES = [
     ("approved", "Approved"),
 ]
 class Profile(models.Model):
-<<<<<<< HEAD
-=======
+
     id = models.BigAutoField(primary_key=True)
->>>>>>> fix/SKEL2-20-implement-broadcast-feature
     username = models.CharField(max_length=150, unique=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="bronze")
     is_banned = models.BooleanField(default=False)
@@ -28,10 +26,7 @@ class Profile(models.Model):
             "is_banned": self.is_banned,
         }
 class Post(models.Model):
-<<<<<<< HEAD
-=======
     id = models.BigAutoField(primary_key=True)
->>>>>>> fix/SKEL2-20-implement-broadcast-feature
     title = models.CharField(max_length=200)
     image_url = models.URLField(blank=True, default="")
     description = models.TextField(blank=True, default="")
