@@ -1,8 +1,10 @@
 import json
+from django.core.mail import get_connection, send_mail
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from .models import BannedIP, Invite, Post, Profile
+from .permissions import golden_required
 
 def _body(request):
     if not request.body:
@@ -67,6 +69,7 @@ def user_promote(request, user_id):
     return JsonResponse(profile.to_dict())
 # ---------- Broadcast ----------
 @csrf_exempt
+@golden_required
 @require_http_methods(["POST"])
 def broadcast(request):
     data = _body(request)
@@ -74,8 +77,53 @@ def broadcast(request):
     statuses = data.get("statuses") or []
     if not message:
         return JsonResponse({"error": "Message is required"}, status=400)
-    recipients_count = Profile.objects.filter(status__in=statuses).count()
-    return JsonResponse({"sent": True, "recipients": recipients_count})
+    if not statuses:
+        return JsonResponse({"error": "At least one status must be selected"}, status=400)
+
+    recipients = (
+        Profile.objects.filter(status__in=statuses)
+        .exclude(email="")
+        .values_list("email", flat=True)
+    )
+    emails = list(recipients)
+    
+    delivered = 0
+    failed = []
+    
+    if emails:
+        connection = get_connection()
+        connection.open()
+        try:
+            for email in emails:
+                try:
+                    send_mail(
+                        subject="Cult of the Tree -- Broadcast",
+                        message=message,
+                        from_email=None,
+                        recipient_list=[email],
+                        fail_silently=False,
+                        connection=connection
+                    )
+                    delivered += 1
+                except Exception:
+                    failed.append(email)
+        finally:
+            connection.close()
+    record = Broadcast.objects.create(
+        message=message,
+        statuses=statuses,
+        recipients_count=len(emails),
+        delivered_count=delivered,
+        failed_emails=failed,
+        sent_by=request.user if request.user.is_authenticated else None,
+    )
+    return JsonResponse(record.to_dict(), status=201)
+
+@golden_required
+@require_http_methods(["GET"])
+def broadcasr_history(request):
+    records = Broadcast.objects.all()[:50]
+    return JsonResponse([r.to_dict() for r in records], safe=False)
 # ---------- Invite ----------
 @csrf_exempt
 @require_http_methods(["POST"])

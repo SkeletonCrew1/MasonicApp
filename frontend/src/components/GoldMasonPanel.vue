@@ -70,13 +70,18 @@ const selectedStatuses = ref([...statuses]);
 const sendingBroadcast = ref(false);
 const broadcastMsg = ref("");
 async function doBroadcast() {
-    if (!broadcastMessage.value.trim()) return;
-    sendingBroadcast.value = true;
-    try {
-        await sendBroadcast(broadcastMessage.value, selectedStatuses.value);
-        broadcastMsg.value = "Broadcast sent"; broadcastMessage.value = "";
-    } catch (e) { broadcastMsg.value = "Error sending"; }
-    finally { sendingBroadcast.value = false; }
+  if (!broadcastMessage.value.trim()) return;
+  sendingBroadcast.value = true;
+  try {
+    const result = await sendBroadcast(broadcastMessage.value, selectedStatuses.value);
+    broadcastMsg.value = `Sent to ${result.delivered_count}/${result.recipients_count}` +
+      (result.failed_emails.length ? ` (${result.failed_emails.length} failed)` : "");
+    broadcastMessage.value = "";
+  } catch (e) {
+    broadcastMsg.value = "Error sending";
+  } finally {
+    sendingBroadcast.value = false;
+  }
 }
 const banIpAddress = ref("");
 const banMsg = ref("");
