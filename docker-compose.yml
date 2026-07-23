@@ -1,19 +1,19 @@
 services:
-  postgres:
-    image: postgres:16-alpine
+  postgres-db:
+    build:
+      context: .
+      dockerfile: DB_Dockerfile
+    container_name: users_db
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
+    networks:
+      - backend 
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - data_sql:/var/lib/postgresql
   backend-django:
     build:
       context: ./backend-django
@@ -42,4 +42,4 @@ services:
     command: npm run dev -- --host 0.0.0.0
 
 volumes:
-  pgdata:
+  data_sql:
