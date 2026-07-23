@@ -52,6 +52,6 @@ func main() {
 
 	mux.HandleFunc("/sighting", handlers.GetSightingByID(db))
 
-	log.Println("Listening on :8080")
-	log.Fatal(http.ListenAndServe(":8080", enableCORS(mux)))
+	log.Println("Listening on :8082")
+	log.Fatal(http.ListenAndServe(":8082", enableCORS(mux)))
 }

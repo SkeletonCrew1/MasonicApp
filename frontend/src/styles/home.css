@@ -17,7 +17,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #f8f8f8;
+    background-color: #fcfbf5;
     padding: 0 20px;
   }
 
@@ -37,12 +37,12 @@
 }
 
 .nav-links a {
-    color: rgb(0, 0, 0);
+    color: #2D2E2F;
     text-decoration: none;
 }
 
 .nav-links a:hover {
-    color: #000000;
+    color: #2D2E2F;
 }
 
 .add-sighting-button {
@@ -56,8 +56,8 @@
     border: none;
     border-radius: 8px;
 
-    background: rgba(255, 240, 240, 0.8);
-    color: rgb(0, 0, 0);
+    background: #fcfbf5;
+    color: #2D2E2F ;
 
     font-size: 16px;
     cursor: pointer;
@@ -66,8 +66,8 @@
 }
 
 .add-sighting-button:hover {
-    background: rgb(0, 0, 0);
-    color: rgba(255, 240, 240, 0.8);
+    background: #2D2E2F ;
+    color: #fcfbf5;
 }
 
 .coordinates {
@@ -78,8 +78,8 @@
 
     padding: 12px 18px;
 
-    background: rgba(0, 0, 0, 0.75);
-    color: white;
+    background: #2D2E2F;
+    color: #fcfbf5;
 
     border-radius: 8px;
 
@@ -92,6 +92,7 @@
     align-items: center;
     gap: 8px;
     min-width: 150px;
+    color: #2D2E2F;
   }
   
 .sighting-popup h3 {
@@ -103,12 +104,12 @@
   max-width: 100%;
   height: auto;
   border-radius: 4px;
-  border: 1px solid #ccc;
+  border: 1px solid #2D2E2F;
 }
 
 .open-page-btn {
-  background-color: #4caf50;
-  color: white;
+  background-color: #fcfbf5;
+  color: #2D2E2F;
   padding: 6px 12px;
   border: none;
   border-radius: 4px;
@@ -118,5 +119,14 @@
 }
 
 .open-page-btn:hover {
-  background-color: #45a049;
+  background-color: #bab9b6;
+}
+
+.custom-marker {
+  background-color: #bab9b6;
+  border: 2px solid #2D2E2F;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }

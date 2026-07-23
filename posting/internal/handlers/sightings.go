@@ -42,9 +42,9 @@ func AddSighting(db *sql.DB) http.HandlerFunc {
 		}
 
 		_, err := db.Exec(`
-			INSERT INTO sightings (name, latitude, longitude, discovery_date, picture)
-			VALUES($1, $2, $3, $4, $5)
-		`, sighting.Name, sighting.Latitude, sighting.Longitude, sighting.Date, sighting.Picture)
+			INSERT INTO sightings (name, latitude, longitude, discovery_date, picture, description)
+			VALUES($1, $2, $3, $4, $5, $6)
+		`, sighting.Name, sighting.Latitude, sighting.Longitude, sighting.Date, sighting.Picture, sighting.Description)
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -56,7 +56,7 @@ func AddSighting(db *sql.DB) http.HandlerFunc {
 
 func GetSightings(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		rows, err := db.Query("SELECT id, name, latitude, longitude, discovery_date, picture FROM sightings")
+		rows, err := db.Query("SELECT id, name, latitude, longitude, discovery_date, picture, description FROM sightings")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -66,7 +66,7 @@ func GetSightings(db *sql.DB) http.HandlerFunc {
 		var sightings []models.Sighting
 		for rows.Next() {
 			var s models.Sighting
-			if err := rows.Scan(&s.ID, &s.Name, &s.Latitude, &s.Longitude, &s.Date, &s.Picture); err != nil {
+			if err := rows.Scan(&s.ID, &s.Name, &s.Latitude, &s.Longitude, &s.Date, &s.Picture, &s.Description); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -81,8 +81,8 @@ func GetSightingByID(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := r.URL.Query().Get("id")
 		var s models.Sighting
-		err := db.QueryRow("SELECT id, name, latitude, longitude, discovery_date, picture FROM sightings WHERE id = $1", id).
-			Scan(&s.ID, &s.Name, &s.Latitude, &s.Longitude, &s.Date, &s.Picture)
+		err := db.QueryRow("SELECT id, name, latitude, longitude, discovery_date, picture, description FROM sightings WHERE id = $1", id).
+			Scan(&s.ID, &s.Name, &s.Latitude, &s.Longitude, &s.Date, &s.Picture, &s.Description)
 
 		if err != nil {
 			http.Error(w, "Sighting not found", http.StatusNotFound)

@@ -16,9 +16,11 @@ services:
     build:
       context: ./posting
     ports:
-      - "8080:8080"
+      - "8082:8082"
     depends_on:
       - db
+    volumes:
+      - uploads_data:/app/uploads
     env_file:
       - .env
 
@@ -28,10 +30,27 @@ services:
     container_name: postgres
     ports:
       - "5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  email-service:
+    build:
+      context: ./test
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+
+  password-service:
+    build:
+      context: ./dailyfunctions
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - email-service
+    environment:
+      - EMAIL_SERVICE_URL=http://email-service:8081/send-email
     env_file:
       - .env
 
 volumes:
-  db_data:
+  uploads_data:

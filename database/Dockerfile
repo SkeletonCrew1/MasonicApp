@@ -10,6 +10,7 @@ RUN apt-get update && \
 
 COPY init.sql .
 COPY start.sh .
+COPY users_init.sql .
 
 RUN chmod +x start.sh
 

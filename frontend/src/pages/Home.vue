@@ -28,15 +28,10 @@ import { useRouter } from "vue-router";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
-
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
+const customIcon = L.divIcon({
+  className: 'custom-marker',
+  iconSize: [16, 16],
+  iconAnchor: [8, 8]
 });
 
 const router = useRouter();
@@ -47,7 +42,7 @@ const markersLayer = L.featureGroup();
 
 async function loadSightings(map) {
   try {
-    const response = await fetch('http://localhost:8080/sightings');
+    const response = await fetch('http://localhost:8082/sightings');
     if (!response.ok) throw new Error("Failed to fetch");
     const sightings = await response.json();
 
@@ -56,7 +51,7 @@ async function loadSightings(map) {
       popupContent.className = 'sighting-popup';
       popupContent.innerHTML = `
         <h3>${sighting.name}</h3>
-        ${sighting.picture ? `<img src="http://localhost:8080${sighting.picture}" class="popup-image" />` : ''}
+        ${sighting.picture ? `<img src="http://localhost:8082${sighting.picture}" class="popup-image" />` : ''}
         <button class="open-page-btn" data-id="${sighting.id}">Open Page</button>
       `;
 
@@ -65,7 +60,7 @@ async function loadSightings(map) {
         router.push(`/sighting/${id}`);
       });
 
-      L.marker([sighting.latitude, sighting.longitude])
+      L.marker([sighting.latitude, sighting.longitude], { icon: customIcon })
         .addTo(map) 
         .bindPopup(popupContent);
     });
@@ -89,10 +84,6 @@ onMounted(() => {
     zoomControl: false
   }).setView([20, 0], 2);
 
-  L.control.zoom({
-    position: 'topright'
-  }).addTo(map);
-
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
     attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
     noWrap: false
@@ -110,7 +101,7 @@ onMounted(() => {
     if (marker) {
       marker.setLatLng(e.latlng);
     } else {
-      marker = L.marker(e.latlng).addTo(map);
+      marker = L.marker(e.latlng, { icon: customIcon } ).addTo(map);
     }
   });
 });

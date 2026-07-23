@@ -9,5 +9,7 @@ CREATE TABLE IF NOT EXISTS sightings
 
     discovery_date DATE NOT NULL,
 
-    picture TEXT NOT NULL
+    picture TEXT NOT NULL,
+
+    description TEXT NOT NULL
 );
