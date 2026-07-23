@@ -25,12 +25,6 @@ def broadcast(request):
     statuses = data.get("statuses") or []
     if not message:
         return JsonResponse({"error": "Message is required"}, status=400)
-<<<<<<< HEAD
-    recipients_count = Profile.objects.filter(status__in=statuses).count()
-    return JsonResponse({"sent": True, "recipients": recipients_count})
-
-
-=======
     if not statuses:
         return JsonResponse({"error": "At least one status must be selected"}, status=400)
 
@@ -78,7 +72,6 @@ def broadcast(request):
 def broadcasr_history(request):
     records = Broadcast.objects.all()[:50]
     return JsonResponse([r.to_dict() for r in records], safe=False)
->>>>>>> origin/fix-2-20-Implement-broadcast-backend
 # ---------- Invite ----------
 @csrf_exempt
 @require_http_methods(["POST"])
