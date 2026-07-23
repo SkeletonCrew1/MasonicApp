@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-
 	"os"
 	_ "runtime/trace"
+
+	_ "github.com/golang-jwt/jwt/v5"
 
 	_ "github.com/jackc/pgx/v5"
 	_ "github.com/lib/pq"
@@ -64,10 +65,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	hashedPassword, _ := hashPassword(user_password)
-	users[user_fake_name] = Login{
-		HashedPassword: hashedPassword,
-	}
-	//postgres://postgres:mysecretpassword@users_db:5432/auth_service?sslmode=disable
+
 	connStr := os.Getenv("DATABASE_URL")
 
 	db, err := sql.Open("postgres", connStr)
@@ -97,8 +95,8 @@ func register(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	email_exists := EmailExists(db, user_email)
-	if email_exists == true {
+	email_exist := EmailExists(db, user_email)
+	if email_exist == true {
 		er := http.StatusMethodNotAllowed
 		http.Error(w, "email registered", er)
 		return
@@ -118,7 +116,55 @@ func register(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func login(w http.ResponseWriter, r *http.Request) {}
+func login(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		er := http.StatusMethodNotAllowed
+		http.Error(w, "Invalid method", er)
+		return
+	}
+	w.Header().Set("Content-type", "application")
+
+	connStr := os.Getenv("DATABASE_URL")
+
+	var secretKey = []byte(os.Getenv("SECRET_KEY"))
+
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		fmt.Fprint(w, "db")
+		panic(err)
+	}
+	user_password := r.FormValue("user_password")
+	user_email := r.FormValue("user_email")
+	hashedPassword, _ := hashPassword(user_password)
+	email_exist := EmailExists(db, user_email)
+	user_fake_name := GetValue(db, "UserFakename", user_email)
+	user_status := GetValue(db, "UserStatus", user_email)
+	if email_exist != true {
+		er := http.StatusMethodNotAllowed
+		http.Error(w, "Invalid email", er)
+		return
+	}
+
+	if !checkPasswordHash(user_password, hashedPassword) {
+		er := http.StatusUnauthorized
+		http.Error(w, "Invalid   password", er)
+
+		return
+	}
+
+	tokenString, err := createToken(secretKey, user_fake_name, user_email, user_status)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Errorf("No user found")
+		fmt.Fprint(w, "%s", err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+
+	defer db.Close()
+
+	fmt.Fprint(w, "Login successfull")
+}
 
 func logout(w http.ResponseWriter, r *http.Request) {}
 
