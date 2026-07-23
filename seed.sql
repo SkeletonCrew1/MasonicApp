@@ -5,19 +5,19 @@ create table Users (
     UserId serial primary key,
     UserDisplayName varchar(40) not null,
     UserPassword text not null,
-    UserStatus varchar(40),
+    UserStatus varchar(40) not null,
     UserEmail text not null,
-    UserIsInquisitor bool not null,
+    UserIsInquisitor bool not null
 );
 
-create table BannedIp (
+create table BannedIps (
     UserID serial primary key references Users(UserID) not null,
-    BannedIp varchar(40) 
+    BannedIp varchar(40) not null
 );
 
 create table Messages (
     MessageId serial primary key not null,
-    MessageContext text ,
+    MessageContext text not null,
     MessageRecieverEmail varchar(40) not null,
     MessageStatus varchar(20) not null,
     SenderId int not null references Users(UserId) not null,
