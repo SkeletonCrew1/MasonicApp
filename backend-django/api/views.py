@@ -1,5 +1,5 @@
 import json
-from django.core.mail import get_connection, send_mail
+import requests
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -87,24 +87,20 @@ def broadcast(request):
     delivered = 0
     failed = 0
     if emails:
-        connection = get_connection()
-        connection.open()
-        try:
-            for email in emails:
-                try:
-                    send_mail(
-                        subject="Cult of the Tree — Broadcast",
-                        message=message,
-                        from_email=None,
-                        recipient_list=[email],
-                        fail_silently=False,
-                        connection=connection,
-                    )
-                    delivered += 1
-                except Exception:
-                    failed += 1
-        finally:
-            connection.close()
+        payload = {
+            "dest": emails,
+            "subject": "Cult of the Tree - Broadcast",
+            "body": message
+        }
+        try: 
+            response = requests.post("http://email-service:8080/api/send", json=payload, timeout=5)
+            if response.status_code in [200, 201]:
+                delivered = len(emails)
+            else:
+                failed = len(emails)
+        except requests.exceptions.RequestException:
+            failed = len(emails)
+            
     if not emails:
         result_status = "failed"
     elif failed == 0:

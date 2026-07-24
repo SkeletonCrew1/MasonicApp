@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -14,6 +16,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - backend
+
   backend-django:
     build:
       context: ./backend-django
@@ -30,6 +35,8 @@ services:
     volumes:
       - ./backend-django:/app
     command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    networks:
+      - backend
 
   frontend:
     build:
@@ -40,6 +47,25 @@ services:
       - ./frontend:/app
       - /app/node_modules
     command: npm run dev -- --host 0.0.0.0
+    networks:
+      - frontend
+
+  email-service:
+    build:
+      context: ./mail-service
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
 
 volumes:
   pgdata:
+
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
