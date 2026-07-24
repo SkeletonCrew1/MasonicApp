@@ -1,59 +1,87 @@
 services:
+
   main-db:
     image: postgres:18
     container_name: main-db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_DB: ${MAIN_DB_NAME}
     ports:
       - "5432:5432"
     networks:
       - backend 
     volumes:
-      - data_sql:/var/lib/postgresql
+      - main_data_sql:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5
+    env_file: .env
 
 
-  flyway-main:
+  main-flyway:
     image: flyway/flyway:latest
-    entrypoint: ["flyway", "-url=jdbc:${DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-validateMigrationNaming=true", "migrate"] 
+    entrypoint: ["flyway", "-url=jdbc:${MAIN_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-validateMigrationNaming=true", "migrate"] 
     volumes:
       - ./db/migrations/main-db:/flyway/sql
     depends_on:
-      - main-db
+      main-db:
+        condition: service_healthy
     networks:
       - backend
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      DATABASE_URL: ${DATABASE_URL}
+      POSTGRES_DB: ${MAIN_DB_NAME}
+      DATABASE_URL: ${MAIN_DATABASE_URL}
+    env_file: .env
   
-  flyway-mastermap:
-    image: flyway/flyway:latest
-    entrypoint: ["flyway", "-url=jdbc:${DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-validateMigrationNaming=true", "migrate"] 
+  map-db:
+    image: postgres:18
+    container_name: map-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${MAP_DB_NAME}
+    ports:
+      - "5433:5432"
+    networks:
+      - backend 
     volumes:
-      - ./db/migrations/main-db:/flyway/sql
+      - map_data_sql:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    env_file: .env
+  
+  map-flyway:
+    image: flyway/flyway:latest
+    entrypoint: ["flyway", "-url=jdbc:${MAP_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-validateMigrationNaming=true", "migrate"] 
+    volumes:
+      - ./db/migrations/mysterymap-db:/flyway/sql
     depends_on:
-      - main-db
+      map-db:
+        condition: service_healthy
     networks:
       - backend
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      DATABASE_URL: ${DATABASE_URL}
-
+      POSTGRES_DB: ${MAP_DB_NAME}
+      DATABASE_URL: ${MAP_DATABASE_URL}
+    env_file: .env
+  
   backend-django:
     build:
       context: ./backend-django
     depends_on:
       main-db:
+        condition: service_healthy
+      map-db:
         condition: service_healthy
     env_file:
       - .env
@@ -68,6 +96,7 @@ services:
     volumes:
       - ./backend-django:/app
     command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    
 
   frontend:
     build:
@@ -91,4 +120,6 @@ networks:
     name: frontend_net
 
 volumes:
-  data_sql:
+  main_data_sql:
+
+  map_data_sql:
