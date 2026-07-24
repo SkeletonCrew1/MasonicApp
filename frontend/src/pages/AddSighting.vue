@@ -143,7 +143,7 @@ async function submit() {
   };
 
   try {
-    const response = await fetch("http://localhost:8082/sightings", {
+    const response = await fetch("http://localhost:8085/sightings", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

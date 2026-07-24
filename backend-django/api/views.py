@@ -2,7 +2,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from .models import BannedIP, Invite, Post, Profile
+from .models import BannedIP, Invite, Profile
 
 def _body(request):
     if not request.body:
@@ -11,37 +11,7 @@ def _body(request):
         return json.loads(request.body)
     except json.JSONDecodeError:
         return {}
-# ---------- Posts ----------
-@csrf_exempt
-@require_http_methods(["GET", "POST"])
-def posts_list(request):
-    if request.method == "GET":
-        posts = Post.objects.all()
-        return JsonResponse([p.to_dict() for p in posts], safe=False)
-    data = _body(request)
-    title = (data.get("title") or "").strip()
-    if not title:
-        return JsonResponse({"error": "Title is required"}, status=400)
-    if data.get("latitude") is None or data.get("longitude") is None:
-        return JsonResponse({"error": "Latitude and longitude are required"}, status=400)
-    post = Post.objects.create(
-        title=title,
-        image_url=data.get("image_url") or "",
-        description=data.get("description") or "",
-        latitude=data["latitude"],
-        longitude=data["longitude"],
-    )
-    return JsonResponse(post.to_dict(), status=201)
-@csrf_exempt
-@require_http_methods(["POST", "PATCH"])
-def post_approve(request, post_id):
-    try:
-        post = Post.objects.get(id=post_id)
-    except Post.DoesNotExist:
-        return JsonResponse({"error": "Post not found"}, status=404)
-    post.status = "approved"
-    post.save(update_fields=["status"])
-    return JsonResponse(post.to_dict())
+
 # ---------- Users / Profiles ----------
 @require_http_methods(["GET"])
 def users_search(request):

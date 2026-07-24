@@ -2,6 +2,22 @@ version: "3.9"
 
 services:
 
+  postgres:
+    networks:
+      - backend
+    build:
+      context: ./database
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
   frontend:
     build:
       context: ./frontend
@@ -13,30 +29,34 @@ services:
       - "3000:3000"
 
     depends_on:
-      - backend
+      - posting
 
-  backend:
+  backend-django:
+    build:
+      context: ./backend-django
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
+    volumes:
+      - ./backend-django:/app
+
+  posting:
     networks:
       - backend
     build:
       context: ./posting
     ports:
-      - "8082:8082"
+      - "8085:8085"
     depends_on:
-      - db
+      - postgres
     volumes:
       - uploads_data:/app/uploads
-    env_file:
-      - .env
-
-  db:
-    networks:
-      - backend
-    build:
-      context: ./database
-    container_name: postgres
-    ports:
-      - "5432:5432"
     env_file:
       - .env
 
@@ -44,7 +64,7 @@ services:
   #   networks:
   #     - backend
   #   build:
-  #     context: ./mailing/mail-service
+  #     context: ./mail-service
   #     dockerfile: Dockerfile
   #   env_file:
   #     - .env
@@ -58,10 +78,12 @@ services:
   #     context: ./dailyfunctions
   #     dockerfile: Dockerfile
   #   depends_on:
-  #     - db
-  #     - email-service
+  #     postgres:
+  #       condition: service_healthy
+  #     email-service:
+  #       condition: service_started
   #   environment:
-  #     - EMAIL_SERVICE_URL=http://email-service:8088/sent-mail
+  #     - EMAIL_SERVICE_URL=http://email-service:8080/sent-mail
   #   env_file:
   #     - .env
 

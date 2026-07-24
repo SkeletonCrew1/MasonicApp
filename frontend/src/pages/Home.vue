@@ -42,7 +42,7 @@ const markersLayer = L.featureGroup();
 
 async function loadSightings(map) {
   try {
-    const response = await fetch('http://localhost:8082/sightings');
+    const response = await fetch('http://localhost:8085/sightings');
     if (!response.ok) throw new Error("Failed to fetch");
     const sightings = await response.json();
 
@@ -51,7 +51,7 @@ async function loadSightings(map) {
       popupContent.className = 'sighting-popup';
       popupContent.innerHTML = `
         <h3>${sighting.name}</h3>
-        ${sighting.picture ? `<img src="http://localhost:8082${sighting.picture}" class="popup-image" />` : ''}
+        ${sighting.picture ? `<img src="http://localhost:8085${sighting.picture}" class="popup-image" />` : ''}
         <button class="open-page-btn" data-id="${sighting.id}">Open Page</button>
       `;
 

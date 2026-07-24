@@ -12,7 +12,7 @@
         <h1 class="title">{{ sighting.name }}</h1>
         
         <div class="image-wrapper">
-          <img v-if="sighting.picture" :src="'http://localhost:8082' + sighting.picture" :alt="sighting.name" class="detail-image" />
+          <img v-if="sighting.picture" :src="'http://localhost:8085' + sighting.picture" :alt="sighting.name" class="detail-image" />
         </div>
 
         <div class="info-grid">
@@ -57,7 +57,7 @@ onMounted(async () => {
   const id = route.params.id;
 
   try {
-    const response = await fetch(`http://localhost:8082/sighting?id=${id}`);
+    const response = await fetch(`http://localhost:8085/sighting?id=${id}`);
     sighting.value = await response.json();
   } catch (err) {
     console.error("Failed to load details.", err);
