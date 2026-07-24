@@ -60,32 +60,32 @@ services:
     env_file:
       - .env
 
-  # email-service:
-  #   networks:
-  #     - backend
-  #   build:
-  #     context: ./mail-service
-  #     dockerfile: Dockerfile
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "8080:8080"
+  email-service:
+    networks:
+      - backend
+    build:
+      context: ./mail-service
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
 
-  # password-service:
-  #   networks:
-  #     - backend
-  #   build:
-  #     context: ./dailyfunctions
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     email-service:
-  #       condition: service_started
-  #   environment:
-  #     - EMAIL_SERVICE_URL=http://email-service:8080/sent-mail
-  #   env_file:
-  #     - .env
+  password-service:
+    networks:
+      - backend
+    build:
+      context: ./dailyfunctions
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      email-service:
+        condition: service_started
+    environment:
+      - EMAIL_SERVICE_URL=http://email-service:8080/sent-mail
+    env_file:
+      - .env
 
 volumes:
   uploads_data:
