@@ -75,7 +75,7 @@ async function doBroadcast() {
   try {
     const result = await sendBroadcast(broadcastMessage.value, selectedStatuses.value);
     broadcastMsg.value = `Sent to ${result.delivered_count}/${result.recipients_count}` +
-      (result.failed_emails.length ? ` (${result.failed_emails.length} failed)` : "");
+      (result.failed_count ? ` (${result.failed_count} failed)` : "");
     broadcastMessage.value = "";
   } catch (e) {
     broadcastMsg.value = "Error sending";

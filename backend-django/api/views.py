@@ -79,17 +79,13 @@ def broadcast(request):
         return JsonResponse({"error": "Message is required"}, status=400)
     if not statuses:
         return JsonResponse({"error": "At least one status must be selected"}, status=400)
-
-    recipients = (
+    emails = list(
         Profile.objects.filter(status__in=statuses)
         .exclude(email="")
         .values_list("email", flat=True)
     )
-    emails = list(recipients)
-    
     delivered = 0
-    failed = []
-    
+    failed = 0
     if emails:
         connection = get_connection()
         connection.open()
@@ -97,31 +93,40 @@ def broadcast(request):
             for email in emails:
                 try:
                     send_mail(
-                        subject="Cult of the Tree -- Broadcast",
+                        subject="Cult of the Tree — Broadcast",
                         message=message,
                         from_email=None,
                         recipient_list=[email],
                         fail_silently=False,
-                        connection=connection
+                        connection=connection,
                     )
                     delivered += 1
                 except Exception:
-                    failed.append(email)
+                    failed += 1
         finally:
             connection.close()
+    if not emails:
+        result_status = "failed"
+    elif failed == 0:
+        result_status = "sent"
+    elif delivered == 0:
+        result_status = "failed"
+    else:
+        result_status = "partial"
     record = Broadcast.objects.create(
         message=message,
-        statuses=statuses,
-        recipients_count=len(emails),
-        delivered_count=delivered,
-        failed_emails=failed,
-        sent_by=request.user if request.user.is_authenticated else None,
+        message_status=result_status,
+        sender=request.user if request.user.is_authenticated else None,
     )
-    return JsonResponse(record.to_dict(), status=201)
+    response = record.to_dict()
+    response["recipients_count"] = len(emails)
+    response["delivered_count"] = delivered
+    response["failed_count"] = failed
+    return JsonResponse(response, status=201)
 
 @golden_required
 @require_http_methods(["GET"])
-def broadcasr_history(request):
+def broadcasts_history(request):
     records = Broadcast.objects.all()[:50]
     return JsonResponse([r.to_dict() for r in records], safe=False)
 # ---------- Invite ----------
