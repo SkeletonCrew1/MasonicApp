@@ -22,7 +22,7 @@ services:
 
 
   main-flyway:
-    image: flyway/flyway:latest
+    image: flyway/flyway:13
     entrypoint: ["flyway", "-url=jdbc:${MAIN_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-validateMigrationNaming=true", "migrate"] 
     volumes:
       - ./db/migrations/main-db:/flyway/sql
@@ -59,7 +59,7 @@ services:
     env_file: .env
   
   map-flyway:
-    image: flyway/flyway:latest
+    image: flyway/flyway:13
     entrypoint: ["flyway", "-url=jdbc:${MAP_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-validateMigrationNaming=true", "migrate"] 
     volumes:
       - ./db/migrations/mysterymap-db:/flyway/sql
