@@ -1,9 +1,10 @@
 package models
 
 type User struct {
-	ID            int    `json:"id"`
-	Login         string `json:"login"`
-	Status        string `json:"status"`
-	Email         string `json:"email"`
-	Is_inquisitor bool   `json:"is_inquisitor"`
+	ID            int    `json:"UserId"`
+	Login         string `json:"UserDisplayName"`
+	Password      string `json:"UserPassword"`
+	Status        string `json:"UserStatus"`
+	Email         string `json:"UserEmail"`
+	Is_inquisitor bool   `json:"UserIsInquisitor"`
 }

@@ -9,24 +9,24 @@
       <div class="content-column">
         <button class="back-btn" @click="$router.push('/')">← Back to Map</button>
         
-        <h1 class="title">{{ sighting.name }}</h1>
+        <h1 class="title">{{ sighting.SightingName }}</h1>
         
         <div class="image-wrapper">
-          <img v-if="sighting.picture" :src="'http://localhost:8085' + sighting.picture" :alt="sighting.name" class="detail-image" />
+          <img v-if="sighting.SightingPicture" :src="'http://localhost:8085' + sighting.SightingPicture" :alt="sighting.SightingName" class="detail-image" />
         </div>
 
         <div class="info-grid">
           <div class="info-item">
             <span class="label">Description</span>
-            <span class="value">{{ sighting.description }}</span>
+            <span class="value">{{ sighting.SightingDescription }}</span>
           </div>
           <div class="info-item">
             <span class="label">Discovery Date</span>
-            <span class="value">{{ sighting.date }}</span>
+            <span class="value">{{ sighting.SightingDiscoveryDate }}</span>
           </div>
           <div class="info-item">
             <span class="label">Coordinates</span>
-            <span class="value">{{ sighting.latitude.toFixed(6) }}, {{ sighting.longitude.toFixed(6) }}</span>
+            <span class="value">{{ sighting.SightingLatitude.toFixed(6) }}, {{ sighting.SightingLongitude.toFixed(6) }}</span>
           </div>
         </div>
       </div>
@@ -78,14 +78,14 @@ onMounted(async () => {
     maxBoundsViscosity: 1.0,
     worldCopyJump: true,
     zoomControl: false
-  }).setView([sighting.value.latitude, sighting.value.longitude], 7);
+  }).setView([sighting.value.SightingLatitude, sighting.value.SightingLongitude], 7);
 
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
     attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
     noWrap: false
   }).addTo(map);
 
-  L.marker([sighting.value.latitude, sighting.value.longitude], { icon: customIcon })
+  L.marker([sighting.value.SightingLatitude, sighting.value.SightingLongitude], { icon: customIcon })
     .addTo(map);
 });
 </script>

@@ -21,6 +21,19 @@ services:
     env_file: .env
 
 
+  frontend:
+    build:
+      context: ./frontend
+
+    networks:
+      - frontend
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      - posting
+
   main-flyway:
     image: flyway/flyway:13
     entrypoint: ["flyway", "-url=jdbc:${MAIN_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-validateMigrationNaming=true", "migrate"] 
@@ -130,10 +143,10 @@ services:
       context: ./dailyfunctions
       dockerfile: Dockerfile
     depends_on:
-      main-db:
-        condition: service_healthy
-      map-db:
-        condition: service_healthy
+      main-flyway:
+        condition: service_completed_successfully
+      map-flyway:
+        condition: service_completed_successfully
       email-service:
         condition: service_started
     environment:

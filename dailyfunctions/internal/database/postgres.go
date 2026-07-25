@@ -13,31 +13,32 @@ import (
 func Connect() (*sql.DB, error) {
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASSWORD")
-	name := os.Getenv("USERS_DB_NAME")
+	user := os.Getenv("POSTGRES_USER")
+	pass := os.Getenv("POSTGRES_PASSWORD")
+	name := os.Getenv("MAIN_DB_NAME")
 
 	conn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, pass, name,
 	)
 
-	var db *sql.DB
-	var err error
+	db, err := sql.Open("postgres", conn)
+	if err != nil {
+		return nil, fmt.Errorf("error opening database: %v", err)
+	}
 
-	// Retry loop to handle the race condition on startup
-	for i := 0; i < 15; i++ {
-		db, err = sql.Open("postgres", conn)
+	maxRetries := 15
+	for i := 1; i <= maxRetries; i++ {
+		err = db.Ping()
 		if err == nil {
-			err = db.Ping()
-			if err == nil {
-				return db, nil
-			}
+			log.Println("Successfully connected to the database!")
+			return db, nil
 		}
 
-		log.Printf("Database not ready yet, retrying in 2 seconds... (%v)", err)
+		log.Printf("Database not ready yet, retrying in 2 seconds... (%v) (attempt %d/%d)", err, i, maxRetries)
 		time.Sleep(2 * time.Second)
 	}
 
+	db.Close()
 	return nil, fmt.Errorf("could not connect to database after multiple retries: %v", err)
 }
