@@ -17,7 +17,9 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
           aws-region: us-east-1
-          role-to-assume: ${{ secrets.ECR_IAM_ROLE }}
+          role-to-assume: arn:aws:iam::914337380547:role/GitHubActionsRoleECR
       - name: Test list repositories
-        run: aws sts get-caller-identity
+        run: |
+          aws sts get-caller-identity
+          aws ecr describe-repositories --output table
           
