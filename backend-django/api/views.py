@@ -11,41 +11,21 @@ def _body(request):
         return json.loads(request.body)
     except json.JSONDecodeError:
         return {}
+    
 
-# ---------- Users / Profiles ----------
-@require_http_methods(["GET"])
-def users_search(request):
-    query = request.GET.get("q", "").strip()
-    if not query:
-        return JsonResponse([], safe=False)
-    profiles = Profile.objects.filter(username__icontains=query)[:20]
-    return JsonResponse([p.to_dict() for p in profiles], safe=False)
-
-@csrf_exempt
-@require_http_methods(["POST"])
-def user_promote(request, user_id):
-    data = _body(request)
-    new_status = data.get("status")
-    if new_status not in ("bronze", "silver", "golden"):
-        return JsonResponse({"error": "Invalid status"}, status=400)
-    try:
-        profile = Profile.objects.get(id=user_id)
-    except Profile.DoesNotExist:
-        return JsonResponse({"error": "User not found"}, status=404)
-    profile.status = new_status
-    profile.save(update_fields=["status"])
-    return JsonResponse(profile.to_dict())
 # ---------- Broadcast ----------
 @csrf_exempt
 @require_http_methods(["POST"])
 def broadcast(request):
     data = _body(request)
-    message = (data.get("message") or "").strip()
+    message = (data.get("message") or "").strip() # do we need .strip() ?
     statuses = data.get("statuses") or []
     if not message:
         return JsonResponse({"error": "Message is required"}, status=400)
     recipients_count = Profile.objects.filter(status__in=statuses).count()
     return JsonResponse({"sent": True, "recipients": recipients_count})
+
+
 # ---------- Invite ----------
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -56,6 +36,8 @@ def invite(request):
         return JsonResponse({"error": "Email is required"}, status=400)
     Invite.objects.create(email=email)
     return JsonResponse({"sent": True, "email": email})
+
+
 # ---------- Ban ----------
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -71,9 +53,36 @@ def ban_ip(request):
 def bans_list(request):
     bans = BannedIP.objects.all()
     return JsonResponse([b.to_dict() for b in bans], safe=False)
+
+
 # ---------- Delete all ----------
 @csrf_exempt
 @require_http_methods(["POST"])
 def delete_all(request):
-    Post.objects.all().delete()
+    Profile.objects.all().delete()
     return JsonResponse({"deleted": True})
+
+
+# promotion feature 
+@csrf_exempt
+def user_promotion(request):
+
+  #  data = json.loads(request.body)
+   # uid = data.get("id")
+    data = _body(request)
+    uid = data.get("id")
+
+    try:
+        user = Profile.objects.get(uid)
+    except Profile.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)
+
+    if user.status == "bronze":
+        user.status = "silver"
+    elif user.status == "silver":
+        user.status = "gold"
+    else:
+        return JsonResponse({"message": "User already with gold status"}, status=200)
+    
+    user.save()
+    return JsonResponse({"message": f"User {user.username} promoted to {user.status}"}, status=200)

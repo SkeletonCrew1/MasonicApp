@@ -1,33 +1,47 @@
-version: "3.9"
-
 services:
-
-  postgres:
-    networks:
-      - backend
-    build:
-      context: ./database
-    container_name: postgres
+  main-db:
+    image: postgres:18
+    container_name: main-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${MAIN_DB_NAME}
     ports:
       - "5432:5432"
-    env_file:
-      - .env
+    networks:
+      - backend 
+    volumes:
+      - main_data_sql:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
-      interval: 10s
-      timeout: 10s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
       retries: 5
+    env_file: .env
+  main-flyway:
+    image: flyway/flyway:latest
+    entrypoint: ["flyway", "-url=jdbc:${MAIN_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-validateMigrationNaming=true", "migrate"] 
+    volumes:
+      - ./db/migrations/main-db:/flyway/sql
+    depends_on:
+      main-db:
+        condition: service_healthy
+    networks:
+      - backend
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${MAIN_DB_NAME}
+      DATABASE_URL: ${MAIN_DATABASE_URL}
+    env_file: .env 
 
   frontend:
     build:
       context: ./frontend
-
     networks:
       - frontend
-
     ports:
       - "3000:3000"
-
     depends_on:
       - posting
 
@@ -35,7 +49,7 @@ services:
     build:
       context: ./backend-django
     depends_on:
-      postgres:
+      main-db:
         condition: service_healthy
     env_file:
       - .env
@@ -54,7 +68,7 @@ services:
     ports:
       - "8085:8085"
     depends_on:
-      - postgres
+      - main-db
     volumes:
       - uploads_data:/app/uploads
     env_file:
@@ -70,6 +84,9 @@ services:
       - .env
     ports:
       - "8080:8080"
+    depends_on:
+      - main-db
+
 
   password-service:
     networks:
@@ -78,7 +95,7 @@ services:
       context: ./dailyfunctions
       dockerfile: Dockerfile
     depends_on:
-      postgres:
+      main-db:
         condition: service_healthy
       email-service:
         condition: service_started
@@ -89,7 +106,7 @@ services:
 
 volumes:
   uploads_data:
-  data_sql:
+  main_data_sql:
 
 networks:
   backend:
