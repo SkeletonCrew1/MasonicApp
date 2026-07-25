@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS users
+(
+    id SERIAL PRIMARY KEY,
+    login TEXT NOT NULL UNIQUE,
+    status TEXT NOT NULL,
+    email TEXT NOT NULL,
+    is_inquisitor BOOL NOT NULL DEFAULT FALSE
+);

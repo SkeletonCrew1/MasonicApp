@@ -1,0 +1,132 @@
+.page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+
+#map {
+  flex-grow: 1;
+  width: 100%;
+}
+
+.navbar {
+    height: 60px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fcfbf5;
+    padding: 0 20px;
+  }
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+
+    list-style: none;
+
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    color: #2D2E2F;
+    text-decoration: none;
+}
+
+.nav-links a:hover {
+    color: #2D2E2F;
+}
+
+.add-sighting-button {
+    position: fixed;
+
+    bottom: 30px;
+    right: 30px;
+
+    padding: 14px 24px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #fcfbf5;
+    color: #2D2E2F ;
+
+    font-size: 16px;
+    cursor: pointer;
+
+    z-index: 1000;
+}
+
+.add-sighting-button:hover {
+    background: #2D2E2F ;
+    color: #fcfbf5;
+}
+
+.coordinates {
+    position: fixed;
+
+    top: 90px;
+    left: 20px;
+
+    padding: 12px 18px;
+
+    background: #2D2E2F;
+    color: #fcfbf5;
+
+    border-radius: 8px;
+
+    z-index: 1000;
+}
+
+.sighting-popup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 150px;
+    color: #2D2E2F;
+  }
+  
+.sighting-popup h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.1rem;
+}
+
+.popup-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  border: 1px solid #2D2E2F;
+}
+
+.open-page-btn {
+  background-color: #fcfbf5;
+  color: #2D2E2F;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.open-page-btn:hover {
+  background-color: #bab9b6;
+}
+
+.custom-marker {
+  background-color: #bab9b6;
+  border: 2px solid #2D2E2F;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}

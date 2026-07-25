@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
 
   main-db:
@@ -85,9 +87,6 @@ services:
         condition: service_healthy
     env_file:
       - .env
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
     ports:
       - "8000:8000"
     networks:
@@ -98,17 +97,47 @@ services:
     command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     
 
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - "5173:5173"
+  posting:
     networks:
-      - frontend
+      - backend
+    build:
+      context: ./posting
+    ports:
+      - "8085:8085"
+    depends_on:
+      map-db:
+        condition: service_healthy
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    command: npm run dev -- --host 0.0.0.0
+      - uploads_data:/app/uploads
+    env_file:
+      - .env
+
+  email-service:
+    networks:
+      - backend
+    build:
+      context: ./mail-service
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+
+  password-service:
+    networks:
+      - backend
+    build:
+      context: ./dailyfunctions
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      email-service:
+        condition: service_started
+    environment:
+      - EMAIL_SERVICE_URL=http://email-service:8080/sent-mail
+    env_file:
+      - .env
 
 
 networks:
@@ -121,5 +150,5 @@ networks:
 
 volumes:
   main_data_sql:
-
+  uploads_data:
   map_data_sql:
