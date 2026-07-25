@@ -42,7 +42,7 @@ func AddSighting(db *sql.DB) http.HandlerFunc {
 		}
 
 		_, err := db.Exec(`
-			INSERT INTO sightings (name, latitude, longitude, discovery_date, picture, description)
+			INSERT INTO sightings (SightingName, SightingLatitude, SightingLongitude, SightingDiscoveryDate, SightingPicture, SightingDescription)
 			VALUES($1, $2, $3, $4, $5, $6)
 		`, sighting.Name, sighting.Latitude, sighting.Longitude, sighting.Date, sighting.Picture, sighting.Description)
 
@@ -56,7 +56,7 @@ func AddSighting(db *sql.DB) http.HandlerFunc {
 
 func GetSightings(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		rows, err := db.Query("SELECT id, name, latitude, longitude, discovery_date, picture, description FROM sightings")
+		rows, err := db.Query("SELECT SightingId, SightingName, SightingLatitude, SightingLongitude, SightingDiscoveryDate, SightingPicture, SightingDescription FROM Sightings")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -81,7 +81,7 @@ func GetSightingByID(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := r.URL.Query().Get("id")
 		var s models.Sighting
-		err := db.QueryRow("SELECT id, name, latitude, longitude, discovery_date, picture, description FROM sightings WHERE id = $1", id).
+		err := db.QueryRow("SELECT SightingId, SightingName, SightingLatitude, SightingLongitude, SightingDiscoveryDate, SightingPicture, SightingDescription FROM Sightings WHERE SightingId = $1", id).
 			Scan(&s.ID, &s.Name, &s.Latitude, &s.Longitude, &s.Date, &s.Picture, &s.Description)
 
 		if err != nil {

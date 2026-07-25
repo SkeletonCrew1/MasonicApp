@@ -134,12 +134,12 @@ async function submit() {
   }
 
   const sighting = {
-    latitude: Number(latitude.value),
-    longitude: Number(longitude.value),
-    name: name.value,
-    date: date.value,
-    picture: picture,
-    description: description.value
+    SightingLatitude: Number(latitude.value),
+    SightingLongitude: Number(longitude.value),
+    SightingName: name.value,
+    SightingDiscoveryDate: date.value,
+    SightingPicture: picture,
+    SightingDescription: description.value
   };
 
   try {

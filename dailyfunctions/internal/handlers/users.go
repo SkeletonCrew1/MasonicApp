@@ -6,7 +6,7 @@ import (
 )
 
 func GetAllUsers(db *sql.DB) ([]models.User, error) {
-	rows, err := db.Query("SELECT login, status, email FROM users")
+	rows, err := db.Query(`SELECT UserId, UserDisplayName, UserPassword, UserStatus, UserEmail, UserIsInquisitor FROM "users"`)
 	if err != nil {
 		return nil, err
 	}
@@ -15,7 +15,7 @@ func GetAllUsers(db *sql.DB) ([]models.User, error) {
 	var users []models.User
 	for rows.Next() {
 		var u models.User
-		if err := rows.Scan(&u.Login, &u.Status, &u.Email); err != nil {
+		if err := rows.Scan(&u.ID, &u.Login, &u.Password, &u.Status, &u.Email, &u.Is_inquisitor); err != nil {
 			return nil, err
 		}
 		users = append(users, u)
@@ -24,7 +24,7 @@ func GetAllUsers(db *sql.DB) ([]models.User, error) {
 }
 
 func GetFilteredUsers(db *sql.DB) ([]models.User, error) {
-	rows, err := db.Query("SELECT login, status, email FROM users WHERE status IN ('golden', 'silver')")
+	rows, err := db.Query(`SELECT UserId, UserDisplayName, UserPassword, UserStatus, UserEmail, UserIsInquisitor FROM "users" WHERE UserStatus IN ('golden', 'silver')`)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func GetFilteredUsers(db *sql.DB) ([]models.User, error) {
 	var users []models.User
 	for rows.Next() {
 		var u models.User
-		if err := rows.Scan(&u.Login, &u.Status, &u.Email); err != nil {
+		if err := rows.Scan(&u.ID, &u.Login, &u.Password, &u.Status, &u.Email, &u.Is_inquisitor); err != nil {
 			return nil, err
 		}
 		users = append(users, u)
@@ -42,11 +42,11 @@ func GetFilteredUsers(db *sql.DB) ([]models.User, error) {
 }
 
 func ResetInquisitors(db *sql.DB) error {
-	_, err := db.Exec("UPDATE users SET is_inquisitor = false")
+	_, err := db.Exec(`UPDATE "users" SET UserIsInquisitor = false`)
 	return err
 }
 
 func SetUserAsInquisitor(db *sql.DB, login string) error {
-	_, err := db.Exec("UPDATE users SET is_inquisitor = true WHERE login = $1", login)
+	_, err := db.Exec(`UPDATE "users" SET UserIsInquisitor = true WHERE UserDisplayName = $1`, login)
 	return err
 }

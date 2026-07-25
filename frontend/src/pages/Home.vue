@@ -50,9 +50,9 @@ async function loadSightings(map) {
       const popupContent = document.createElement('div');
       popupContent.className = 'sighting-popup';
       popupContent.innerHTML = `
-        <h3>${sighting.name}</h3>
-        ${sighting.picture ? `<img src="http://localhost:8085${sighting.picture}" class="popup-image" />` : ''}
-        <button class="open-page-btn" data-id="${sighting.id}">Open Page</button>
+        <h3>${sighting.SightingName}</h3>
+        ${sighting.SightingPicture ? `<img src="http://localhost:8085${sighting.SightingPicture}" class="popup-image" />` : ''}
+        <button class="open-page-btn" data-id="${sighting.SightingId}">Open Page</button>
       `;
 
       popupContent.querySelector('.open-page-btn').addEventListener('click', (e) => {
@@ -60,7 +60,7 @@ async function loadSightings(map) {
         router.push(`/sighting/${id}`);
       });
 
-      L.marker([sighting.latitude, sighting.longitude], { icon: customIcon })
+      L.marker([sighting.SightingLatitude, sighting.SightingLongitude], { icon: customIcon })
         .addTo(map) 
         .bindPopup(popupContent);
     });
