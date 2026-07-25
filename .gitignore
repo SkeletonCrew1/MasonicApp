@@ -21,6 +21,7 @@ frontend/.vite/
 .env
 .env.*
 !.env.example
+config.env
 
 # IDE / OS
 .vscode/
