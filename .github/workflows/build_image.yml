@@ -55,5 +55,10 @@ jobs:
           ECR_REPO: ${{ matrix.service }}
           TAG: ${{ github.sha }}
         run: |
-          echo $ECR_REGISTRY/$ECR_REPO:$TAG
-          
+          cd ${{ matrix.service }}
+          docker build \
+            -t $ECR_REGISTRY/$ECR_REPO:$TAG \
+            -t $ECR_REGISTRY/$ECR_REPO:latest .
+
+          docker push $ECR_REGISTRY/$ECR_REPO:$TAG
+          docker push $ECR_REGISTRY/$ECR_REPO:latest
