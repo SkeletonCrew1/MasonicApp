@@ -19,6 +19,5 @@ jobs:
           aws-region: us-east-1
           role-to-assume: ${{ secrets.ECR_IAM_ROLE }}
       - name: Test list repositories
-        run: |
-          echo "List all repositories"
-          aws ecr describe-repositories --output table
+        run: aws sts get-caller-identity
+          
