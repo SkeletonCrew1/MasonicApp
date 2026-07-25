@@ -5,10 +5,6 @@ STATUS_CHOICES = [
     ("silver", "Silver"),
     ("golden", "Golden"),
 ]
-POST_STATUS_CHOICES = [
-    ("pending", "Pending"),
-    ("approved", "Approved"),
-]
 class Profile(models.Model):
 
     id = models.BigAutoField(primary_key=True)
@@ -24,30 +20,6 @@ class Profile(models.Model):
             "username": self.username,
             "status": self.status,
             "is_banned": self.is_banned,
-        }
-class Post(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    title = models.CharField(max_length=200)
-    image_url = models.URLField(blank=True, default="")
-    description = models.TextField(blank=True, default="")
-    latitude = models.FloatField()
-    longitude = models.FloatField()
-    status = models.CharField(max_length=10, choices=POST_STATUS_CHOICES, default="pending")
-    created_at = models.DateTimeField(auto_now_add=True)
-    class Meta:
-        ordering = ["-created_at"]
-    def __str__(self):
-        return self.title
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "title": self.title,
-            "image_url": self.image_url,
-            "description": self.description,
-            "latitude": self.latitude,
-            "longitude": self.longitude,
-            "status": self.status,
-            "created_at": self.created_at.isoformat(),
         }
 class BannedIP(models.Model):
     ip_address = models.GenericIPAddressField(unique=True)

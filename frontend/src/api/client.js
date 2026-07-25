@@ -10,15 +10,6 @@ async function request(path, options = {}) {
     }
     return res.json();
 }
-export function fetchPosts() {
-    return request("/posts/");
-}
-export function createPost(data) {
-    return request("/posts/", { method: "POST", body: JSON.stringify(data) });
-}
-export function approvePost(postId) {
-    return request(`/posts/${postId}/approve/`, { method: "PATCH" });
-}
 export function searchUsers(query) {
     return request(`/users/search/?q=${encodeURIComponent(query)}`);
 }
