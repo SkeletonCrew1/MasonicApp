@@ -1,7 +1,7 @@
 name: Build and Push Docker image to ECR
 
 on:
-  [workflow_dispatch]
+  workflow_dispatch:
 
 permissions:
   id-token: write
