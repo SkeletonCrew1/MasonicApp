@@ -1,15 +1,15 @@
 CREATE TABLE IF NOT EXISTS sightings
 (
-    id SERIAL PRIMARY KEY,
+    SightingId SERIAL PRIMARY KEY,
 
-    name TEXT NOT NULL,
+    SightingName TEXT NOT NULL,
 
-    latitude DOUBLE PRECISION NOT NULL,
-    longitude DOUBLE PRECISION NOT NULL,
+    SightingLatitude DOUBLE PRECISION NOT NULL,
+    SightingLongitude DOUBLE PRECISION NOT NULL,
 
-    discovery_date DATE NOT NULL,
+    SightingDiscoveryDate DATE NOT NULL,
 
-    picture TEXT NOT NULL,
+    SightingPicture TEXT NOT NULL,
 
-    description TEXT NOT NULL
+    SightingDescription TEXT NOT NULL
 );
