@@ -105,6 +105,8 @@ services:
     ports:
       - "8085:8085"
     depends_on:
+      main-db:
+        condition: service_healthy
       map-db:
         condition: service_healthy
     volumes:
@@ -130,7 +132,9 @@ services:
       context: ./dailyfunctions
       dockerfile: Dockerfile
     depends_on:
-      postgres:
+      main-db:
+        condition: service_healthy
+      map-db:
         condition: service_healthy
       email-service:
         condition: service_started
