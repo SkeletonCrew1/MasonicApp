@@ -1,6 +1,9 @@
 name: Build and Push Docker image to ECR
 
 on:
+  push:
+   branches:
+   - main
   workflow_dispatch:
 
 permissions:
@@ -8,23 +11,49 @@ permissions:
   contents: read
 
 jobs:
-  push_image:
+  build_and_push_image:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+         - posting
+         - mail-service
+         - backend-django
+         - frontend
+         - dailyfunctions
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changes in ${{ matrix.service }}
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            src: 
+              - '${{ matrix.service }}/**'
 
       - name: Configure AWS Credentials
+        if: steps.changes.output.src == 'true' || github.event_name == 'workflow_dispatch'
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
           role-to-assume: ${{ secrets.ECR_IAM_ROLE }}
           aws-region: us-east-1
 
       - name: Login to Amazon ECR
+        if: steps.changes.output.src == 'true' || github.event_name == 'workflow_dispatch'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Test list repositories
+      - name: Build image and push ${{ matrix.service }} to ECR
+        if: steps.changes.output.src == 'true' || github.event_name == 'workflow_dispatch'
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPO: ${{ matrix.service }}
+          TAG: ${{ github.sha }}
         run: |
-          aws ecr describe-repositories --output table
+          echo $ECR_REGISTRY/$ECR_REPO:$TAG
           
