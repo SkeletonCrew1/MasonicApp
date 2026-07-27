@@ -2,7 +2,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from .models import BannedIP, Invite, Profile
+from .models import BannedIP, Invite, Profile, User, BroadcastHistory
 
 def _body(request):
     if not request.body:
@@ -41,7 +41,7 @@ def user_promote(request, user_id):
     profile.status = new_status
     profile.save(update_fields=["status"])
     return JsonResponse(profile.to_dict())
-# ---------- Broadcast ----------
+# ---------- Broadcast && History ----------
 @csrf_exempt
 @require_http_methods(["POST"])
 def broadcast(request):
@@ -49,13 +49,24 @@ def broadcast(request):
     message = (data.get("message") or "").strip()
     statuses = data.get("statuses") or []
     if not message:
-        return JsonResponse({"error": "Please select at least one status"}, status=400)
+        return JsonResponse({"error": "Message is required"}, status=400)
     if not statuses:
-            return JsonResponse({"error": "Message is required"}, status=400)
-    recipients_count = Profile.objects.filter(status__in=statuses).count()
+            return JsonResponse({"error": "Please select at least one status"}, status=400)
+    recipients_count = User.objects.filter(status__in=statuses).count()
     if recipients_count == 0:
         return JsonResponse({"error": "No users found for selected statuses"}, status=404)
+    for s in statuses:
+        BroadcastHistory.objects.create(message=message, status_target=s)
     return JsonResponse({"sent": True, "recipients": recipients_count})
+
+@require_http_methods(["GET"])
+def broadcast_history(request):
+    status_filter = request.GET.get("status", "").strip()
+    history = BroadcastHistory.objects.all()
+    if status_filter:
+        history = history.filter(status_target=status_filter)
+    history = history.order_by("-created_at")[:50]
+    return JsonResponse([h.to_dict() for h in history], safe=False)
 # ---------- Invite ----------
 @csrf_exempt
 @require_http_methods(["POST"])

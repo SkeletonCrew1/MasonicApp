@@ -22,11 +22,22 @@
                         <p v-if="broadcastMsg" class="feedback">{{ broadcastMsg }}</p>
                     </div>
                     <div class="box">
-                        <div class="box-header">Ban agent <span>G</span></div>
-                        <input v-model="banUserId" type="number" placeholder="User ID (required)" style="margin-bottom: 5px;" />
-                        <input v-model="banIpAddress" type="text" placeholder="IP Address (optional)" />
-                        <button class="action-btn right-align" :disabled="!banUserId" @click="doBan">BAN</button>
-                        <p v-if="banMsg" class="feedback">{{ banMsg }}</p>
+                        <div class="box-header">Broadcast History</div>
+                        <div class="status-tabs" style="display: flex; gap: 5px; margin-bottom: 8px;">
+                            <button v-for="s in statuses" :key="s" 
+                                    :class="{ 'active-tab': activeHistoryTab === s }" 
+                                    @click="loadHistory(s)"
+                                    style="flex: 1; padding: 4px; cursor: pointer;">
+                                {{ s }}
+                            </button>
+                        </div>
+                        <ul class="history-list" v-if="historyItems.length" style="max-height: 120px; overflow-y: auto; padding-left: 15px; font-size: 12px;">
+                            <li v-for="item in historyItems" :key="item.id" style="margin-bottom: 4px;">
+                                <span style="color: #888;">{{ new Date(item.created_at).toLocaleTimeString() }}</span>: 
+                                {{ item.message }}
+                            </li>
+                        </ul>
+                        <p v-else class="empty-history" style="font-size: 12px; color: #888;">No history for {{ activeHistoryTab }}</p>
                     </div>
                 </div>
                 <div class="col center-col">
@@ -64,13 +75,23 @@
 
 <script setup>
 import { ref } from "vue";
-import { deleteAllData, inviteUser, promoteUser, searchUsers, sendBroadcast, banIp } from "../api/client";
+import { deleteAllData, inviteUser, promoteUser, searchUsers, sendBroadcast, banIp, getBroadcastHistory } from "../api/client";
 const emit = defineEmits(["close"]);
 const statuses = ["bronze", "silver", "golden"];
 const broadcastMessage = ref("");
 const selectedStatuses = ref([...statuses]);
 const sendingBroadcast = ref(false);
 const broadcastMsg = ref("");
+const activeHistoryTab = ref("bronze");
+const historyItems = ref([]);
+async function loadHistory(status) {
+    activeHistoryTab.value = status;
+    try {
+        historyItems.value = await getBroadcastHistory(status);
+    } catch (e) {
+        historyItems.value = [];
+    }
+}
 async function doBroadcast() {
     if (!broadcastMessage.value.trim()) return;
     sendingBroadcast.value = true;
@@ -78,6 +99,7 @@ async function doBroadcast() {
         const data = await sendBroadcast(broadcastMessage.value, selectedStatuses.value);
         broadcastMsg.value = `Broadcast sent to ${data.recipients} users`; 
         broadcastMessage.value = "";
+        loadHistory(activeHistoryTab.value);
     } catch (e) { 
         broadcastMsg.value = e.message || "Error sending broadcast"; 
     }
@@ -85,6 +107,7 @@ async function doBroadcast() {
         sendingBroadcast.value = false; 
     }
 }
+loadHistory("bronze");
 const banUserId = ref("");
 const banIpAddress = ref("");
 const banMsg = ref("");
@@ -128,4 +151,9 @@ async function doDeleteAll() {
 
 <style scoped>
 @import "../styles/GoldMasonPanel.css";
+.active-tab {
+    background-color: #333;
+    color: #fff;
+    font-weight: bold;
+}
 </style>

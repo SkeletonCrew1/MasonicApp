@@ -48,3 +48,17 @@ class Invite(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.email
+    
+class BroadcastHistory(models.Model):
+    message = models.TextField()
+    status_target = models.CharField(max_length=20)  
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        db_table = "broadcast_history"
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "message": self.message,
+            "status": self.status_target,
+            "created_at": self.created_at.isoformat()
+        }

@@ -50,3 +50,7 @@ export function listBans() {
 export function deleteAllData() {
     return request("/delete-all/", { method: "POST" });
 }
+
+export function getBroadcastHistory(status) {
+    return request((`/broadcast/history/?status=${encodeURIComponent(status)}(`);
+}
