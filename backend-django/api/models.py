@@ -6,12 +6,14 @@ STATUS_CHOICES = [
     ("golden", "Golden"),
 ]
 class Profile(models.Model):
-
-    id = models.BigAutoField(primary_key=True)
-    username = models.CharField(max_length=150, unique=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="bronze")
-    is_banned = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    id = models.BigAutoField(primary_key=True, db_column="userid")
+    username = models.CharField(max_length=150, unique=True, db_column="userdisplayname")
+    password = models.TextField(db_column="userpassword", default="")
+    status = models.CharField(max_length=40, choices=STATUS_CHOICES, default="bronze", db_column="userstatus")
+    email = models.EmailField(db_column="useremail", default="")
+    is_inquisitor = models.BooleanField(default=False, db_column="userisinquisitor")
+    class Meta:
+        db_table = "users"
     def __str__(self):
         return self.username
     def to_dict(self):
@@ -19,15 +21,28 @@ class Profile(models.Model):
             "id": self.id,
             "username": self.username,
             "status": self.status,
-            "is_banned": self.is_banned,
+            "email": self.email,
+            "is_inquizitor": self.is_inquisitor
         }
 class BannedIP(models.Model):
-    ip_address = models.GenericIPAddressField(unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.OneToOneField(
+        Profile,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        db_column='userid'
+    )
+    banned_ip = models.CharField(max_length=40, db_column="bannedip")
+    class Meta: 
+        db_table = "bannedips"
+        
     def __str__(self):
-        return self.ip_address
+        return f" User ID {self.user_id} -> IP {self.banned_ip}"
+    
     def to_dict(self):
-        return {"ip": self.ip_address}
+        return {
+            "user_id": self.user.id,
+            "ip": self.banned_ip
+        }
 class Invite(models.Model):
     email = models.EmailField()
     created_at = models.DateTimeField(auto_now_add=True)

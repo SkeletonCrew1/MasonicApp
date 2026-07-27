@@ -11,6 +11,12 @@ def _body(request):
         return json.loads(request.body)
     except json.JSONDecodeError:
         return {}
+    
+def get_client_ip(request):
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        return x_forwarded_for.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR", "")
 
 # ---------- Users / Profiles ----------
 @require_http_methods(["GET"])
@@ -61,19 +67,35 @@ def invite(request):
 @require_http_methods(["POST"])
 def ban_ip(request):
     data = _body(request)
-    ip = (data.get("ip") or "").strip()
+    user_id = data.get("user_id")
+    ip = (data.get("ip") or get_client_ip(request)).strip()
+    if not user_id:
+            return JsonResponse({"error": "user_id is required"}, status=400)
     if not ip:
         return JsonResponse({"error": "IP is required"}, status=400)
-    BannedIP.objects.get_or_create(ip_address=ip)
-    return JsonResponse({"ip": ip, "banned": True})
+    try:
+        profile = Profile.objects.get(id=user_id)
+    except Profile.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)
+    banned_ip_obj, created = BannedIP.objects.update_or_create(
+        user=profile,
+        defaults={"banned_ip": ip}
+    )
+    
+    return JsonResponse({
+        "user_id": profile.id,
+        "ip": banned_ip_obj.banned_ip,
+        "banned": True,
+        "is_new_ban": created
+    })
 
 @require_http_methods(["GET"])
 def bans_list(request):
-    bans = BannedIP.objects.all()
+    bans = BannedIP.objects.select_related('user').all()
     return JsonResponse([b.to_dict() for b in bans], safe=False)
 # ---------- Delete all ----------
 @csrf_exempt
 @require_http_methods(["POST"])
 def delete_all(request):
-    Post.objects.all().delete()
+    BannedIP.objects.all().delete()
     return JsonResponse({"deleted": True})
