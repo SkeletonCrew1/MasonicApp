@@ -1,2 +1,29 @@
-main
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# Django
+*.log
+db.sqlite3
+media/
+staticfiles/
+
+# Node
+node_modules/
+dist/
+frontend/.vite/
+
+# Env / secrets
 .env
+.env.*
+!.env.example
+config.env
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
