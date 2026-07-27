@@ -48,7 +48,7 @@ func GetValue(db *sql.DB, column string, email string) string {
 }
 
 func UserExists(db *sql.DB, username string) bool {
-	sqlStmt := `SELECT UserFakename FROM users WHERE UserFakename = $1`
+	sqlStmt := `SELECT UserDisplayName FROM users WHERE UserDisplayName = $1`
 	err := db.QueryRow(sqlStmt, username).Scan(&username)
 	if err != nil {
 		if err != sql.ErrNoRows {

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	_ "runtime/trace"
+	"time"
 
 	_ "github.com/golang-jwt/jwt/v5"
 
@@ -50,6 +51,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 	user_fake_name := fake_name_list[random_num]
 	user_rank := "bronze"
 	user_email := r.FormValue("user_email")
+	user_is_inqusitor := false
 	//user_secret_key=r.FormValue("user_secret_key")
 
 	if len(user_password) < 8 {
@@ -66,7 +68,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 
 	hashedPassword, _ := hashPassword(user_password)
 
-	connStr := os.Getenv("DATABASE_URL")
+	connStr := os.Getenv("AUTH_URL")
 
 	db, err := sql.Open("postgres", connStr)
 
@@ -103,10 +105,10 @@ func register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	query := `
-		INSERT INTO users (UserFakename,UserPassword,UserStatus,UserEmail)
-		VALUES ($1, $2, $3, $4);
+		INSERT INTO users (UserDisplayName,UserPassword,UserStatus,UserEmail,UserIsInquisitor)
+		VALUES ($1, $2, $3, $4, $5);
 	`
-	_, err = db.Exec(query, user_fake_name, hashedPassword, user_rank, user_email)
+	_, err = db.Exec(query, user_fake_name, hashedPassword, user_rank, user_email, user_is_inqusitor)
 	if err != nil {
 		panic(err)
 	}
@@ -124,7 +126,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-type", "application")
 
-	connStr := os.Getenv("DATABASE_URL")
+	connStr := os.Getenv("AUTH_URL")
 
 	var secretKey = []byte(os.Getenv("SECRET_KEY"))
 
@@ -137,7 +139,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	user_email := r.FormValue("user_email")
 	hashedPassword, _ := hashPassword(user_password)
 	email_exist := EmailExists(db, user_email)
-	user_fake_name := GetValue(db, "UserFakename", user_email)
+	user_fake_name := GetValue(db, "UserDisplayName", user_email)
 	user_status := GetValue(db, "UserStatus", user_email)
 	if email_exist != true {
 		er := http.StatusMethodNotAllowed
@@ -159,13 +161,22 @@ func login(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "%s", err)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
 
 	defer db.Close()
+	http.SetCookie(w, &http.Cookie{
+		Name:     "JWT",
+		Value:    tokenString,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HttpOnly: true,
+	})
 
+	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "Login successfull")
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {}
 
-func protected(w http.ResponseWriter, r *http.Request) {}
+func protected(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Contnet-type", "application/json")
+
+}

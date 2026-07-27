@@ -85,6 +85,21 @@ services:
       DATABASE_URL: ${MAP_DATABASE_URL}
     env_file: .env
   
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    depends_on:
+      main-db:
+        condition: service_healthy
+      main-flyway:
+        condition: service_completed_successfully
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    env_file: .env
   backend-django:
     build:
       context: ./backend-django
