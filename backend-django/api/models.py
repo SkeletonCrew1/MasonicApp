@@ -1,6 +1,9 @@
 from django.db import models
 
-STATUS_CHOICES = [
+
+class User(models.Model):
+
+    status_choices = [
     ("bronze", "Bronze"),
     ("silver", "Silver"),
     ("golden", "Golden"),
@@ -14,8 +17,10 @@ class Profile(models.Model):
     is_inquisitor = models.BooleanField(default=False, db_column="userisinquisitor")
     class Meta:
         db_table = "users"
+
     def __str__(self):
         return self.username
+    
     def to_dict(self):
         return {
             "id": self.id,
@@ -24,6 +29,7 @@ class Profile(models.Model):
             "email": self.email,
             "is_inquizitor": self.is_inquisitor
         }
+
 class BannedIP(models.Model):
     user = models.OneToOneField(
         Profile,
@@ -43,6 +49,7 @@ class BannedIP(models.Model):
             "user_id": self.user.id,
             "ip": self.banned_ip
         }
+
 class Invite(models.Model):
     email = models.EmailField()
     created_at = models.DateTimeField(auto_now_add=True)

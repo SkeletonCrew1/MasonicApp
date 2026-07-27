@@ -24,13 +24,10 @@ services:
   frontend:
     build:
       context: ./frontend
-
     networks:
       - frontend
-
     ports:
       - "3000:3000"
-
     depends_on:
       - posting
 
@@ -96,6 +93,10 @@ services:
         condition: service_healthy
       map-db:
         condition: service_healthy
+      map-flyway:
+        condition: service_completed_successfully
+      main-flyway:
+        condition: service_completed_successfully
     env_file:
       - .env
     ports:
@@ -132,7 +133,7 @@ services:
       context: ./mail-service
       dockerfile: Dockerfile
     env_file:
-      - .env
+     - .env
     ports:
       - "8080:8080"
 
