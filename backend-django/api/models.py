@@ -1,19 +1,21 @@
 from django.db import models
 
-STATUS_CHOICES = [
+
+class User(models.Model):
+
+    status_choices = [
     ("bronze", "Bronze"),
     ("silver", "Silver"),
-    ("golden", "Golden"),
-]
-class Profile(models.Model):
+    ("gold", "Gold"),
+    ]  
 
-    id = models.BigAutoField(primary_key=True)
-    username = models.CharField(max_length=150, unique=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="bronze")
-    is_banned = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    userid = models.BigAutoField(primary_key=True)
+    userdisplayname = models.CharField(max_length=150, unique=True)
+    userstatus = models.CharField(max_length=10, choices=status_choices, default="bronze")
+
     def __str__(self):
         return self.username
+    
     def to_dict(self):
         return {
             "id": self.id,
@@ -21,6 +23,12 @@ class Profile(models.Model):
             "status": self.status,
             "is_banned": self.is_banned,
         }
+    
+    class Meta:
+        db_table = "users"
+
+
+    
 class BannedIP(models.Model):
     ip_address = models.GenericIPAddressField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -28,6 +36,8 @@ class BannedIP(models.Model):
         return self.ip_address
     def to_dict(self):
         return {"ip": self.ip_address}
+
+    
 class Invite(models.Model):
     email = models.EmailField()
     created_at = models.DateTimeField(auto_now_add=True)
