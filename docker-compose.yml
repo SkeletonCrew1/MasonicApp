@@ -21,15 +21,15 @@ services:
     env_file: .env
 
 
-  #frontend:
-  #  build:
-  #    context: ./frontend
-  #  networks:
-  #    - frontend
-  #  ports:
-  #    - "3000:3000"
-  #  depends_on:
-  #    - posting
+  frontend:
+    build:
+      context: ./frontend
+    networks:
+      - frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - posting
 
   main-flyway:
     image: flyway/flyway:13
@@ -109,51 +109,51 @@ services:
     command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     
 
-  #posting:
-  #  networks:
-  #    - backend
-  #  build:
-  #    context: ./posting
-  #  ports:
-  #    - "8085:8085"
-  #  depends_on:
-  #    main-db:
-  #      condition: service_healthy
-  #    map-db:
-  #      condition: service_healthy
-  #  volumes:
-  #    - uploads_data:/app/uploads
-  #  env_file:
-  #    - .env
+  posting:
+    networks:
+      - backend
+    build:
+      context: ./posting
+    ports:
+      - "8085:8085"
+    depends_on:
+      main-db:
+        condition: service_healthy
+      map-db:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads
+    env_file:
+      - .env
 
-  #email-service:
-  #  networks:
-  #    - backend
-  #  build:
-  #    context: ./mail-service
-  #    dockerfile: Dockerfile
-  #  env_file:
-  #   - .env
-  # ports:
-   #   - "8080:8080"
+  email-service:
+    networks:
+      - backend
+    build:
+      context: ./mail-service
+      dockerfile: Dockerfile
+    env_file:
+     - .env
+    ports:
+      - "8080:8080"
 
- # password-service:
- #   networks:
- #     - backend
- #   build:
- #     context: ./dailyfunctions
- #     dockerfile: Dockerfile
- #   depends_on:
- #     main-flyway:
- #       condition: service_completed_successfully
- #     map-flyway:
- #       condition: service_completed_successfully
- #     email-service:
- #       condition: service_started
- #   environment:
- #     - EMAIL_SERVICE_URL=http://email-service:8080/sent-mail
- #   env_file:
- #     - .env
+  password-service:
+    networks:
+      - backend
+    build:
+      context: ./dailyfunctions
+      dockerfile: Dockerfile
+    depends_on:
+      main-flyway:
+        condition: service_completed_successfully
+      map-flyway:
+        condition: service_completed_successfully
+      email-service:
+        condition: service_started
+    environment:
+      - EMAIL_SERVICE_URL=http://email-service:8080/sent-mail
+    env_file:
+      - .env
 
 
 networks:
