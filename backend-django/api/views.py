@@ -49,8 +49,12 @@ def broadcast(request):
     message = (data.get("message") or "").strip()
     statuses = data.get("statuses") or []
     if not message:
-        return JsonResponse({"error": "Message is required"}, status=400)
+        return JsonResponse({"error": "Please select at least one status"}, status=400)
+    if not statuses:
+            return JsonResponse({"error": "Message is required"}, status=400)
     recipients_count = Profile.objects.filter(status__in=statuses).count()
+    if recipients_count == 0:
+        return JsonResponse({"error": "No users found for selected statuses"}, status=404)
     return JsonResponse({"sent": True, "recipients": recipients_count})
 # ---------- Invite ----------
 @csrf_exempt
