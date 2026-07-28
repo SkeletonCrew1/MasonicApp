@@ -43,16 +43,18 @@ TEMPLATES = [
     },
 ]
 WSGI_APPLICATION = "core.wsgi.application"
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME", "skeletoncrew2"),
-        "USER": os.environ.get("DB_USER", "skeletoncrew2"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", "supersecuresecret"),
-        "HOST": os.environ.get("DB_HOST", "postgres"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
+        "NAME": os.environ.get("MAIN_DB_NAME"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST"),
+        "PORT": os.environ.get("DB_PORT"),
     }
 }
+
 AUTH_PASSWORD_VALIDATORS = []
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
