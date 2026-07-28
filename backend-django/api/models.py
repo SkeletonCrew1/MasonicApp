@@ -31,24 +31,11 @@ class Profile(models.Model):
         }
 
 class BannedIP(models.Model):
-    user = models.OneToOneField(
-        Profile,
-        on_delete=models.CASCADE,
-        primary_key=True,
-        db_column='userid'
-    )
-    banned_ip = models.CharField(max_length=40, db_column="bannedip")
-    class Meta: 
-        db_table = "bannedips"
-        
-    def __str__(self):
-        return f" User ID {self.user_id} -> IP {self.banned_ip}"
+    ipid = models.BigAutoField(primary_key=True)
+    bannedip = models.CharField(max_lenth=40, db_column="bannedip")
     
-    def to_dict(self):
-        return {
-            "user_id": self.user.id,
-            "ip": self.banned_ip
-        }
+    class Meta:
+        db_table = "bannedips"
 
 class Invite(models.Model):
     email = models.EmailField()
