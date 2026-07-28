@@ -5,6 +5,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from .models import BannedIP, User
 import requests
+#from core.settings import MAIL_SERVICE_URL
+from django.conf import settings
+
+
 
 def _body(request):
     if not request.body:
@@ -37,30 +41,10 @@ def broadcast(request):
         "body": message
     }
 
-    response = requests.post(os.getenv("MAIL_URL"), json = data_to_send)
+    response = requests.post(settings.MAIL_SERVICE_URL, json = data_to_send)
     return JsonResponse({ "data": data_to_send, "response": response.status_code }, status=200)
      
 
-
-# ---------- Invite ----------
-@csrf_exempt
-@require_http_methods(["POST"])
-def invite(request):
-    data = _body(request)
-    email = data.get("useremail")
-    subject = "Invite message"
-    invite_message = "You are welcome! You are invited to the secret mason comunity! http://localhost:3000"
-    if not email:
-        return JsonResponse({"error": "Email is required"}, status=400)
-    
-    data_to_send = {
-        "dest": [email],
-        "subject": subject,
-        "body": invite_message
-    }
-
-    response = requests.post(os.environ.get("mail_url"), json = data_to_send)
-    return JsonResponse({ "data": data_to_send, "response": response.status_code }, status=200)
 
 
 # ---------- Ban ----------
