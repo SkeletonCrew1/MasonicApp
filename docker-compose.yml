@@ -21,15 +21,15 @@ services:
     env_file: .env
 
 
-  frontend:
-    build:
-      context: ./frontend
-    networks:
-      - frontend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - posting
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #   networks:
+  #     - frontend
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - posting
 
   main-flyway:
     image: flyway/flyway:13
@@ -149,9 +149,9 @@ services:
       map-flyway:
         condition: service_completed_successfully
       email-service:
-        condition: service_started
+       condition: service_started
     environment:
-      - EMAIL_SERVICE_URL=http://email-service:8080/sent-mail
+     - EMAIL_SERVICE_URL=http://email-service:8080/sent-mail
     env_file:
       - .env
 
