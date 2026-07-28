@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	_ "runtime/trace"
@@ -31,11 +32,15 @@ var fake_name_list = [30]string{
 var users = map[string]Login{}
 
 func main() {
-	http.HandleFunc("/register", register)
+
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/register", register)
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/logout", logout)
 	http.HandleFunc("/protected", protected)
-	http.ListenAndServe(":8080", nil)
+
+	log.Fatal(http.ListenAndServe(":8080", enableCORS(mux)))
 }
 
 func register(w http.ResponseWriter, r *http.Request) {
@@ -193,4 +198,19 @@ func logout(w http.ResponseWriter, r *http.Request) {
 
 func protected(w http.ResponseWriter, r *http.Request) {
 
+}
+
+func enableCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
