@@ -7,14 +7,15 @@ class User(models.Model):
     ("bronze", "Bronze"),
     ("silver", "Silver"),
     ("gold", "Gold"),
-    ]
+    ]  
 
     userid = models.BigAutoField(primary_key=True)
     userdisplayname = models.CharField(max_length=150, unique=True)
     userstatus = models.CharField(max_length=10, choices=status_choices, default="bronze")
-    useremail = models.EmailField(default="")
-    userisinquisitor = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.username
+    
     def to_dict(self):
         return {
             "id": self.userid,
@@ -23,31 +24,22 @@ class User(models.Model):
             "email": self.useremail,
             "is_inquizitor": self.userisinquisitor
         }
-
+    
     class Meta:
         db_table = "users"
 
 
+    
 class BannedIP(models.Model):
     userid = models.BigAutoField(primary_key=True)
     bannedip = models.CharField(max_length=40)
 
     def to_dict(self):
-        return {
-            "user_id": self.userid,
-            "ip": self.bannedip
-        }
+        return {"ip": self.ip_address}
 
-    class Meta: 
-        db_table = "bannedips"
-
-
-class Message(models.Model):
-    messageid = models.BigAutoField(primary_key=True)
-    messagecontext = models.CharField(max_length=200)
-    messagerecieverstatus = models.CharField(max_length=40)
-    messagestatus = models.CharField(max_length=20)
-   # senderid = models.BigAutoField(primary_key=True) 
+    
+class Invite(models.Model):
+    email = models.EmailField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def to_dict(self):
