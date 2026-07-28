@@ -1,4 +1,5 @@
 import json
+import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -36,7 +37,7 @@ def broadcast(request):
         "body": message
     }
 
-    response = requests.post("http://email-service:8080/sent-mail", json = data_to_send)
+    response = requests.post(os.getenv("MAIL_URL"), json = data_to_send)
     return JsonResponse({ "data": data_to_send, "response": response.status_code }, status=200)
      
 
@@ -46,11 +47,20 @@ def broadcast(request):
 @require_http_methods(["POST"])
 def invite(request):
     data = _body(request)
-    email = (data.get("email") or "").strip()
+    email = data.get("useremail")
+    subject = "Invite message"
+    invite_message = "You are welcome! You are invited to the secret mason comunity! http://localhost:3000"
     if not email:
         return JsonResponse({"error": "Email is required"}, status=400)
-    User.objects.create(email=email)
-    return JsonResponse({"sent": True, "email": email})
+    
+    data_to_send = {
+        "dest": [email],
+        "subject": subject,
+        "body": invite_message
+    }
+
+    response = requests.post(os.environ.get("mail_url"), json = data_to_send)
+    return JsonResponse({ "data": data_to_send, "response": response.status_code }, status=200)
 
 
 # ---------- Ban ----------
