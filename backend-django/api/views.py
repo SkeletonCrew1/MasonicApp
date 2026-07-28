@@ -2,7 +2,8 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from .models import BannedIP, Invite, User
+from .models import BannedIP, User
+import requests
 
 def _body(request):
     if not request.body:
@@ -11,28 +12,34 @@ def _body(request):
         return json.loads(request.body)
     except json.JSONDecodeError:
         return {}
-    
-def get_client_ip(request):
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
-    if x_forwarded_for:
-        return x_forwarded_for.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR", "")
 
 
-# ---------- Broadcast ----------
+# Broadcast feature
 @csrf_exempt
 @require_http_methods(["POST"])
 def broadcast(request):
+
+    subject = "Broadcast"
     data = _body(request)
-    message = (data.get("message") or "").strip()
-    statuses = data.get("statuses") or []
+    message = data.get("message")
+    status = data.get("status")
     if not message:
-        return JsonResponse({"error": "Please select at least one status"}, status=400)
-    if not statuses:
-            return JsonResponse({"error": "Message is required"}, status=400)
-    recipients_count = Profile.objects.filter(status__in=statuses).count()
-    if recipients_count == 0:
-        return JsonResponse({"error": "No users found for selected statuses"}, status=404)
+        return JsonResponse({"error": "Please define a message"}, status=400)
+    if not status:
+        return JsonResponse({"error": "Status is required"}, status=400)
+
+    emails = list(User.objects.values_list('useremail', flat=True))
+
+    data_to_send = {
+        "dest": emails,
+        "subject": subject,
+        "body": message
+    }
+
+    response = requests.post("http://email-service:8080/sent-mail", json = data_to_send)
+    return JsonResponse({ "data": data_to_send, "response": response.status_code }, status=200)
+     
+
 
 # ---------- Invite ----------
 @csrf_exempt
@@ -42,7 +49,7 @@ def invite(request):
     email = (data.get("email") or "").strip()
     if not email:
         return JsonResponse({"error": "Email is required"}, status=400)
-    Invite.objects.create(email=email)
+    User.objects.create(email=email)
     return JsonResponse({"sent": True, "email": email})
 
 
@@ -50,44 +57,36 @@ def invite(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def ban_ip(request):
-    data = _body(request)
-    user_id = data.get("user_id")
-    ip = (data.get("ip") or get_client_ip(request)).strip()
-    if not user_id:
-            return JsonResponse({"error": "user_id is required"}, status=400)
+    
+    data = json.loads(request.body)
+    ip = (data.get("ip"))
     if not ip:
         return JsonResponse({"error": "IP is required"}, status=400)
     try:
-        profile = Profile.objects.get(id=user_id)
-    except Profile.DoesNotExist:
-        return JsonResponse({"error": "User not found"}, status=404)
-    banned_ip_obj, created = BannedIP.objects.update_or_create(
-        user=profile,
-        defaults={"banned_ip": ip}
-    )
-    
-    return JsonResponse({
-        "user_id": profile.id,
-        "ip": banned_ip_obj.banned_ip,
-        "banned": True,
-        "is_new_ban": created
-    })
+        BannedIP.objects.get(bannedip=ip)
+        return JsonResponse({"message": f"{ip} already banned"}, status=200)
+    except BannedIP.DoesNotExist:
+        ban = BannedIP(bannedip=ip)
+        ban.save()
+        return JsonResponse({"message": f"{ip} banned successfully"}, status=200)
 
 @require_http_methods(["GET"])
 def bans_list(request):
-    bans = BannedIP.objects.select_related('user').all()
-    return JsonResponse([b.to_dict() for b in bans], safe=False)
-
+    bans = list(BannedIP.objects.values("userid", "bannedip"))
+    return JsonResponse(bans, safe=False)
 
 # ---------- Delete all ----------
 @csrf_exempt
 @require_http_methods(["POST"])
 def delete_all(request):
-    BannedIP.objects.all().delete()
+    User.objects.all().delete()
     return JsonResponse({"deleted": True})
+@csrf_exempt
+
 
 # promotion feature                                                                      
 @csrf_exempt
+@require_http_methods(["POST"])
 def user_promotion(request):
 
     data = json.loads(request.body)
