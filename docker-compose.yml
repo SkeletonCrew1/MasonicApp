@@ -25,7 +25,7 @@ services:
     build:
       context: ./frontend
     networks:
-      - frontend
+     - frontend
     ports:
       - "3000:3000"
     depends_on:
@@ -149,9 +149,9 @@ services:
       map-flyway:
         condition: service_completed_successfully
       email-service:
-        condition: service_started
+       condition: service_started
     environment:
-      - EMAIL_SERVICE_URL=http://email-service:8080/sent-mail
+     - EMAIL_SERVICE_URL=http://email-service:8080/sent-mail
     env_file:
       - .env
 
