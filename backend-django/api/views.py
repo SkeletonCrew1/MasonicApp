@@ -73,7 +73,7 @@ def ban_ip(request):
 
 @require_http_methods(["GET"])
 def bans_list(request):
-    bans = list(BannedIP.objects.values("banid", "bannedip"))
+    bans = list(BannedIP.objects.values("ipid", "bannedip"))
     return JsonResponse(bans, safe=False)
 
 
