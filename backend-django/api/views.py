@@ -57,11 +57,12 @@ def invite(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def ban_ip(request):
-    
     data = json.loads(request.body)
     ip = (data.get("ip"))
+    
     if not ip:
         return JsonResponse({"error": "IP is required"}, status=400)
+    
     try:
         BannedIP.objects.get(bannedip=ip)
         return JsonResponse({"message": f"{ip} already banned"}, status=200)
@@ -72,8 +73,9 @@ def ban_ip(request):
 
 @require_http_methods(["GET"])
 def bans_list(request):
-    bans = list(BannedIP.objects.values("userid", "bannedip"))
+    bans = list(BannedIP.objects.values("banid", "bannedip"))
     return JsonResponse(bans, safe=False)
+
 
 # ---------- Delete all ----------
 @csrf_exempt
