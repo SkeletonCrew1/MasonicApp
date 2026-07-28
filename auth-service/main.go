@@ -135,12 +135,14 @@ func login(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "db")
 		panic(err)
 	}
+
 	user_password := r.FormValue("user_password")
 	user_email := r.FormValue("user_email")
 	hashedPassword, _ := hashPassword(user_password)
 	email_exist := EmailExists(db, user_email)
 	user_fake_name := GetValue(db, "UserDisplayName", user_email)
 	user_status := GetValue(db, "UserStatus", user_email)
+
 	if email_exist != true {
 		er := http.StatusMethodNotAllowed
 		http.Error(w, "Invalid email", er)
@@ -154,11 +156,10 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenString, err := createToken(secretKey, user_fake_name, user_email, user_status)
+	tokenString, err := createToken(secretKey, user_fake_name, user_status)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Errorf("No user found")
-		fmt.Fprint(w, "%s", err)
 		return
 	}
 
@@ -174,9 +175,22 @@ func login(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Login successfull")
 }
 
-func logout(w http.ResponseWriter, r *http.Request) {}
+func logout(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		er := http.StatusMethodNotAllowed
+		http.Error(w, "Invalid method", er)
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     "JWT",
+		Value:    "",
+		Expires:  time.Now().Add(time.Hour * 24),
+		HttpOnly: true,
+	})
+	fmt.Fprint(w, "Logout successfull")
+
+}
 
 func protected(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Contnet-type", "application/json")
 
 }

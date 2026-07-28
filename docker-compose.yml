@@ -21,16 +21,16 @@ services:
     env_file: .env
 
 
-  #frontend:
-  #  build:
-  #    context: ./frontend
-  #  networks:
-  #    - frontend
-  #  ports:
-  #    - "3000:3000"
-  #  depends_on:
-  #    - posting
-
+  frontend:
+    build:
+      context: ./frontend
+    networks:
+      - frontend
+    ports:
+     - "3000:3000"
+    # depends_on:
+    #  - posting
+#MAIN_DATABASE_URL=postgresql://<container-name>:<PORT>/<database-name>
   main-flyway:
     image: flyway/flyway:13
     entrypoint: ["flyway", "-url=jdbc:${MAIN_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-validateMigrationNaming=true", "migrate"] 

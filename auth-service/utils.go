@@ -52,8 +52,7 @@ func UserExists(db *sql.DB, username string) bool {
 	err := db.QueryRow(sqlStmt, username).Scan(&username)
 	if err != nil {
 		if err != sql.ErrNoRows {
-			// a real error happened! you should change your function return
-			// to "(bool, error)" and return "false, err" here
+
 			log.Print(err)
 		}
 
@@ -68,8 +67,7 @@ func EmailExists(db *sql.DB, email string) bool {
 	err := db.QueryRow(sqlStmt, email).Scan(&email)
 	if err != nil {
 		if err != sql.ErrNoRows {
-			// a real error happened! you should change your function return
-			// to "(bool, error)" and return "false, err" here
+
 			log.Print(err)
 		}
 
@@ -84,11 +82,10 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func createToken(secretKey []byte, username string, email string, status string) (string, error) {
+func createToken(secretKey []byte, username string, status string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"username": username,
-			"email":    email,
 			"status":   status,
 			"exp":      time.Now().Add(time.Hour * 24).Unix()})
 
