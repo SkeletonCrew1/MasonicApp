@@ -7,14 +7,15 @@ class User(models.Model):
     ("bronze", "Bronze"),
     ("silver", "Silver"),
     ("gold", "Gold"),
-    ]
+    ]  
 
     userid = models.BigAutoField(primary_key=True)
     userdisplayname = models.CharField(max_length=150, unique=True)
     userstatus = models.CharField(max_length=10, choices=status_choices, default="bronze")
-    useremail = models.EmailField(default="")
-    userisinquisitor = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.username
+    
     def to_dict(self):
         return {
             "id": self.userid,
@@ -23,11 +24,12 @@ class User(models.Model):
             "email": self.useremail,
             "is_inquizitor": self.userisinquisitor
         }
-
+    
     class Meta:
         db_table = "users"
 
 
+    
 class BannedIP(models.Model):
     userid = models.BigAutoField(primary_key=True)
     bannedip = models.CharField(max_length=40)

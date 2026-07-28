@@ -3,12 +3,7 @@ import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from .models import BannedIP, User
-import requests
-#from core.settings import MAIL_SERVICE_URL
-from django.conf import settings
-
-
+from .models import BannedIP, Invite, User
 
 def _body(request):
     if not request.body:
@@ -19,7 +14,7 @@ def _body(request):
         return {}
 
 
-# Broadcast feature
+# ---------- Broadcast ----------
 @csrf_exempt
 @require_http_methods(["POST"])
 def broadcast(request):
