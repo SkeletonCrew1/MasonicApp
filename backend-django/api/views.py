@@ -1,9 +1,9 @@
 import json
+import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from .models import BannedIP, User
-import requests
+from .models import BannedIP, Invite, User
 
 def _body(request):
     if not request.body:
@@ -14,7 +14,7 @@ def _body(request):
         return {}
 
 
-# Broadcast feature
+# ---------- Broadcast ----------
 @csrf_exempt
 @require_http_methods(["POST"])
 def broadcast(request):
@@ -36,21 +36,10 @@ def broadcast(request):
         "body": message
     }
 
-    response = requests.post("http://email-service:8080/sent-mail", json = data_to_send)
+    response = requests.post(settings.MAIL_SERVICE_URL, json = data_to_send)
     return JsonResponse({ "data": data_to_send, "response": response.status_code }, status=200)
      
 
-
-# ---------- Invite ----------
-@csrf_exempt
-@require_http_methods(["POST"])
-def invite(request):
-    data = _body(request)
-    email = (data.get("email") or "").strip()
-    if not email:
-        return JsonResponse({"error": "Email is required"}, status=400)
-    User.objects.create(email=email)
-    return JsonResponse({"sent": True, "email": email})
 
 
 # ---------- Ban ----------

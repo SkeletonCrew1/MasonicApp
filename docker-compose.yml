@@ -24,12 +24,18 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        - VITE_POSTING_SERVICE_URL=${VITE_POSTING_SERVICE_URL}
     networks:
       - frontend
+      - backend
     ports:
       - "3000:3000"
     depends_on:
-      - posting
+      posting:
+        condition: service_started
+    env_file:
+      - .env
 
   main-flyway:
     image: flyway/flyway:13
@@ -117,8 +123,6 @@ services:
     ports:
       - "8085:8085"
     depends_on:
-      main-db:
-        condition: service_healthy
       map-db:
         condition: service_healthy
     volumes:
@@ -133,7 +137,7 @@ services:
       context: ./mail-service
       dockerfile: Dockerfile
     env_file:
-     - .env
+      - .env
     ports:
       - "8080:8080"
 
@@ -141,20 +145,29 @@ services:
     networks:
       - backend
     build:
-      context: ./dailyfunctions
+      context: ./daily-password
       dockerfile: Dockerfile
     depends_on:
       main-flyway:
         condition: service_completed_successfully
-      map-flyway:
-        condition: service_completed_successfully
       email-service:
         condition: service_started
-    environment:
-      - EMAIL_SERVICE_URL=http://email-service:8080/sent-mail
     env_file:
       - .env
 
+  inquisitor-service:
+    networks:
+      - backend
+    build:
+      context: ./daily-inquisitor
+      dockerfile: Dockerfile
+    depends_on:
+      main-flyway:
+        condition: service_completed_successfully
+      email-service:
+        condition: service_started
+    env_file:
+      - .env
 
 networks:
   backend:
