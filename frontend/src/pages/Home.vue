@@ -39,10 +39,11 @@ const lat = ref("Click map");
 const lng = ref("Click map");
 const showAddButton = ref(false);
 const markersLayer = L.featureGroup();
+const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL
 
 async function loadSightings(map) {
   try {
-    const response = await fetch('http://localhost:8085/sightings');
+    const response = await fetch(`${POSTING_SERVICE_URL}/sightings`);
     if (!response.ok) throw new Error("Failed to fetch");
     const sightings = await response.json();
 
@@ -51,7 +52,7 @@ async function loadSightings(map) {
       popupContent.className = 'sighting-popup';
       popupContent.innerHTML = `
         <h3>${sighting.SightingName}</h3>
-        ${sighting.SightingPicture ? `<img src="http://localhost:8085${sighting.SightingPicture}" class="popup-image" />` : ''}
+        ${sighting.SightingPicture ? `<img src="${POSTING_SERVICE_URL}${sighting.SightingPicture}" class="popup-image" />` : ''}
         <button class="open-page-btn" data-id="${sighting.SightingId}">Open Page</button>
       `;
 

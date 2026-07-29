@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -62,10 +63,10 @@ func runInquisitorTask() {
 	payload := EmailPayload{
 		Dest:    []string{selectedUser.Email},
 		Subject: "Congratulations!",
-		Body:    "Congrats you are inquisitor today",
+		Body:    "Congratulations, you are an inquisitor today!",
 	}
 
-	emailServiceEndpoint := "http://email-service:8080/sent-mail"
+	emailServiceEndpoint := os.Getenv("MAIL_SERVICE_URL")
 
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
