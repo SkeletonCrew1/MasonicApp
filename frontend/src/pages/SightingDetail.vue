@@ -20,7 +20,6 @@
           <div class="info-item">
             <span class="label">Description</span>
             <span class="value">{{ sighting.SightingDescription }}</span>
-            <span class="value">{{ sighting.SightingDescription }}</span>
           </div>
           <div class="info-item">
             <span class="label">Discovery Date</span>
@@ -84,14 +83,12 @@ onMounted(async () => {
     worldCopyJump: true,
     zoomControl: false
   }).setView([sighting.value.SightingLatitude, sighting.value.SightingLongitude], 7);
-  }).setView([sighting.value.SightingLatitude, sighting.value.SightingLongitude], 7);
 
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
     attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
     noWrap: false
   }).addTo(map);
 
-  L.marker([sighting.value.SightingLatitude, sighting.value.SightingLongitude], { icon: customIcon })
   L.marker([sighting.value.SightingLatitude, sighting.value.SightingLongitude], { icon: customIcon })
     .addTo(map);
 });
