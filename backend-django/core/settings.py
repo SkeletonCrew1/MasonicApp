@@ -3,6 +3,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+MAIL_SERVICE_URL = os.getenv("MAIL_URL")
 SECRET_KEY = os.environ["SECRET_KEY"]
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 ALLOWED_HOSTS = ["*"]

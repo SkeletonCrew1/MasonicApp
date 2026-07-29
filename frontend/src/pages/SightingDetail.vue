@@ -10,9 +10,10 @@
         <button class="back-btn" @click="$router.push('/')">← Back to Map</button>
         
         <h1 class="title">{{ sighting.SightingName }}</h1>
+        <h1 class="title">{{ sighting.SightingName }}</h1>
         
         <div class="image-wrapper">
-          <img v-if="sighting.SightingPicture" :src="'http://localhost:8085' + sighting.SightingPicture" :alt="sighting.SightingName" class="detail-image" />
+          <img v-if="sighting.SightingPicture" :src="`${POSTING_SERVICE_URL}` + sighting.SightingPicture" :alt="sighting.SightingName" class="detail-image" />
         </div>
 
         <div class="info-grid">
@@ -23,9 +24,11 @@
           <div class="info-item">
             <span class="label">Discovery Date</span>
             <span class="value">{{ sighting.SightingDiscoveryDate }}</span>
+            <span class="value">{{ sighting.SightingDiscoveryDate }}</span>
           </div>
           <div class="info-item">
             <span class="label">Coordinates</span>
+            <span class="value">{{ sighting.SightingLatitude.toFixed(6) }}, {{ sighting.SightingLongitude.toFixed(6) }}</span>
             <span class="value">{{ sighting.SightingLatitude.toFixed(6) }}, {{ sighting.SightingLongitude.toFixed(6) }}</span>
           </div>
         </div>
@@ -52,12 +55,13 @@ const customIcon = L.divIcon({
 
 const route = useRoute();
 const sighting = ref(null);
+const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL
 
 onMounted(async () => {
   const id = route.params.id;
 
   try {
-    const response = await fetch(`http://localhost:8085/sighting?id=${id}`);
+    const response = await fetch(`${POSTING_SERVICE_URL}/sighting?id=${id}`);
     sighting.value = await response.json();
   } catch (err) {
     console.error("Failed to load details.", err);

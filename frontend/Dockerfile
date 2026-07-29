@@ -2,6 +2,8 @@ FROM node:alpine
 
 WORKDIR /app
 
+ARG VITE_POSTING_SERVICE_URL
+
 COPY package*.json ./
 
 RUN npm install

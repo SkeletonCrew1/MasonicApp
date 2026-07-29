@@ -1,4 +1,5 @@
 import json
+import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -17,25 +18,28 @@ def _body(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def broadcast(request):
-    data = _body(request)
-    message = (data.get("message") or "").strip()
-    statuses = data.get("statuses") or []
-    if not message :
-        return JsonResponse({"error": "Message is required"}, status=400)
-    recipients_count = User.objects.filter(status__in=statuses).count()
-    return JsonResponse({"sent": True, "recipients": recipients_count})
 
-
-# ---------- Invite ----------
-@csrf_exempt
-@require_http_methods(["POST"])
-def invite(request):
+    subject = "Broadcast"
     data = _body(request)
-    email = (data.get("email") or "").strip()
-    if not email:
-        return JsonResponse({"error": "Email is required"}, status=400)
-    Invite.objects.create(email=email)
-    return JsonResponse({"sent": True, "email": email})
+    message = data.get("message")
+    status = data.get("status")
+    if not message:
+        return JsonResponse({"error": "Please define a message"}, status=400)
+    if not status:
+        return JsonResponse({"error": "Status is required"}, status=400)
+
+    emails = list(User.objects.values_list('useremail', flat=True))
+
+    data_to_send = {
+        "dest": emails,
+        "subject": subject,
+        "body": message
+    }
+
+    response = requests.post(settings.MAIL_SERVICE_URL, json = data_to_send)
+    return JsonResponse({ "data": data_to_send, "response": response.status_code }, status=200)
+     
+
 
 
 # ---------- Ban ----------
@@ -66,6 +70,7 @@ def delete_all(request):
 
 # promotion feature                                                                      
 @csrf_exempt
+@require_http_methods(["POST"])
 def user_promotion(request):
 
     data = json.loads(request.body)
