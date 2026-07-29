@@ -32,7 +32,7 @@ class Profile(models.Model):
 
 class BannedIP(models.Model):
     ipid = models.BigAutoField(primary_key=True)
-    bannedip = models.CharField(max_lenth=40, db_column="bannedip")
+    bannedip = models.CharField(max_length=40, db_column="bannedip")
     
     class Meta:
         db_table = "bannedips"
