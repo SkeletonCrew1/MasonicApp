@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from .models import BannedIP, Invite, Profile
+from .models import BannedIP, User
 
-admin.site.register(Profile)
+admin.site.register(User)
 admin.site.register(BannedIP)
-admin.site.register(Invite)

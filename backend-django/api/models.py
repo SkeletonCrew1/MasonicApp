@@ -1,35 +1,64 @@
 from django.db import models
 
-STATUS_CHOICES = [
+
+class User(models.Model):
+
+    status_choices = [
     ("bronze", "Bronze"),
     ("silver", "Silver"),
-    ("golden", "Golden"),
-]
-class Profile(models.Model):
+    ("gold", "Gold"),
+    ]  
 
-    id = models.BigAutoField(primary_key=True)
-    username = models.CharField(max_length=150, unique=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="bronze")
-    is_banned = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    userid = models.BigAutoField(primary_key=True)
+    userdisplayname = models.CharField(max_length=150, unique=True)
+    userstatus = models.CharField(max_length=10, choices=status_choices, default="bronze")
+
     def __str__(self):
         return self.username
+    
     def to_dict(self):
         return {
-            "id": self.id,
-            "username": self.username,
-            "status": self.status,
-            "is_banned": self.is_banned,
+            "id": self.userid,
+            "username": self.userdisplayname,
+            "status": self.userstatus,
+            "email": self.useremail,
+            "is_inquizitor": self.userisinquisitor
         }
+    
+    class Meta:
+        db_table = "users"
+
+
+    
 class BannedIP(models.Model):
-    ip_address = models.GenericIPAddressField(unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.ip_address
+    userid = models.BigAutoField(primary_key=True)
+    bannedip = models.CharField(max_length=40)
+
     def to_dict(self):
-        return {"ip": self.ip_address}
-class Invite(models.Model):
-    email = models.EmailField()
+        return {
+            "user_id": self.userid,
+            "ip": self.bannedip
+        }
+
+    class Meta: 
+        db_table = "bannedips"
+
+
+class Message(models.Model):
+    messageid = models.BigAutoField(primary_key=True)
+    messagecontext = models.CharField(max_length=200)
+    messagerecieverstatus = models.CharField(max_length=40)
+    messagestatus = models.CharField(max_length=20)
+   # senderid = models.BigAutoField(primary_key=True) 
     created_at = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.email
+
+    def to_dict(self):
+        return {
+            "id": self.messageid,
+            "message": self.messagecontext,
+            "status": self.messagestatus,
+            "created_at": self.created_at.isoformat()
+        }
+
+    class Meta:
+        db_table = "messages"

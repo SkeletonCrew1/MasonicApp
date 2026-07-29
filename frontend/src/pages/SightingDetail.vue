@@ -10,6 +10,7 @@
         <button class="back-btn" @click="$router.push('/')">← Back to Map</button>
         
         <h1 class="title">{{ sighting.SightingName }}</h1>
+        <h1 class="title">{{ sighting.SightingName }}</h1>
         
         <div class="image-wrapper">
           <img v-if="sighting.SightingPicture" :src="`${POSTING_SERVICE_URL}` + sighting.SightingPicture" :alt="sighting.SightingName" class="detail-image" />
@@ -19,13 +20,16 @@
           <div class="info-item">
             <span class="label">Description</span>
             <span class="value">{{ sighting.SightingDescription }}</span>
+            <span class="value">{{ sighting.SightingDescription }}</span>
           </div>
           <div class="info-item">
             <span class="label">Discovery Date</span>
             <span class="value">{{ sighting.SightingDiscoveryDate }}</span>
+            <span class="value">{{ sighting.SightingDiscoveryDate }}</span>
           </div>
           <div class="info-item">
             <span class="label">Coordinates</span>
+            <span class="value">{{ sighting.SightingLatitude.toFixed(6) }}, {{ sighting.SightingLongitude.toFixed(6) }}</span>
             <span class="value">{{ sighting.SightingLatitude.toFixed(6) }}, {{ sighting.SightingLongitude.toFixed(6) }}</span>
           </div>
         </div>
@@ -80,12 +84,14 @@ onMounted(async () => {
     worldCopyJump: true,
     zoomControl: false
   }).setView([sighting.value.SightingLatitude, sighting.value.SightingLongitude], 7);
+  }).setView([sighting.value.SightingLatitude, sighting.value.SightingLongitude], 7);
 
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
     attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
     noWrap: false
   }).addTo(map);
 
+  L.marker([sighting.value.SightingLatitude, sighting.value.SightingLongitude], { icon: customIcon })
   L.marker([sighting.value.SightingLatitude, sighting.value.SightingLongitude], { icon: customIcon })
     .addTo(map);
 });
