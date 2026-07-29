@@ -138,6 +138,9 @@ const user_email = ref("");
 const user_password = ref("");
 const daily_password = ref("");
 
+async function submit() {
+    
+}
 
 
 
