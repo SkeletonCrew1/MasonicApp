@@ -3,7 +3,7 @@ import os
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from .models import BannedIP, Invite, User
+from .models import BannedIP, User
 
 def _body(request):
     if not request.body:
@@ -46,17 +46,24 @@ def broadcast(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def ban_ip(request):
-    data = _body(request)
-    ip = (data.get("ip") or "").strip()
+    data = json.loads(request.body)
+    ip = (data.get("ip"))
+    
     if not ip:
         return JsonResponse({"error": "IP is required"}, status=400)
-    BannedIP.objects.get_or_create(ip_address=ip)
-    return JsonResponse({"ip": ip, "banned": True})
+    
+    try:
+        BannedIP.objects.get(bannedip=ip)
+        return JsonResponse({"message": f"{ip} already banned"}, status=200)
+    except BannedIP.DoesNotExist:
+        ban = BannedIP(bannedip=ip)
+        ban.save()
+        return JsonResponse({"message": f"{ip} banned successfully"}, status=200)
 
 @require_http_methods(["GET"])
 def bans_list(request):
-    bans = BannedIP.objects.all()
-    return JsonResponse([b.to_dict() for b in bans], safe=False)
+    bans = list(BannedIP.objects.values("ipid", "bannedip"))
+    return JsonResponse(bans, safe=False)
 
 
 # ---------- Delete all ----------

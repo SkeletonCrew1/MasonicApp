@@ -31,16 +31,10 @@ class User(models.Model):
 
     
 class BannedIP(models.Model):
-    userid = models.BigAutoField(primary_key=True)
-    bannedip = models.CharField(max_length=40)
-
-    def to_dict(self):
-        return {
-            "user_id": self.userid,
-            "ip": self.bannedip
-        }
-
-    class Meta: 
+    ipid = models.BigAutoField(primary_key=True)
+    bannedip = models.CharField(max_length=40, db_column="bannedip")
+    
+    class Meta:
         db_table = "bannedips"
 
 
