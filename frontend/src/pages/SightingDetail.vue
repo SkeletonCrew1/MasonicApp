@@ -12,7 +12,7 @@
         <h1 class="title">{{ sighting.SightingName }}</h1>
         
         <div class="image-wrapper">
-          <img v-if="sighting.SightingPicture" :src="'http://localhost:8085' + sighting.SightingPicture" :alt="sighting.SightingName" class="detail-image" />
+          <img v-if="sighting.SightingPicture" :src="`${POSTING_SERVICE_URL}` + sighting.SightingPicture" :alt="sighting.SightingName" class="detail-image" />
         </div>
 
         <div class="info-grid">
@@ -52,12 +52,13 @@ const customIcon = L.divIcon({
 
 const route = useRoute();
 const sighting = ref(null);
+const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL
 
 onMounted(async () => {
   const id = route.params.id;
 
   try {
-    const response = await fetch(`http://localhost:8085/sighting?id=${id}`);
+    const response = await fetch(`${POSTING_SERVICE_URL}/sighting?id=${id}`);
     sighting.value = await response.json();
   } catch (err) {
     console.error("Failed to load details.", err);

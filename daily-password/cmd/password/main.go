@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -87,7 +88,7 @@ func runPasswordTask() {
 		Body:    fmt.Sprintf("Greetings! New password is: %s", password),
 	}
 
-	emailServiceEndpoint := "http://email-service:8080/sent-mail"
+	emailServiceEndpoint := os.Getenv("MAIL_SERVICE_URL")
 
 	jsonData, err := json.Marshal(payload)
 	if err != nil {

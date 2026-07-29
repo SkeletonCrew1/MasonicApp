@@ -73,6 +73,7 @@ const name = ref("");
 const date = ref("");
 const description = ref("");
 const pictureInput = ref(null);
+const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL
 
 let map = null;
 let marker = null;
@@ -143,7 +144,7 @@ async function submit() {
   };
 
   try {
-    const response = await fetch("http://localhost:8085/sightings", {
+    const response = await fetch(`${POSTING_SERVICE_URL}/sightings`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
