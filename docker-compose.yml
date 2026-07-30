@@ -39,7 +39,7 @@ services:
 
   main-flyway:
     image: flyway/flyway:13
-    entrypoint: ["flyway", "-url=jdbc:${MAIN_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-validateMigrationNaming=true", "migrate"] 
+    entrypoint: ["flyway", "-url=jdbc:${MAIN_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-baselineVersion=0", "-validateMigrationNaming=true", "migrate"]
     volumes:
       - ./db/migrations/main-db:/flyway/sql
     depends_on:
@@ -76,7 +76,7 @@ services:
   
   map-flyway:
     image: flyway/flyway:13
-    entrypoint: ["flyway", "-url=jdbc:${MAP_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-validateMigrationNaming=true", "migrate"] 
+    entrypoint: ["flyway", "-url=jdbc:${MAP_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-baselineVersion=0", "-validateMigrationNaming=true", "migrate"] 
     volumes:
       - ./db/migrations/mysterymap-db:/flyway/sql
     depends_on:
