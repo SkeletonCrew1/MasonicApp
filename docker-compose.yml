@@ -205,6 +205,24 @@ services:
         condition: service_started
     env_file:
       - .env
+  
+  voting-service:
+    networks:
+      - backend
+      - frontend
+    build:
+      context: ./voting-service
+      dockerfile: Dockerfile
+    depends_on:
+      main-flyway:
+        condition: service_completed_successfully
+      voting-flyway:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    ports:
+      - "4242:4242"
+    
 
 networks:
   backend:
