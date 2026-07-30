@@ -3,10 +3,6 @@ services:
   main-db:
     image: postgres:18
     container_name: main-db
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${MAIN_DB_NAME}
     ports:
       - "5432:5432"
     networks:
@@ -18,6 +14,10 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${MAIN_DB_NAME}
     env_file: .env
 
 
@@ -30,7 +30,7 @@ services:
       - frontend
       - backend
     ports:
-      - "3000:3000"
+      - "5173:5173"
     depends_on:
       posting:
         condition: service_started
@@ -47,11 +47,6 @@ services:
         condition: service_healthy
     networks:
       - backend
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${MAIN_DB_NAME}
-      DATABASE_URL: ${MAIN_DATABASE_URL}
     env_file: .env
   
   map-db:
@@ -84,11 +79,6 @@ services:
         condition: service_healthy
     networks:
       - backend
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${MAP_DB_NAME}
-      DATABASE_URL: ${MAP_DATABASE_URL}
     env_file: .env
   
   auth-service:
@@ -102,7 +92,7 @@ services:
       main-flyway:
         condition: service_completed_successfully
     ports:
-      - "8080:8080"
+      - "8081:8081"
     networks:
       - backend
     env_file: .env
@@ -145,44 +135,44 @@ services:
     env_file:
       - .env
 
-  email-service:
-    networks:
-      - backend
-    build:
-      context: ./mail-service
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    ports:
-      - "8080:8080"
+  # email-service:
+  #   networks:
+  #     - backend
+  #   build:
+  #     context: ./mail-service
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "8080:8080"
 
-  password-service:
-    networks:
-      - backend
-    build:
-      context: ./daily-password
-      dockerfile: Dockerfile
-    depends_on:
-      main-flyway:
-        condition: service_completed_successfully
-      email-service:
-        condition: service_started
-    env_file:
-      - .env
+  # password-service:
+  #   networks:
+  #     - backend
+  #   build:
+  #     context: ./daily-password
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     main-flyway:
+  #       condition: service_completed_successfully
+  #     email-service:
+  #       condition: service_started
+  #   env_file:
+  #     - .env
 
-  inquisitor-service:
-    networks:
-      - backend
-    build:
-      context: ./daily-inquisitor
-      dockerfile: Dockerfile
-    depends_on:
-      main-flyway:
-        condition: service_completed_successfully
-      email-service:
-        condition: service_started
-    env_file:
-      - .env
+  # inquisitor-service:
+  #   networks:
+  #     - backend
+  #   build:
+  #     context: ./daily-inquisitor
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     main-flyway:
+  #       condition: service_completed_successfully
+  #     email-service:
+  #       condition: service_started
+  #   env_file:
+  #     - .env
 
 networks:
   backend:

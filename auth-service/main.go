@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -36,11 +37,11 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/register", register)
-	http.HandleFunc("/login", login)
-	http.HandleFunc("/logout", logout)
-	http.HandleFunc("/protected", protected)
+	mux.HandleFunc("/login", login)
+	mux.HandleFunc("/logout", logout)
+	mux.HandleFunc("/protected", protected)
 
-	log.Fatal(http.ListenAndServe(":8080", enableCORS(mux)))
+	log.Fatal(http.ListenAndServe(":8081", enableCORS(mux)))
 }
 
 func register(w http.ResponseWriter, r *http.Request) {
@@ -49,13 +50,17 @@ func register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid method", er)
 		return
 	}
-
+	var register_body User
+	if err := json.NewDecoder(r.Body).Decode(&register_body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	random_num := randRange(0, 30)
 
-	user_password := r.FormValue("user_password")
+	user_password := register_body.UserPassword
 	user_fake_name := fake_name_list[random_num]
 	user_rank := "bronze"
-	user_email := r.FormValue("user_email")
+	user_email := register_body.UserEmail
 	user_is_inqusitor := false
 	//user_secret_key=r.FormValue("user_secret_key")
 
@@ -202,7 +207,7 @@ func protected(w http.ResponseWriter, r *http.Request) {
 
 func enableCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 

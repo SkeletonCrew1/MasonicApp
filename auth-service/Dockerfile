@@ -17,7 +17,7 @@ RUN apk del go
 
 RUN go version
 WORKDIR /auth
-COPY go.mod go.sum main.go utils.go  ./
+COPY go.mod go.sum main.go utils.go models.go ./
 RUN go build -o main
 
 FROM alpine:3.23.5

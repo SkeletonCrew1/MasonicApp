@@ -2,23 +2,8 @@
 
     <html lang="en">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Neumorphism Login Form</title>
-        <meta name="description" content="Soft-UI login form with realistic dual shadows and ambient mouse-tracked lighting.">
-        <meta name="author" content="Aigars Silkalns / Colorlib">
-        <link rel="canonical" href="https://preview.colorlib.com/theme/login-forms/forms/neumorphism/">
-        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%236366f1'/><text x='50' y='68' font-size='60' text-anchor='middle' fill='white' font-family='system-ui,sans-serif'>L</text></svg>">
-        <meta property="og:type" content="website">
-        <meta property="og:title" content="Neumorphism Login Form">
-        <meta property="og:description" content="Soft-UI login form with realistic dual shadows and ambient mouse-tracked lighting.">
-        <meta property="og:url" content="https://preview.colorlib.com/theme/login-forms/forms/neumorphism/">
-        <meta property="og:image" content="https://preview.colorlib.com/theme/login-forms/assets/screenshots/neumorphism.png">
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="Neumorphism Login Form">
-        <meta name="twitter:description" content="Soft-UI login form with realistic dual shadows and ambient mouse-tracked lighting.">
-        <meta name="twitter:image" content="https://preview.colorlib.com/theme/login-forms/assets/screenshots/neumorphism.png">
-        <link rel="stylesheet" href="style.css">
+        <link rel="shortcut icon" href="">
+
     </head>
     <body>
         <div class="login-container">
@@ -35,10 +20,10 @@
                     <h2>Register </h2>
                 </div>
                 
-                <form class="login-form" id="loginForm" novalidate>
+                <form class="login-form" id="loginForm" @submit.prevent="Register" novalidate>
                     <div class="form-group">
                         <div class="input-group neu-input">
-                            <input type="text" id="user_email" v-model="user_email" required placeholder=" ">
+                            <input type="email" id="user_email" v-model="user_email" required placeholder=" ">
                             <label for="email">Email address</label>
                             <div class="input-icon">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -98,7 +83,7 @@
                         <span class="error-message" id="passwordError"></span>
                     </div>
 
-                    <button type="submit" class="neu-button login-btn">
+                    <button type="submit" class="neu-button login-btn" >
                         <span class="btn-text">Register</span>
                         <div class="btn-loader">
                             <div class="neu-spinner"></div>
@@ -137,12 +122,33 @@ const router = useRouter();
 const user_email = ref("");
 const user_password = ref("");
 const daily_password = ref("");
+const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL
 
-async function submit() {
-    
+async function Register() {
+    alert("func works")
+    const user = {
+        UserEmail: user_email.value,
+        UserPassword: user_password.value,
+    // DailyPassword: daily_password.value
+    };
+    try {
+        const response = await fetch(`${AUTH_SERVICE_URL}/register`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(user)
+        });
+        alert("in try")
+        if (response.ok) {
+        alert("Registration successfull!");
+        router.push('/');
+        } else {
+        alert("Failed to submit sighting.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Cannot connect to the server.");
+    }
 }
-
-
-
-
 </script>
