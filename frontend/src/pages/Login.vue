@@ -16,10 +16,10 @@
                     <h2>Login </h2>
                 </div>
                 
-                <form class="login-form" id="loginForm" novalidate>
+                <form class="login-form" id="loginForm" @submit.prevent="Login" novalidate>
                     <div class="form-group">
                         <div class="input-group neu-input">
-                            <input type="email" id="email" name="email" required autocomplete="email" placeholder=" ">
+                            <input type="email" id="email" name="email" v-model="user_email" required autocomplete="email" placeholder=" ">
                             <label for="email">Email address</label>
                             <div class="input-icon">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -33,7 +33,7 @@
                     
                     <div class="form-group">
                         <div class="input-group neu-input password-group">
-                            <input type="password" id="daily_password" name="daily_password" required  placeholder=" ">
+                            <input type="password" id="daily_password" name="daily_password" v-model="user_password" required  placeholder=" ">
                             <label for="daily_password">Daily password</label>
                             <div class="input-icon">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -47,7 +47,7 @@
 
                     <div class="form-group">
                         <div class="input-group neu-input password-group">
-                            <input type="password" id="daily_password" name="daily_password" required  placeholder=" ">
+                            <input type="password" id="daily_password" name="daily_password" v-model="daily_password" required  placeholder=" ">
                             <label for="daily_password">Daily password</label>
                             <div class="input-icon">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -69,7 +69,7 @@
 
 
                 <div class="signup-link">
-                    <p>Don't have an account? <a href="#">Register</a></p>
+                    <p>Don't have an account? <a href="/">Register</a></p>
                 </div>
 
                 <div class="success-message" id="successMessage">
@@ -89,7 +89,40 @@
 </template>
 
 <script setup>
+import { useRouter } from "vue-router";
+import { ref} from "vue";
 import "../styles/Auth.css";
 
+const router = useRouter();
 
+const user_email = ref("");
+const user_password = ref("");
+const daily_password = ref("");
+const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL
+
+async function Login() {
+    const user = {
+        UserEmail: user_email.value,
+        UserPassword: user_password.value,
+    // DailyPassword: daily_password.value
+    };
+    try {
+        const response = await fetch(`${AUTH_SERVICE_URL}/login`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(user)
+        });
+        if (response.ok) {
+        router.push('/home');
+        } else {
+        alert("Failed to submit sighting.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Cannot connect to the server.");
+    }
+
+}
 </script>

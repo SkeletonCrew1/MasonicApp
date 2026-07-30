@@ -86,13 +86,6 @@ func register(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	err = db.Ping()
-	if err != nil {
-		er := http.StatusMethodNotAllowed
-		http.Error(w, "error4", er)
-		return
-	}
-
 	defer db.Close()
 	db, err = sql.Open("postgres", connStr)
 	name_exists := UserExists(db, user_fake_name)
@@ -142,12 +135,17 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		fmt.Fprint(w, "db")
+		fmt.Fprint(w, "can't connect to database")
 		panic(err)
 	}
+	var login_body User
+	if err := json.NewDecoder(r.Body).Decode(&login_body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	user_password := r.FormValue("user_password")
-	user_email := r.FormValue("user_email")
+	user_password := login_body.UserPassword
+	user_email := login_body.UserEmail
 	hashedPassword, _ := hashPassword(user_password)
 	email_exist := EmailExists(db, user_email)
 	user_fake_name := GetValue(db, "UserDisplayName", user_email)
@@ -169,7 +167,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 	tokenString, err := createToken(secretKey, user_fake_name, user_status)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Errorf("No user found")
 		return
 	}
 
@@ -177,8 +174,10 @@ func login(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "JWT",
 		Value:    tokenString,
-		Expires:  time.Now().Add(time.Hour * 24),
+		Expires:  time.Now().Add(time.Hour * 2),
 		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
 	})
 
 	w.WriteHeader(http.StatusOK)

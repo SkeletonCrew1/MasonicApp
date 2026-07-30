@@ -93,7 +93,7 @@
 
 
                 <div class="signup-link">
-                    <p>Already have an account? <a href="#">Login</a></p>
+                    <p>Already have an account? <a href="/login">Login</a></p>
                 </div>
 
                 <div class="success-message" id="successMessage">
@@ -125,7 +125,6 @@ const daily_password = ref("");
 const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL
 
 async function Register() {
-    alert("func works")
     const user = {
         UserEmail: user_email.value,
         UserPassword: user_password.value,
@@ -139,10 +138,9 @@ async function Register() {
         },
         body: JSON.stringify(user)
         });
-        alert("in try")
         if (response.ok) {
         alert("Registration successfull!");
-        router.push('/');
+        router.push('/login');
         } else {
         alert("Failed to submit sighting.");
         }
@@ -150,5 +148,6 @@ async function Register() {
         console.error(error);
         alert("Cannot connect to the server.");
     }
+
 }
 </script>

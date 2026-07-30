@@ -36,6 +36,17 @@ services:
         condition: service_started
     env_file:
       - .env
+    develop:
+      watch:
+        - path: ./src
+          target: /app/src
+          action: sync
+        - path: ./package.json
+          target: /app/package.json
+          action: restart
+        - path: ./vite.config.js
+          target: /app/vite.config.js
+          action: restart
 
   main-flyway:
     image: flyway/flyway:13
@@ -135,44 +146,44 @@ services:
     env_file:
       - .env
 
-  # email-service:
-  #   networks:
-  #     - backend
-  #   build:
-  #     context: ./mail-service
-  #     dockerfile: Dockerfile
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "8080:8080"
+  email-service:
+    networks:
+      - backend
+    build:
+      context: ./mail-service
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
 
-  # password-service:
-  #   networks:
-  #     - backend
-  #   build:
-  #     context: ./daily-password
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     main-flyway:
-  #       condition: service_completed_successfully
-  #     email-service:
-  #       condition: service_started
-  #   env_file:
-  #     - .env
+  password-service:
+    networks:
+      - backend
+    build:
+      context: ./daily-password
+      dockerfile: Dockerfile
+    depends_on:
+      main-flyway:
+        condition: service_completed_successfully
+      email-service:
+        condition: service_started
+    env_file:
+      - .env
 
-  # inquisitor-service:
-  #   networks:
-  #     - backend
-  #   build:
-  #     context: ./daily-inquisitor
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     main-flyway:
-  #       condition: service_completed_successfully
-  #     email-service:
-  #       condition: service_started
-  #   env_file:
-  #     - .env
+  inquisitor-service:
+    networks:
+      - backend
+    build:
+      context: ./daily-inquisitor
+      dockerfile: Dockerfile
+    depends_on:
+      main-flyway:
+        condition: service_completed_successfully
+      email-service:
+        condition: service_started
+    env_file:
+      - .env
 
 networks:
   backend:
