@@ -142,7 +142,7 @@ async function Register() {
         alert("Registration successfull!");
         router.push('/login');
         } else {
-        alert("Failed to submit sighting.");
+        alert("Failed to register.");
         }
     } catch (error) {
         console.error(error);

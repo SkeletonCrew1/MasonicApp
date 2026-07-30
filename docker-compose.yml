@@ -30,7 +30,7 @@ services:
       - frontend
       - backend
     ports:
-      - "5173:5173"
+      - "3000:5173"
     depends_on:
       posting:
         condition: service_started
@@ -38,10 +38,10 @@ services:
       - .env
     develop:
       watch:
-        - path: ./src
+        - path: ./frontend/src
           target: /app/src
           action: sync
-        - path: ./package.json
+        - path: ./frontend/package.json
           target: /app/package.json
           action: restart
         - path: ./vite.config.js

@@ -112,12 +112,13 @@ async function Login() {
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(user)
+        body: JSON.stringify(user),
+        credentials : "include"
         });
         if (response.ok) {
         router.push('/home');
         } else {
-        alert("Failed to submit sighting.");
+        alert("Failed to login.");
         }
     } catch (error) {
         console.error(error);
