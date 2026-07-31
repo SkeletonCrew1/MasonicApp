@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand/v2"
+	"net/http"
 	"net/mail"
-	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -26,25 +26,25 @@ func valid_email(email string) bool {
 	return err == nil
 }
 
-func GetValue(db *sql.DB, column string, email string) string {
+// func GetValue(db *sql.DB, column string, email string) string {
 
-	var value string
-	rows, err := db.Query("SELECT $1 FROM users WHERE UserEmail = $2;", column, email)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-	for rows.Next() {
-		if err := rows.Scan(&value); err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(value)
-	}
-	if err := rows.Err(); err != nil {
-		log.Fatal(err)
-	}
-	return value
-}
+// 	var value string
+// 	rows, err := db.Query("SELECT $1 FROM users WHERE UserEmail = $2;", column, email)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer rows.Close()
+// 	for rows.Next() {
+// 		if err := rows.Scan(&value); err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		fmt.Println(value)
+// 	}
+// 	if err := rows.Err(); err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	return value
+// }
 
 func GetUserStatus(db *sql.DB, email string) string {
 
@@ -147,7 +147,7 @@ func createToken(secretKey []byte, username string, status string, userid string
 			"username": username,
 			"status":   status,
 			"userid":   userid,
-			"exp":      time.Now().Add(time.Hour * 24).Unix()})
+		})
 
 	tokenString, err := token.SignedString(secretKey)
 	if err != nil {
@@ -156,18 +156,11 @@ func createToken(secretKey []byte, username string, status string, userid string
 	return tokenString, nil
 }
 
-func verifyToken(tokenString string, secretKey []byte) error {
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return secretKey, nil
-	})
-
+func GetJWTValue(w http.ResponseWriter, r *http.Request) string {
+	cookie, err := r.Cookie("JWT")
 	if err != nil {
-		return err
+		return ""
 	}
 
-	if !token.Valid {
-		return fmt.Errorf("Invalid token")
-	}
-
-	return nil
+	return cookie.Value
 }

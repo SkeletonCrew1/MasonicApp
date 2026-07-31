@@ -33,7 +33,7 @@ const customIcon = L.divIcon({
   iconSize: [16, 16],
   iconAnchor: [8, 8]
 });
-
+const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL
 const router = useRouter();
 const lat = ref("Click map");
 const lng = ref("Click map");
@@ -69,8 +69,27 @@ async function loadSightings(map) {
     console.error("Error loading sightings:", err);
   }
 }
+onMounted(async() =>{
+  try {
+    const response = await fetch(`${AUTH_SERVICE_URL}/protected`, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    credentials : "include"
+    });
+    
+    if (!response.ok) {
+      router.push('/');
+    } 
+  } catch (error) {
+    console.error(error);
+    alert("Cannot connect to the server.");
+  }
+})
 
 onMounted(() => {
+
   const bounds = [
     [-85, -Infinity],
     [85, Infinity]

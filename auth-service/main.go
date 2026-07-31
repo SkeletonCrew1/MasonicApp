@@ -10,8 +10,8 @@ import (
 	_ "runtime/trace"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	_ "github.com/golang-jwt/jwt/v5"
-
 	_ "github.com/jackc/pgx/v5"
 	_ "github.com/lib/pq"
 )
@@ -135,7 +135,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		fmt.Fprint(w, "can't connect to database")
+		log.Println("Invalid token", err)
+
 		panic(err)
 	}
 	var login_body User
@@ -167,7 +168,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	tokenString, err := createToken(secretKey, user_fake_name, user_status, user_id)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+
+		er := http.StatusInternalServerError
+		http.Error(w, "Invalid method", er)
 		return
 	}
 
@@ -182,8 +185,13 @@ func login(w http.ResponseWriter, r *http.Request) {
 		Secure:   true,
 	})
 
-	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "Login successfull")
+}
+
+type CustomClaims struct {
+	username string `json:"username"`
+	status   bool   `json:"status"`
+	userid   string `json:"userid"`
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
@@ -199,10 +207,28 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	})
 	fmt.Fprint(w, "Logout successfull")
-
+	w.WriteHeader(http.StatusOK)
 }
 
 func protected(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		er := http.StatusMethodNotAllowed
+		http.Error(w, "Invalid method", er)
+		return
+	}
+
+	var secretKey = []byte(os.Getenv("SECRET_KEY"))
+	var claims = jwt.MapClaims{}
+	JWT_value := GetJWTValue(w, r)
+	token, err := jwt.ParseWithClaims(JWT_value, &claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secretKey), nil // Ensure 'secret' is your HS256 key
+	})
+
+	if err != nil || !token.Valid {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		log.Println("Invalid token", err)
+		return
+	}
 
 }
 
