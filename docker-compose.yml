@@ -175,7 +175,11 @@ services:
     ports:
       - "5001:5000"
     environment:
-      - FLASK_ENV=development
+      FLASK_ENV: development
+      SQLALCHEMY_DATABASE_URI: "sqlite:////tmp/bird.db"
+      SECRET_KEY: ${BIRDWATCHING_SECRET_KEY}
+    env_file:
+      - .env
     networks:
       - masonic-net
 
@@ -193,3 +197,4 @@ volumes:
   main_data_sql:
   uploads_data:
   map_data_sql:
+  bird_data_sql:

@@ -177,6 +177,7 @@ def hunter_report():
 
 @app.before_request
 def block_reported_ips():
+    db.create_all()
     visitor_ip = request.remote_addr
     ip_record = ReportedIp.query.filter_by(ip=visitor_ip).first()
 
