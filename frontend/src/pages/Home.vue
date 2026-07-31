@@ -95,6 +95,7 @@ onMounted(() => {
 
   let marker = null;
   map.on("click", (e) => {
+    if (checkAndRedirect()) return;
     lat.value = e.latlng.lat.toFixed(6);
     lng.value = e.latlng.lng.toFixed(6);
     sessionStorage.setItem("latitude", lat.value);
@@ -113,7 +114,7 @@ function goToAddSighting() {
 }
 
 function goToLogin() {
-  checkAndRedirect();
+  if (checkAndRedirect()) return;
   router.push("/login");
 }
 </script>
