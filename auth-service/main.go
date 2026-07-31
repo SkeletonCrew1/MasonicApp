@@ -150,6 +150,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	email_exist := EmailExists(db, user_email)
 	user_fake_name := GetValue(db, "UserDisplayName", user_email)
 	user_status := GetValue(db, "UserStatus", user_email)
+	user_id := GetValue(db, "UserId", user_email)
 
 	if email_exist != true {
 		er := http.StatusMethodNotAllowed
@@ -164,7 +165,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenString, err := createToken(secretKey, user_fake_name, user_status)
+	tokenString, err := createToken(secretKey, user_fake_name, user_status, user_id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

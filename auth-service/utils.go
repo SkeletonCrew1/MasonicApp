@@ -82,11 +82,12 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func createToken(secretKey []byte, username string, status string) (string, error) {
+func createToken(secretKey []byte, username string, status string, userid string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"username": username,
 			"status":   status,
+			"userid":   userid,
 			"exp":      time.Now().Add(time.Hour * 24).Unix()})
 
 	tokenString, err := token.SignedString(secretKey)
