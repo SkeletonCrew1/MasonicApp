@@ -148,9 +148,9 @@ func login(w http.ResponseWriter, r *http.Request) {
 	user_email := login_body.UserEmail
 	hashedPassword, _ := hashPassword(user_password)
 	email_exist := EmailExists(db, user_email)
-	user_fake_name := GetValue(db, "UserDisplayName", user_email)
-	user_status := GetValue(db, "UserStatus", user_email)
-	user_id := GetValue(db, "UserId", user_email)
+	user_fake_name := GetUserDisplayName(db, user_email)
+	user_status := GetUserStatus(db, user_email)
+	user_id := GetUserId(db, user_email)
 
 	if email_exist != true {
 		er := http.StatusMethodNotAllowed

@@ -44,7 +44,66 @@ func GetValue(db *sql.DB, column string, email string) string {
 		log.Fatal(err)
 	}
 	return value
+}
 
+func GetUserStatus(db *sql.DB, email string) string {
+
+	var value string
+	rows, err := db.Query("SELECT UserStatus FROM users WHERE UserEmail = $1;", email)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.Scan(&value); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(value)
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return value
+}
+
+func GetUserDisplayName(db *sql.DB, email string) string {
+
+	var value string
+	rows, err := db.Query("SELECT UserDisplayName FROM users WHERE UserEmail = $1;", email)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.Scan(&value); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(value)
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return value
+}
+
+func GetUserId(db *sql.DB, email string) string {
+
+	var value string
+	rows, err := db.Query("SELECT UserId FROM users WHERE UserEmail = $1;", email)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.Scan(&value); err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(value)
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return value
 }
 
 func UserExists(db *sql.DB, username string) bool {
