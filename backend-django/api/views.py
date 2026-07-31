@@ -1,7 +1,9 @@
 import json
+import django
 import requests
 from django.conf import settings
 from django.http import JsonResponse
+from django.db.utils import OperationalError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from .models import BannedIP, User, WhiteList
@@ -53,9 +55,9 @@ def invite(request):
 
   if not email:
       return JsonResponse({"error": "Email is required"}, status=400)
-  
+
   WhiteList.objects.get_or_create(invitedemail=email)
-  
+
   data_to_send = {
       "dest": [email],
       "subject": subject,
@@ -63,7 +65,7 @@ def invite(request):
     }
 
   response = requests.post(settings.MAIL_SERVICE_URL, json = data_to_send)
-  return JsonResponse({ "data": data_to_send, "response": response.status_code }, status=200)
+  return JsonResponse({ "db-status": data_to_send, "response": response.status_code }, status=200)
 
 
 # ---------- Ban ----------
