@@ -1,6 +1,6 @@
 from flask import Flask, request, make_response
 from config import MAIN_DATABASE_URL, VOTING_DATABASE_URL
-from models import db, Voting, Vote
+from models import db, Voting, Vote, User
 
 app = Flask(__name__)
 
@@ -34,6 +34,30 @@ def add_vote():
     db.session.add(added_vote)
     db.session.commit()
     return make_response({"success": "Your vote was added"}, 200)
+
+
+@app.route("/get_votings", methods=['POST'])
+def get_all_votings():
+    data = request.get_json()
+    user_id = data.get("user_id")
+    votings_list = []
+    all_votings = Voting.query.all()
+    for voting in all_votings:
+        voting_id = voting.voting_id
+        category = voting.voting_category
+        username = voting.voting_subject
+        if db.session.get(Vote, (voting_id, user_id)) is not None:
+            is_approved = True
+        else:
+            is_approved = False
+        voting_info = {
+            "voting_id": voting_id,
+            "category": category,
+            "username": username,
+            "is_approved": is_approved
+        }
+        votings_list.append(voting_info)
+    return make_response({"votings": votings_list}, 200)
 
 
 if __name__ == "__main__":
