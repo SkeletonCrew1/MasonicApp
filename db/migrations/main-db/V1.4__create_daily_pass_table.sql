@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS Dailycode
+(
+    CodeId SERIAL PRIMARY KEY,
+
+    DailyCode TEXT NOT NULL,
+    CodeDate DATE NOT NULL
+)

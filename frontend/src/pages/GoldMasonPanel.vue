@@ -23,8 +23,9 @@
                     </div>
                     <div class="box">
                         <div class="box-header">Ban agent <span>G</span></div>
-                        <input v-model="banIpAddress" type="text" placeholder="Find somebody by IP" />
-                        <button class="action-btn right-align" :disabled="!banIpAddress" @click="doBan">BAN</button>
+                        <input v-model="banUserId" type="number" placeholder="User ID (required)" style="margin-bottom: 5px;" />
+                        <input v-model="banIpAddress" type="text" placeholder="IP Address (optional)" />
+                        <button class="action-btn right-align" :disabled="!banUserId" @click="doBan">BAN</button>
                         <p v-if="banMsg" class="feedback">{{ banMsg }}</p>
                     </div>
                 </div>
@@ -74,16 +75,29 @@ async function doBroadcast() {
     if (!broadcastMessage.value.trim()) return;
     sendingBroadcast.value = true;
     try {
-        await sendBroadcast(broadcastMessage.value, selectedStatuses.value);
-        broadcastMsg.value = "Broadcast sent"; broadcastMessage.value = "";
-    } catch (e) { broadcastMsg.value = "Error sending"; }
-    finally { sendingBroadcast.value = false; }
+        const data = await sendBroadcast(broadcastMessage.value, selectedStatuses.value);
+        broadcastMsg.value = `Broadcast sent to ${data.recipients} users`; 
+        broadcastMessage.value = "";
+    } catch (e) { 
+        broadcastMsg.value = e.message || "Error sending broadcast"; 
+    }
+    finally { 
+        sendingBroadcast.value = false; 
+    }
 }
+const banUserId = ref("");
 const banIpAddress = ref("");
 const banMsg = ref("");
 async function doBan() {
-    try { await banIp(banIpAddress.value); banMsg.value = "IP Banned"; banIpAddress.value = ""; }
-    catch (e) { banMsg.value = "Error banning"; }
+    try { 
+        await banIp(banUserId.value, banIpAddress.value); 
+        banMsg.value = "User/IP Banned successfully"; 
+        banUserId.value = ""; 
+        banIpAddress.value = ""; 
+    }
+    catch (e) { 
+        banMsg.value = e.message || "Error banning user"; 
+    }
 }
 const userQuery = ref("");
 const searchResults = ref([]);

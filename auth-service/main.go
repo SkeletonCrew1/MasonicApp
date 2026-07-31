@@ -62,20 +62,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 	user_rank := "bronze"
 	user_email := register_body.UserEmail
 	user_is_inqusitor := false
-	//user_secret_key=r.FormValue("user_secret_key")
-
-	if len(user_password) < 8 {
-		er := http.StatusNotAcceptable
-		http.Error(w, "Invalid name or password", er)
-		return
-	}
-
-	if valid_email(user_email) == false {
-		er := http.StatusConflict
-		http.Error(w, "incorect email", er)
-		return
-	}
-
+	daily_password := register_body.DailyPassword
 	hashedPassword, _ := hashPassword(user_password)
 
 	connStr := os.Getenv("AUTH_URL")
@@ -86,6 +73,23 @@ func register(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	if len(user_password) < 8 {
+		er := http.StatusConflict
+		http.Error(w, "Password has to be at least 8 characters long", er)
+		return
+	}
+
+	if valid_email(user_email) == false {
+		er := http.StatusConflict
+		http.Error(w, "Incorect email", er)
+		return
+	}
+
+	if checkDailyPassword(db, daily_password) {
+		er := http.StatusConflict
+		http.Error(w, "Wrong daily password", er)
+		return
+	}
 	defer db.Close()
 	db, err = sql.Open("postgres", connStr)
 	name_exists := UserExists(db, user_fake_name)
@@ -117,7 +121,6 @@ func register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer db.Close()
-	fmt.Fprintf(w, "User %s registered successfully", user_fake_name)
 
 }
 
@@ -147,8 +150,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	user_password := login_body.UserPassword
 	user_email := login_body.UserEmail
+	daily_password := login_body.DailyPassword
+
 	hashedPassword, _ := hashPassword(user_password)
 	email_exist := EmailExists(db, user_email)
+
 	user_fake_name := GetUserDisplayName(db, user_email)
 	user_status := GetUserStatus(db, user_email)
 	user_id := GetUserId(db, user_email)
@@ -165,7 +171,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
+	if checkDailyPassword(db, daily_password) {
+		er := http.StatusConflict
+		http.Error(w, "Wrong daily password", er)
+		return
+	}
 	tokenString, err := createToken(secretKey, user_fake_name, user_status, user_id)
 	if err != nil {
 
@@ -186,12 +196,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 	})
 
 	fmt.Fprint(w, "Login successfull")
-}
-
-type CustomClaims struct {
-	username string `json:"username"`
-	status   bool   `json:"status"`
-	userid   string `json:"userid"`
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {

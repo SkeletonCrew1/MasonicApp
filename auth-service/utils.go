@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"math/rand/v2"
 	"net/http"
@@ -26,26 +25,6 @@ func valid_email(email string) bool {
 	return err == nil
 }
 
-// func GetValue(db *sql.DB, column string, email string) string {
-
-// 	var value string
-// 	rows, err := db.Query("SELECT $1 FROM users WHERE UserEmail = $2;", column, email)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer rows.Close()
-// 	for rows.Next() {
-// 		if err := rows.Scan(&value); err != nil {
-// 			log.Fatal(err)
-// 		}
-// 		fmt.Println(value)
-// 	}
-// 	if err := rows.Err(); err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	return value
-// }
-
 func GetUserStatus(db *sql.DB, email string) string {
 
 	var value string
@@ -58,7 +37,7 @@ func GetUserStatus(db *sql.DB, email string) string {
 		if err := rows.Scan(&value); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(value)
+
 	}
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
@@ -67,7 +46,6 @@ func GetUserStatus(db *sql.DB, email string) string {
 }
 
 func GetUserDisplayName(db *sql.DB, email string) string {
-
 	var value string
 	rows, err := db.Query("SELECT UserDisplayName FROM users WHERE UserEmail = $1;", email)
 	if err != nil {
@@ -78,7 +56,7 @@ func GetUserDisplayName(db *sql.DB, email string) string {
 		if err := rows.Scan(&value); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(value)
+
 	}
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
@@ -98,7 +76,7 @@ func GetUserId(db *sql.DB, email string) string {
 		if err := rows.Scan(&value); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(value)
+
 	}
 	if err := rows.Err(); err != nil {
 		log.Fatal(err)
@@ -163,4 +141,36 @@ func GetJWTValue(w http.ResponseWriter, r *http.Request) string {
 	}
 
 	return cookie.Value
+}
+
+func GetDailyPasscode(db *sql.DB) string {
+
+	var value string
+	rows, err := db.Query("SELECT DailyCode FROM dailycode ORDER BY CodeId DESC LIMIT 1;")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.Scan(&value); err != nil {
+			log.Fatal(err)
+		}
+
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return value
+}
+
+func checkDailyPassword(db *sql.DB, input_pass string) bool {
+	daily_pass := GetDailyPasscode(db)
+
+	if daily_pass == input_pass {
+		return true
+	} else {
+		return false
+	}
+
 }

@@ -28,8 +28,21 @@ export function sendBroadcast(message, statuses) {
 export function inviteUser(email) {
     return request("/invite/", { method: "POST", body: JSON.stringify({ email }) });
 }
-export function banIp(ip) {
-    return request("/ban/", { method: "POST", body: JSON.stringify({ ip }) });
+
+/**
+ * @param { number } userId
+ * @param { string } [ip]
+*/
+export function banIp(userId, ip = null) {
+    if (!userId) throw new Error("userId is required");
+    const payload = { user_id: userId };
+    if (ip) {
+        payload.ip = ip;
+    }
+    return request("/ban/", {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
 }
 export function listBans() {
     return request("/bans/");
