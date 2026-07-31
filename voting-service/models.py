@@ -22,6 +22,7 @@ class Voting(db.Model):
     voting_id = db.Column('votingid', db.Integer, primary_key=True, autoincrement=True)
     voting_subject = db.Column('votingsubject', db.String(40), nullable=False)
     voting_category = db.Column('votingcategory', db.String(40), nullable=False)
+    subject_status = db.Column("subjectstatus", db.String(40), nullable=False)
     votes = db.relationship('Vote', backref='voting', cascade='all, delete-orphan', lazy=True)
 
 

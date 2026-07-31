@@ -2,6 +2,7 @@ from flask import Flask, request, make_response
 from config import MAIN_DATABASE_URL, VOTING_DATABASE_URL
 from models import db, Voting, Vote, User
 
+
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = MAIN_DATABASE_URL
@@ -17,8 +18,14 @@ def create_voting():
     data = request.get_json()
     voting_subject = data.get("voting_subject")
     voting_category = data.get("voting_category")
+    subject_data = User.query.filter_by(user_display_name=voting_subject).first()
+    subject_status = subject_data.user_status
 
-    new_voting = Voting(voting_subject=voting_subject, voting_category=voting_category)
+    new_voting = Voting(
+        voting_subject=voting_subject,
+        voting_category=voting_category,
+        subject_status=subject_status
+        )
     db.session.add(new_voting)
     db.session.commit()
     return make_response({"success": "New voting was created"}, 200)
@@ -40,12 +47,26 @@ def add_vote():
 def get_all_votings():
     data = request.get_json()
     user_id = data.get("user_id")
+
+    viewer_status = data.get("status")
+
+    if viewer_status == "bronze":
+        all_votings = Voting.query.filter_by(voting_category="exclude").all()
+    elif viewer_status == "silver":
+        all_votings = Voting.query.filter(
+            (Voting.subject_status == "bronze") | (Voting.voting_category == "exclude")
+            ).all()
+    else:
+        all_votings = Voting.query.all()
+
     votings_list = []
-    all_votings = Voting.query.all()
+
     for voting in all_votings:
         voting_id = voting.voting_id
         category = voting.voting_category
         username = voting.voting_subject
+        subject_status = voting.subject_status
+
         if db.session.get(Vote, (voting_id, user_id)) is not None:
             is_approved = True
         else:
@@ -54,7 +75,8 @@ def get_all_votings():
             "voting_id": voting_id,
             "category": category,
             "username": username,
-            "is_approved": is_approved
+            "is_approved": is_approved,
+            "subject_status": subject_status
         }
         votings_list.append(voting_info)
     return make_response({"votings": votings_list}, 200)
