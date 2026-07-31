@@ -1,9 +1,7 @@
 import json
-import django
 import requests
 from django.conf import settings
 from django.http import JsonResponse
-from django.db.utils import OperationalError
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from .models import BannedIP, User, WhiteList
