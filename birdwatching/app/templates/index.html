@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bird Sightings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <nav class="mb-4">
+        <a href="/" class="btn btn-light">Home</a>
+        <div class="float-end">
+            {% if current_user.is_authenticated %}
+                <span>Welcome, {{ current_user.username }}</span>
+                <a href="/create_post" class="btn btn-sm btn-success">Create Post</a>
+                <a href="/logout" class="btn btn-sm btn-danger">Logout</a>
+                <a href="/hunter/report" class="btn btn-sm btn-warning">Report hunter</a>
+            {% else %}
+                <a href="/login" class="btn btn-sm btn-primary">Login</a>
+                <a href="/register" class="btn btn-sm btn-secondary">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <h1>Bird Sightings</h1>
+    <hr>
+
+    <div class="row">
+    {% for post in posts %}
+        <div class="col-md-4 mb-3">
+            <div class="p-3 border rounded position-relative">
+                {% if post.post_password %}
+                    <div class="d-flex align-items-center justify-content-center bg-light border rounded mb-2" style="height: 200px;">
+                        <svg fill="#000000" width="80px" height="80px" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><path d="M 27.9883 51.2969 C 28.3633 51.2969 28.9492 51.1562 29.5586 50.8516 C 42.6602 43.4688 47.1836 40.3750 47.1836 31.9609 L 47.1836 14.2891 C 47.1836 11.8750 46.1289 11.1016 44.1836 10.2813 C 41.4414 9.1562 32.6524 5.9922 29.9336 5.0313 C 29.3008 4.8438 28.6680 4.7031 27.9883 4.7031 C 27.3320 4.7031 26.6992 4.8438 26.0664 5.0313 C 23.3476 6.0156 14.5586 9.1797 11.8164 10.2813 C 9.8711 11.0781 8.8164 11.8750 8.8164 14.2891 L 8.8164 31.9609 C 8.8164 40.3750 13.3633 43.4453 26.4414 50.8516 C 27.0508 51.1562 27.6133 51.2969 27.9883 51.2969 Z M 19.7617 35.7344 L 19.7617 26.6406 C 19.7617 25.1172 20.3476 24.3203 21.5898 24.1328 L 21.5898 21.3203 C 21.5898 17.0078 24.1914 14.1016 27.9883 14.1016 C 31.8086 14.1016 34.3867 17.0078 34.3867 21.3203 L 34.3867 24.1094 C 35.6524 24.2969 36.2383 25.0938 36.2383 26.6406 L 36.2383 35.7344 C 36.2383 37.4922 35.4649 38.3125 33.8242 38.3125 L 22.1524 38.3125 C 20.5351 38.3125 19.7617 37.4922 19.7617 35.7344 Z M 24.0508 24.0860 L 31.9492 24.0625 L 31.9492 21.0625 C 31.9492 18.2969 30.3789 16.4687 27.9883 16.4687 C 25.6211 16.4687 24.0508 18.2969 24.0508 21.0625 Z"/></svg>
+                    </div>
+                {% elif post.hide_photo %}
+                    <div class="d-flex align-items-center justify-content-center bg-light border rounded mb-2" style="height: 200px;">
+                        <p class="text-muted mb-0"><i>Image hidden</i></p>
+                    </div>
+                {% else %}
+                    <img src="{{ post.presigned_url }}" class="img-fluid rounded mb-2" style="width: 100%; height: 200px; object-fit: cover;">
+                {% endif %}
+                <a href="{{ url_for('app.post_detail', post_id=post.id) }}" class="text-decoration-none text-dark stretched-link d-flex justify-content-between">
+                    {{ post.title }}
+                    <p class="mb-0">
+                        <svg width="20px" height="20px" viewBox="0 0 12 12" enable-background="new 0 0 12 12" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M8.5,1C7.5206299,1,6.6352539,1.4022217,6,2.0504761C5.3648071,1.4022827,4.4793701,1,3.5,1  C1.5670166,1,0,2.5670166,0,4.5S2,8,6,11c4-3,6-4.5670166,6-6.5S10.4329834,1,8.5,1z" fill="#1D1D1B"/></svg>
+                        {{ post.likes|length }}
+                    </p>
+                </a>
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+</body>
+</html>

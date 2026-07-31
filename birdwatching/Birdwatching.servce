@@ -1,0 +1,15 @@
+[Unit]
+Description=Birdwatching
+After=network.target
+
+[Service]
+User=vagrant
+Group=vagrant
+WorkingDirectory=/home/vagrant/application/web-servers/
+ExecStart=/home/vagrant/application/web-servers/venv/bin/python3 /home/vagrant/application/web-servers/app.py
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+[Install]
+WantedBy=multi-user.target

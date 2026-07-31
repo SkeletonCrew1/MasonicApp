@@ -1,0 +1,10 @@
+flask
+SQLAlchemy
+flask_sqlalchemy
+dotenv
+pymysql
+flask_wtf
+wtforms
+email-validator
+flask_login
+boto3

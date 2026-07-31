@@ -4,7 +4,7 @@
       <div class="logo">Cult of the Tree</div>
       <ul class="nav-links">
         <li><a href="#">Register</a></li>
-        <li><a href="#">Login</a></li>
+        <li><a href="#" @click.prevent="goToLogin">Login</a></li>
       </ul>
     </nav>
 
@@ -27,6 +27,7 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { checkAndRedirect } from "@/utils/OnClick.js";
 
 const customIcon = L.divIcon({
   className: 'custom-marker',
@@ -109,5 +110,10 @@ onMounted(() => {
 
 function goToAddSighting() {
   router.push("/add-sighting");
+}
+
+function goToLogin() {
+  checkAndRedirect();
+  router.push("/login");
 }
 </script>

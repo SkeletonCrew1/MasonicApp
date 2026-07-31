@@ -169,6 +169,16 @@ services:
     env_file:
       - .env
 
+  birdwatching:
+    build:
+      context: ./birdwatching
+    ports:
+      - "5001:5000"
+    environment:
+      - FLASK_ENV=development
+    networks:
+      - masonic-net
+
 networks:
   backend:
     driver: bridge
@@ -176,6 +186,8 @@ networks:
   frontend:
     driver: bridge
     name: frontend_net
+  masonic-net:
+    driver: bridge
 
 volumes:
   main_data_sql:
