@@ -13,6 +13,7 @@ func enableCORS(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", os.Getenv("FRONTEND_SERVICE_URL"))
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusOK)
@@ -38,6 +39,7 @@ func main() {
 
 	fileServer := http.FileServer(http.Dir("./uploads"))
 	mux.Handle("/uploads/", http.StripPrefix("/uploads/", fileServer))
+	mux.HandleFunc("/user-status", handlers.GetUserStatusHandler(db))
 
 	mux.HandleFunc("/sightings", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
@@ -51,6 +53,7 @@ func main() {
 	})
 
 	mux.HandleFunc("/sighting", handlers.GetSightingByID(db))
+	mux.HandleFunc("/seen-too", handlers.AddSeenToo(db)) // <-- New endpoint registered
 
 	log.Println("Listening on :8085")
 	log.Fatal(http.ListenAndServe(":8085", enableCORS(mux)))
