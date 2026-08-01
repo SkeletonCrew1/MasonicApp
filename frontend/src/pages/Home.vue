@@ -3,7 +3,9 @@
     <nav class="navbar">
       <div class="logo">Cult of the Tree</div>
       <ul class="nav-links">
-        <li><a href="#">Login</a></li>
+        <li>
+          <a href="#" @click="Logout">Logout</a>          
+        </li>
       </ul>
     </nav>
 
@@ -155,4 +157,26 @@ function goToAddSighting() {
   }
   router.push("/add-sighting");
 }
+async function Logout() {
+    
+    try {
+        const response = await fetch(`${AUTH_SERVICE_URL}/logout`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials : "include"
+        });
+        if (response.ok) {
+        router.push('/');
+        } else {
+        alert("Failed to logout.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Cannot connect to the server.");
+    }
+
+}
 </script>
+

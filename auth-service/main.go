@@ -210,8 +210,11 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		Value:    "",
 		Expires:  time.Now().Add(time.Hour * 24),
 		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Path:     "/",
+		Secure:   true,
 	})
-	fmt.Fprint(w, "Logout successfull")
+	log.Println("Logout successfull")
 	w.WriteHeader(http.StatusOK)
 }
 
