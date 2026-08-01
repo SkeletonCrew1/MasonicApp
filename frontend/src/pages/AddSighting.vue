@@ -154,7 +154,7 @@ async function submit() {
 
     if (response.ok) {
       alert("Sighting submitted successfully!");
-      router.push('/');
+      router.push('/home');
     } else {
       alert("Failed to submit sighting.");
     }
