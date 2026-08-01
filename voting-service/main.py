@@ -2,6 +2,8 @@ from flask import Flask, request, make_response
 from config import MAIN_DATABASE_URL, VOTING_DATABASE_URL
 from models import db, Voting, Vote, User
 from sqlalchemy.exc import IntegrityError
+from flask_apscheduler import APScheduler
+
 
 app = Flask(__name__)
 
@@ -12,6 +14,8 @@ app.config['SQLALCHEMY_BINDS'] = {
 }
 
 db.init_app(app)
+
+scheduler = APScheduler()
 
 @app.route("/create_voting", methods=['POST'])
 def create_voting():
@@ -88,29 +92,49 @@ def get_all_votings():
     return make_response({"votings": votings_list}, 200)
 
 
-@app.route("/sumarize_votings", methods=['GET']) # temporary for testing
-def sumarize_votings():
-    votings_list = []
-    votings_data = Voting.query.all()
-    for voting_data in votings_data:
-        voting_id = voting_data.voting_id
-        voting_subject = voting_data.voting_subject
-        voting_category = voting_data.voting_category
-        subject_status = voting_data.subject_status
-        votes_count = len(list(voting_data.votes))
+def summarize_votings():
+    with app.app_context():
+        votings_list = []
+        all_voters_count = len(list(User.query.all()))
+        bronze_voters_count = len(list(User.query.filter(
+            (User.user_status == "silver") | (User.user_status == "gold")
+            ).all()))
+        silver_voters_count = len(list(User.query.filter_by(user_status="gold").all()))
+        votings_data = Voting.query.all()
+        for voting_data in votings_data:
+            voting_id = voting_data.voting_id
+            voting_subject = voting_data.voting_subject
+            voting_category = voting_data.voting_category
+            subject_status = voting_data.subject_status
+            votes_count = len(list(voting_data.votes))
 
-        if voting_category == "exclude":
-            pass
+            if voting_category == "exclude":
+                if (votes_count / all_voters_count) * 100 > 80:
+                    # block user func
+                    pass
+            elif voting_category == "promote":
+                if subject_status == "bronze":
+                    if (votes_count / bronze_voters_count) * 100 >= 51:
+                        # promote user func
+                        pass
+                elif subject_status == "silver":
+                    if (votes_count / silver_voters_count) * 100 >= 51:
+                        # promote user func
+                        pass
+                
 
-        voting_info = {
-            "voting_id": voting_id,
-            "voting_subject": voting_subject,
-            "voting_category": voting_category,
-            "subject_status": subject_status,
-            "votes_count": votes_count
-        }
-        votings_list.append(voting_info)
-    return make_response({"votings": votings_list}, 200)
+            voting_info = {
+                "voting_id": voting_id,
+                "voting_subject": voting_subject,
+                "voting_category": voting_category,
+                "subject_status": subject_status,
+                "votes_count": votes_count
+            }
+            votings_list.append(voting_info)
+         # return make_response({"votings": votings_list}, 200)
 
 if __name__ == "__main__":
+    scheduler.init_app(app)
+    scheduler.add_job(func=summarize_votings, trigger='interval', seconds=20, id='sumarize')
+    scheduler.start()
     app.run(host="0.0.0.0", port=4242)
