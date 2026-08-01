@@ -98,7 +98,7 @@ def promote(user_id: int):
         "id": user_id
     }
     response = requests.post("http://backend-django:8000/api/promotion", json=body)
-    print(response)
+    print(response.message)
 
 def summarize_votings():
     with app.app_context():
