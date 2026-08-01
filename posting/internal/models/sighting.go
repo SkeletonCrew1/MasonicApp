@@ -8,4 +8,6 @@ type Sighting struct {
 	Date        string  `json:"SightingDiscoveryDate"`
 	Picture     string  `json:"SightingPicture"`
 	Description string  `json:"SightingDescription"`
+	SeenCount   int     `json:"SeenCount"`
+	HasSeenIt   bool    `json:"HasSeenIt"`
 }
