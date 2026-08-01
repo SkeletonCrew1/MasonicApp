@@ -1,3 +1,4 @@
+import requests
 from flask import Flask, request, make_response
 from config import MAIN_DATABASE_URL, VOTING_DATABASE_URL
 from models import db, Voting, Vote, User
@@ -92,6 +93,13 @@ def get_all_votings():
     return make_response({"votings": votings_list}, 200)
 
 
+def promote(user_id: int):
+    body = {
+        "id": user_id
+    }
+    response = requests.post("http://backend-django:8000/api/promotion", json=body)
+    print(response)
+
 def summarize_votings():
     with app.app_context():
         votings_list = []
@@ -100,27 +108,35 @@ def summarize_votings():
             (User.user_status == "silver") | (User.user_status == "gold")
             ).all()))
         silver_voters_count = len(list(User.query.filter_by(user_status="gold").all()))
+        
+        if all_voters_count == 0:
+            all_voters_count = 1
+        if bronze_voters_count == 0:
+            bronze_voters_count = 1
+        if silver_voters_count == 0:
+            silver_voters_count = 1
+
         votings_data = Voting.query.all()
         for voting_data in votings_data:
             voting_id = voting_data.voting_id
             voting_subject = voting_data.voting_subject
+            subject_data = User.query.filter_by(user_display_name=voting_subject).first()
             voting_category = voting_data.voting_category
             subject_status = voting_data.subject_status
             votes_count = len(list(voting_data.votes))
 
             if voting_category == "exclude":
                 if (votes_count / all_voters_count) * 100 > 80:
-                    # block user func
+                    # block user func (subject_data.user_email)
                     pass
             elif voting_category == "promote":
                 if subject_status == "bronze":
                     if (votes_count / bronze_voters_count) * 100 >= 51:
-                        # promote user func
-                        pass
+                        promote(subject_data.user_id)
                 elif subject_status == "silver":
                     if (votes_count / silver_voters_count) * 100 >= 51:
-                        # promote user func
-                        pass
+                        promote(subject_data.user_id)
+                        
                 
 
             voting_info = {
@@ -131,6 +147,7 @@ def summarize_votings():
                 "votes_count": votes_count
             }
             votings_list.append(voting_info)
+        print(votings_list)
          # return make_response({"votings": votings_list}, 200)
 
 if __name__ == "__main__":
