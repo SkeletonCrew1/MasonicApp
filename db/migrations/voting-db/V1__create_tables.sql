@@ -1,7 +1,8 @@
 create table if not exists Votings (
     VotingId serial primary key,
     VotingSubject varchar(40) not null,
-    VotingCategory varchar(40) not null
+    VotingCategory varchar(40) not null,
+    SubjectStatus varchar(40) not null
 );
 
 create table if not exists Votes (
