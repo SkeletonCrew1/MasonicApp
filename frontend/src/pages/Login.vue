@@ -104,8 +104,9 @@ async function Login() {
     const user = {
         UserEmail: user_email.value,
         UserPassword: user_password.value,
-    // DailyPassword: daily_password.value
+        DailyPassword: daily_password.value
     };
+    
     try {
         const response = await fetch(`${AUTH_SERVICE_URL}/login`, {
         method: "POST",

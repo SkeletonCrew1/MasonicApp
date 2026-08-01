@@ -85,11 +85,12 @@ func register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if checkDailyPassword(db, daily_password) {
+	if !checkDailyPassword(db, daily_password) {
 		er := http.StatusConflict
 		http.Error(w, "Wrong daily password", er)
 		return
 	}
+
 	defer db.Close()
 	db, err = sql.Open("postgres", connStr)
 	name_exists := UserExists(db, user_fake_name)
@@ -171,7 +172,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	if checkDailyPassword(db, daily_password) {
+	if !checkDailyPassword(db, daily_password) {
 		er := http.StatusConflict
 		http.Error(w, "Wrong daily password", er)
 		return
