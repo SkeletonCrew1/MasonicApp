@@ -64,6 +64,15 @@ func runPasswordTask() {
 	}
 	defer db.Close()
 
+	today := time.Now().Format("2006-01-02")
+	var existingID int
+	err = db.QueryRow(`SELECT CodeId FROM Dailycode WHERE CodeDate = $1`, today).Scan(&existingID)
+
+	if err == nil {
+		log.Println("Password/Code for today already exists. Skipping password generation, email notification, and update.")
+		return
+	}
+
 	users, err := handlers.GetAllUsers(db)
 	if err != nil {
 		log.Printf("Failed to fetch users: %v", err)
@@ -109,6 +118,14 @@ func runPasswordTask() {
 	}
 
 	log.Println("Password emails sent successfully!")
+
+	err = handlers.UpdateDailyCode(db, password, true)
+	if err != nil {
+		log.Printf("Failed to update daily code: %v", err)
+		return
+	}
+
+	log.Println("Daily code checked/updated successfully!")
 }
 
 func main() {
