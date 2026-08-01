@@ -105,10 +105,10 @@ def delete_all(request):
 def user_promotion(request):
 
     data = json.loads(request.body)
-    uid = data.get("id")
+    user_name = data.get("userdisplayname")
 
     try:
-        user = User.objects.get(userid=uid)
+        user = User.objects.get(userdisplayname=user_name)
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found"}, status=404)
 
