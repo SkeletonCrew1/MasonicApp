@@ -15,6 +15,12 @@ class User(db.Model):
     user_is_inquisitor = db.Column('userisinquisitor', db.Boolean, nullable=False)
 
 
+class Blacklist(db.Model):
+    __tablename__ = 'blacklist'
+
+    banned_email = db.Column('bannedemail', db.Text, primary_key=True)
+
+
 class Voting(db.Model):
     __bind_key__ = 'voting-db'
     __tablename__ = 'votings'

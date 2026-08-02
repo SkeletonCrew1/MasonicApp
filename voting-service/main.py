@@ -1,9 +1,11 @@
 import requests
 from flask import Flask, request, make_response
-from config import MAIN_DATABASE_URL, VOTING_DATABASE_URL
-from models import db, Voting, Vote, User
+from config import MAIN_DATABASE_URL, VOTING_DATABASE_URL, MAIL_SERVICE_URL, PROMOTION_URL
+from models import db, Voting, Vote, User, Blacklist
 from sqlalchemy.exc import IntegrityError
-from flask_apscheduler import APScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+from pytz import timezone
 
 
 app = Flask(__name__)
@@ -16,7 +18,7 @@ app.config['SQLALCHEMY_BINDS'] = {
 
 db.init_app(app)
 
-scheduler = APScheduler()
+scheduler = BackgroundScheduler()
 
 @app.route("/create_voting", methods=['POST'])
 def create_voting():
@@ -24,7 +26,18 @@ def create_voting():
     voting_subject = data.get("voting_subject")
     voting_category = data.get("voting_category")
     subject_data = User.query.filter_by(user_display_name=voting_subject).first()
+
+    if subject_data is None:
+        return  make_response({"error": "Selected user not found"}, 404)
+
     subject_status = subject_data.user_status
+
+    voting_exist = Voting.query.filter(
+            (Voting.voting_subject == voting_subject) | (Voting.voting_category == voting_category)
+            ).first()
+    
+    if voting_exist is not None:
+        return make_response({"error": "This voting already exist"}, 409)
 
     if subject_status == "gold" and voting_category == "promote":
         return make_response({"message": "Current user already has gold status"}, 200)
@@ -50,7 +63,7 @@ def add_vote():
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-        return make_response({"error": "Vote already exist"}, 400)
+        return make_response({"error": "Vote already exist"}, 409)
     return make_response({"message": "Your vote was added"}, 200)
 
 
@@ -69,7 +82,7 @@ def get_all_votings():
     elif viewer_status == "gold":
         all_votings = Voting.query.all()
     else:
-        return make_response({"message": "Current user status doesn't exist"}, 200)
+        return make_response({"error": "Current user status doesn't exist"}, 404)
     votings_list = []
 
     for voting in all_votings:
@@ -93,24 +106,31 @@ def get_all_votings():
     return make_response({"votings": votings_list}, 200)
 
 
-def promote(user_id: int):
+def promote(user_name: str, email: str):
     body = {
-        "id": user_id
+        "userdisplayname": user_name
     }
-    response = requests.post("http://backend-django:8000/api/promotion", json=body)
-    print(response.message)
+    response = requests.post(PROMOTION_URL, json=body)
 
+    if int(response.status_code) == 200:
+        notification = {
+            "dest": [email],
+            "subject": "Promotion",
+            "body": "Congrats! Your was promoted to higher status."
+        }
+        requests.post(MAIL_SERVICE_URL, json=notification)
+
+
+# This endpoint gives ability to trigger function without scheduler
+# @app.route("/summarize", methods=['GET'])
 def summarize_votings():
     with app.app_context():
-        votings_list = []
         all_voters_count = len(list(User.query.all()))
         bronze_voters_count = len(list(User.query.filter(
             (User.user_status == "silver") | (User.user_status == "gold")
             ).all()))
         silver_voters_count = len(list(User.query.filter_by(user_status="gold").all()))
-        
-        if all_voters_count == 0:
-            all_voters_count = 1
+
         if bronze_voters_count == 0:
             bronze_voters_count = 1
         if silver_voters_count == 0:
@@ -118,8 +138,7 @@ def summarize_votings():
 
         votings_data = Voting.query.all()
         for voting_data in votings_data:
-            voting_id = voting_data.voting_id
-            voting_subject = voting_data.voting_subject
+            voting_subject = str (voting_data.voting_subject)
             subject_data = User.query.filter_by(user_display_name=voting_subject).first()
             voting_category = voting_data.voting_category
             subject_status = voting_data.subject_status
@@ -127,31 +146,30 @@ def summarize_votings():
 
             if voting_category == "exclude":
                 if (votes_count / all_voters_count) * 100 > 80:
-                    # block user func (subject_data.user_email)
-                    pass
+                    try:
+                        email_to_ban = Blacklist(banned_email=subject_data.user_email)
+                        db.session.add(email_to_ban)
+                        db.session.commit()
+                    except IntegrityError:
+                        db.session.rollback()
             elif voting_category == "promote":
                 if subject_status == "bronze":
                     if (votes_count / bronze_voters_count) * 100 >= 51:
-                        promote(subject_data.user_id)
+                        promote(voting_subject, subject_data.user_email)
                 elif subject_status == "silver":
                     if (votes_count / silver_voters_count) * 100 >= 51:
-                        promote(subject_data.user_id)
-                        
-                
+                        promote(voting_subject, subject_data.user_email)
 
-            voting_info = {
-                "voting_id": voting_id,
-                "voting_subject": voting_subject,
-                "voting_category": voting_category,
-                "subject_status": subject_status,
-                "votes_count": votes_count
-            }
-            votings_list.append(voting_info)
-        print(votings_list)
-         # return make_response({"votings": votings_list}, 200)
+        db.session.execute(db.delete(Voting))
+        db.session.commit()
+
 
 if __name__ == "__main__":
-    scheduler.init_app(app)
-    scheduler.add_job(func=summarize_votings, trigger='interval', seconds=20, id='sumarize')
+    kyiv_tz = timezone('Europe/Kyiv')
+    scheduler.add_job(
+        func=summarize_votings,
+        trigger=CronTrigger(hour=23, minute=59, timezone=kyiv_tz),
+        id='votings_sumarize'
+        )
     scheduler.start()
     app.run(host="0.0.0.0", port=4242)
