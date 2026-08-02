@@ -169,6 +169,16 @@ services:
     env_file:
       - .env
 
+  bird-db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${BIRD_DB_PASSWORD}
+      MYSQL_DATABASE: birdwatching
+    volumes:
+      - bird_data_sql:/var/lib/mysql
+    networks:
+      - masonic-net
+      
   birdwatching:
     build:
       context: ./birdwatching
@@ -176,7 +186,6 @@ services:
       - "5001:5000"
     environment:
       FLASK_ENV: development
-      SQLALCHEMY_DATABASE_URI: "sqlite:////tmp/bird.db"
       SECRET_KEY: ${BIRDWATCHING_SECRET_KEY}
     env_file:
       - .env

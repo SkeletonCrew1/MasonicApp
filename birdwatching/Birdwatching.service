@@ -1,0 +1,13 @@
+[Unit]
+Description=Birdwatching
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+ExecStart=/var/www/birdwatching/venv/bin/python3 /var/www/birdwatching/run.py
+StandardOutput=syslog
+StandardError=syslog
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+[Install]
+WantedBy=multi-user.target
