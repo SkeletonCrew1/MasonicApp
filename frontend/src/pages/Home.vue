@@ -3,8 +3,9 @@
     <nav class="navbar">
       <div class="logo">Cult of the Tree</div>
       <ul class="nav-links">
-        <li><a href="#">Register</a></li>
-        <li><a href="#">Login</a></li>
+        <li>
+          <a href="#" @click="Logout">Logout</a>          
+        </li>
       </ul>
     </nav>
 
@@ -38,12 +39,15 @@ const router = useRouter();
 const lat = ref("Click map");
 const lng = ref("Click map");
 const showAddButton = ref(false);
-const markersLayer = L.featureGroup();
-const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL
+const userStatus = ref("bronze");
+const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL;
+const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
 
 async function loadSightings(map) {
   try {
-    const response = await fetch(`${POSTING_SERVICE_URL}/sightings`);
+    const response = await fetch(`${POSTING_SERVICE_URL}/sightings`, {
+      credentials: "include"
+    });
     if (!response.ok) throw new Error("Failed to fetch");
     const sightings = await response.json();
 
@@ -70,7 +74,42 @@ async function loadSightings(map) {
   }
 }
 
-onMounted(() => {
+async function checkUserStatus() {
+  try {
+    const response = await fetch(`${POSTING_SERVICE_URL}/user-status`, {
+      credentials: "include"
+    });
+    if (response.ok) {
+      const data = await response.json();
+      userStatus.value = data.status;
+    }
+  } catch (err) {
+    console.error("Failed to fetch user status", err);
+  }
+}
+
+onMounted(async() =>{
+  try {
+    const response = await fetch(`${AUTH_SERVICE_URL}/protected`, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    credentials : "include"
+    });
+    
+    if (!response.ok) {
+      router.push('/');
+    } 
+  } catch (error) {
+    console.error(error);
+    alert("Cannot connect to the server.");
+  }
+})
+
+onMounted(async () => {
+  await checkUserStatus();
+
   const bounds = [
     [-85, -Infinity],
     [85, Infinity]
@@ -98,7 +137,11 @@ onMounted(() => {
     lng.value = e.latlng.lng.toFixed(6);
     sessionStorage.setItem("latitude", lat.value);
     sessionStorage.setItem("longitude", lng.value);
-    showAddButton.value = true;
+
+    if (userStatus.value !== "bronze") {
+      showAddButton.value = true;
+    }
+
     if (marker) {
       marker.setLatLng(e.latlng);
     } else {
@@ -108,10 +151,35 @@ onMounted(() => {
 });
 
 function goToAddSighting() {
+  if (userStatus.value === "bronze") {
+    alert("Bronze users are not allowed to add sightings.");
+    return;
+  }
   router.push("/add-sighting");
 }
 
 function goToLogin() {
   router.push("/login");
 }
-</script>
+async function Logout() {
+    
+    try {
+        const response = await fetch(`${AUTH_SERVICE_URL}/logout`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials : "include"
+        });
+        if (response.ok) {
+        router.push('/');
+        } else {
+        alert("Failed to logout.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Cannot connect to the server.");
+    }
+
+}
+

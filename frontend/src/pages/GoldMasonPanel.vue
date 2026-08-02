@@ -35,18 +35,8 @@
                 <div class="col right-col">
                     <div class="box">
                         <div class="box-header">Promotion <span>G</span></div>
-                        <input v-model="userQuery" type="text" placeholder="username search" @input="doSearch" />
-                        <ul v-if="searchResults.length" class="results">
-                            <li v-for="u in searchResults" :key="u.id"
-                                :class="{ selected: selectedUser && selectedUser.id === u.id }"
-                                @click="selectedUser = u">
-                                {{ u.username }}
-                            </li>
-                        </ul>
-                        <select v-model="chosenStatus">
-                            <option v-for="s in statuses" :key="s" :value="s">{{ s }}</option>
-                        </select>
-                        <button class="action-btn right-align mt-auto" :disabled="!selectedUser"
+                        <input v-model="promoteUsername" type="text" placeholder="Username" />
+                        <button class="action-btn right-align mt-auto" :disabled="!promoteUsername"
                             @click="doPromote">Promote</button>
                         <p v-if="promotionMsg" class="feedback">{{ promotionMsg }}</p>
                     </div>
@@ -64,30 +54,33 @@
 
 <script setup>
 import { ref } from "vue";
-import { deleteAllData, inviteUser, promoteUser, searchUsers, sendBroadcast, banIp } from "../api/client";
+import { deleteAllData, inviteUser, promoteUser, sendBroadcast, banIp } from "../api/client";
 const emit = defineEmits(["close"]);
-const statuses = ["bronze", "silver", "golden"];
+const statuses = ["bronze", "silver", "gold"];
+
+
 const broadcastMessage = ref("");
 const selectedStatuses = ref([...statuses]);
 const sendingBroadcast = ref(false);
 const broadcastMsg = ref("");
+
 async function doBroadcast() {
-    if (!broadcastMessage.value.trim()) return;
-    sendingBroadcast.value = true;
+    if (!broadcastMessage.value.trim() || !selectedStatuses.value.length) return;
     try {
-        const data = await sendBroadcast(broadcastMessage.value, selectedStatuses.value);
-        broadcastMsg.value = `Broadcast sent to ${data.recipients} users`; 
-        broadcastMessage.value = "";
-    } catch (e) { 
-        broadcastMsg.value = e.message || "Error sending broadcast"; 
-    }
-    finally { 
-        sendingBroadcast.value = false; 
+        await sendBroadcast(broadcastMessage.value, selectedStatuses.value);
+        broadcastMsg.value = "Broadcast message sucessfully sent!";
+    } catch (e) {
+        broadcastMsg.value = e.message || "Error sending broadcast!";
+    } finally {
+        sendingBroadcast.value = false;
     }
 }
+
+
 const banUserId = ref("");
 const banIpAddress = ref("");
 const banMsg = ref("");
+
 async function doBan() {
     try { 
         await banIp(banUserId.value, banIpAddress.value); 
@@ -99,31 +92,41 @@ async function doBan() {
         banMsg.value = e.message || "Error banning user"; 
     }
 }
-const userQuery = ref("");
-const searchResults = ref([]);
-const selectedUser = ref(null);
-const chosenStatus = ref("bronze");
+
+
+const promoteUsername = ref("");
 const promotionMsg = ref("");
-async function doSearch() {
-    if (!userQuery.value) { searchResults.value = []; return; }
-    try { searchResults.value = await searchUsers(userQuery.value); } catch (e) { searchResults.value = []; }
-}
+
 async function doPromote() {
-    if (!selectedUser.value) return;
-    try { await promoteUser(selectedUser.value.id, chosenStatus.value); promotionMsg.value = "Promoted"; }
-    catch (e) { promotionMsg.value = "Error"; }
+    if (!promoteUsername.value) return;
+    try {
+        const data = await promoteUser(promoteUsername.value);
+        promotionMsg.value = data.message || "User sucessfully promoted!";
+    } catch (e) {
+        promotionMsg.value = e.message || "Error!";
+    }
 }
+
+
 const inviteEmail = ref("");
 const inviteMsg = ref("");
+
 async function doInvite() {
-    try { await inviteUser(inviteEmail.value); inviteMsg.value = "Sent"; inviteEmail.value = ""; }
-    catch (e) { inviteMsg.value = "Error"; }
+    try {
+        await inviteUser(inviteEmail.value);
+        inviteMsg.value = "Invite message sucessfully sent!";
+    } catch (e) {
+        inviteMsg.value = e.message || "Error!";
+    }
 }
+
+
 async function doDeleteAll() {
     if (!confirm("Delete all data?")) return;
     try { await deleteAllData(); alert("Deleted"); }
     catch (e) { alert("Error"); }
 }
+
 </script>
 
 <style scoped>

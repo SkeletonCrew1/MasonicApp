@@ -3,6 +3,8 @@ import Home from "../pages/Home.vue";
 import AddSighting from "../pages/AddSighting.vue";
 import SightingDetail from '../pages/SightingDetail.vue';
 import GoldMasonPanel from "../pages/GoldMasonPanel.vue"
+import Register from "../pages/Registration.vue";
+import Login from "../pages/Login.vue";
 
 const REDIRECT_URL = (window as any).__APP_CONFIG__?.BIRDWATCHING_URL || (import.meta as any).env.VITE_BIRDWATCHING_URL || 'http://localhost:5001';
 

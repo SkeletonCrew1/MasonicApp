@@ -12,9 +12,8 @@ class User(models.Model):
     userid = models.BigAutoField(primary_key=True)
     userdisplayname = models.CharField(max_length=150, unique=True)
     userstatus = models.CharField(max_length=10, choices=status_choices, default="bronze")
+    useremail = models.CharField(max_length=150, unique=True)
 
-    def __str__(self):
-        return self.username
     
     def to_dict(self):
         return {
@@ -56,3 +55,12 @@ class Message(models.Model):
 
     class Meta:
         db_table = "messages"
+
+
+
+class WhiteList(models.Model):
+    invitationid = models.BigAutoField(primary_key=True)
+    invitedemail = models.CharField(max_length=150, unique=True)
+
+    class Meta:
+        db_table = "whitelist"

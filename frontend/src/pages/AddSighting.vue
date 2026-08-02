@@ -3,7 +3,7 @@
     <div class="add-container">
 
       <div class="form-column">
-        <button class="back-btn" @click="$router.push('/')">← Back to Map</button>
+        <button class="back-btn" @click="$router.push('/home')">← Back to Map</button>
         <h1>Add Sighting</h1>
 
         <form @submit.prevent="submit">
@@ -73,12 +73,46 @@ const name = ref("");
 const date = ref("");
 const description = ref("");
 const pictureInput = ref(null);
-const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL
+const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL;
+const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
 
 let map = null;
 let marker = null;
 
+onMounted(async() =>{
+  try {
+    const response = await fetch(`${AUTH_SERVICE_URL}/protected`, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    credentials : "include"
+    });
+    
+    if (!response.ok) {
+      router.push('/');
+    } 
+  } catch (error) {
+    console.error(error);
+    alert("Cannot connect to the server.");
+  }
+})
+
 onMounted(async () => {
+  try {
+    const res = await fetch(`${POSTING_SERVICE_URL}/user-status`, { credentials: "include" });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === "bronze") {
+        alert("Access denied. Bronze users cannot access this page.");
+        router.push("/home");
+        return;
+      }
+    }
+  } catch (e) {
+    console.error("Authorization check failed", e);
+  }
+
   await nextTick();
 
   const bounds = [
@@ -146,6 +180,7 @@ async function submit() {
   try {
     const response = await fetch(`${POSTING_SERVICE_URL}/sightings`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json"
       },
@@ -154,9 +189,9 @@ async function submit() {
 
     if (response.ok) {
       alert("Sighting submitted successfully!");
-      router.push('/');
+      router.push('/home');
     } else {
-      alert("Failed to submit sighting.");
+      alert("Failed to submit sighting. Make sure you have silver or golden status.");
     }
   } catch (error) {
     console.error(error);

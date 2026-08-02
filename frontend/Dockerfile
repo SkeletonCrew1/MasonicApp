@@ -3,6 +3,7 @@ FROM node:alpine
 WORKDIR /app
 
 ARG VITE_POSTING_SERVICE_URL
+ARG VITE_AUTH_SERVICE_URL
 
 COPY package*.json ./
 RUN npm install
@@ -20,3 +21,4 @@ EXPOSE 3000
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 CMD ["serve", "-s", "dist", "-l", "3000"]
+
