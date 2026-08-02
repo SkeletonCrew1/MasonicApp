@@ -28,7 +28,7 @@ def create_voting():
     subject_data = User.query.filter_by(user_display_name=voting_subject).first()
 
     if subject_data is None:
-        return  make_response({"error": "Selected user not found"}, 404)
+        return make_response({"error": "Selected user not found"}, 404)
 
     subject_status = subject_data.user_status
 
