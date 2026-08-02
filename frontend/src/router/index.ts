@@ -17,4 +17,18 @@ const router = createRouter({
     ]
 });
 
+router.beforeEach(async (to, from, next) => {
+    try {
+        // const response = await fetch('/api/check-ban-status');
+        const response = { status: 403 }
+        if (response.status === 403) {
+            window.location.href = REDIRECT_URL;
+            return;
+        }
+    } catch (error) {
+        console.error("Could not check ban status:", error)
+    }
+    next();
+});
+
 export default router;
