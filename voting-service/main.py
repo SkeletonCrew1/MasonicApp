@@ -138,7 +138,7 @@ def summarize_votings():
 
         votings_data = Voting.query.all()
         for voting_data in votings_data:
-            voting_subject = str (voting_data.voting_subject)
+            voting_subject = str(voting_data.voting_subject)
             subject_data = User.query.filter_by(user_display_name=voting_subject).first()
             voting_category = voting_data.voting_category
             subject_status = voting_data.subject_status
