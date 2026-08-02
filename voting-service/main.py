@@ -40,7 +40,7 @@ def create_voting():
         return make_response({"error": "This voting already exist"}, 409)
 
     if subject_status == "gold" and voting_category == "promote":
-        return make_response({"message": "Current user already has gold status"}, 200)
+        return make_response({"message": "Current user already has gold status"}, 304)
 
     new_voting = Voting(
         voting_subject=voting_subject,
