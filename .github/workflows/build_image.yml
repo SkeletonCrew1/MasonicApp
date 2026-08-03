@@ -17,11 +17,14 @@ jobs:
       fail-fast: false
       matrix:
         service:
-         - posting
-         - mail-service
-         - backend-django
-         - frontend
-         - dailyfunctions
+          - posting
+          - mail-service
+          - backend-django
+          - frontend
+          - daily-inquisitor
+          - daily-password
+          - voting-service
+          - auth-service
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,6 +50,9 @@ jobs:
         if: steps.changes.output.src == 'true' || github.event_name == 'workflow_dispatch'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+      
+      - name: Set current date as env variable
+        run: echo "TIME=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
       - name: Build image and push ${{ matrix.service }} to ECR
         if: steps.changes.output.src == 'true' || github.event_name == 'workflow_dispatch'
@@ -54,11 +60,12 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPO: ${{ matrix.service }}
           TAG: ${{ github.sha }}
+          TIME_TAG: ${{ env.TIME }}
         run: |
           cd ${{ matrix.service }}
           docker build \
             -t $ECR_REGISTRY/$ECR_REPO:$TAG \
-            -t $ECR_REGISTRY/$ECR_REPO:latest .
+            -t $ECR_REGISTRY/$ECR_REPO:$TIME_TAG .
 
           docker push $ECR_REGISTRY/$ECR_REPO:$TAG
-          docker push $ECR_REGISTRY/$ECR_REPO:latest
+          docker push $ECR_REGISTRY/$ECR_REPO:$TIME_TAG
