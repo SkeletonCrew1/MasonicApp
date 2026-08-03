@@ -1,10 +1,13 @@
 <template>
   <div class="page">
-    <nav class="navbar">
+<nav class="navbar">
       <div class="logo">Cult of the Tree</div>
       <ul class="nav-links">
+        <li v-if="userStatus === 'golden'">
+          <router-link to="/control-panel">Control Panel</router-link>
+        </li>
         <li>
-          <a href="#" @click="Logout">Logout</a>          
+          <a href="#" @click="Logout">Logout</a>         
         </li>
       </ul>
     </nav>
