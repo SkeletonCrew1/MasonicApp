@@ -1,10 +1,19 @@
 <template>
   <div class="page">
     <nav class="navbar">
-      <div class="logo">Cult of the Tree</div>
+      <router-link to="/home" class="logo">Cult of the Tree</router-link>
       <ul class="nav-links">
+        <li v-if="userStatus?.trim().toLowerCase() === 'gold'">
+          <router-link to="/control-panel">Gold User page</router-link>
+        </li>
         <li>
-          <a href="#" @click="Logout">Logout</a>          
+          <router-link to="/voting-page">Voting</router-link>
+        </li>
+        <li class="user-greeting" v-if="currentUsername">
+          {{ currentUsername }}
+        </li>
+        <li>
+          <a href="#" @click.prevent="Logout">Logout</a>
         </li>
       </ul>
     </nav>
