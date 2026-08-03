@@ -6,9 +6,12 @@ from sqlalchemy.exc import IntegrityError
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from pytz import timezone
+from flask_cors import CORS
 
 
 app = Flask(__name__)
+
+CORS(app, supports_credentials=True)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = MAIN_DATABASE_URL
 
