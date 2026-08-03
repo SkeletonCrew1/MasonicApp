@@ -16,7 +16,7 @@ This code is implementation of our frontend website that features sighting map a
 ## How to run?
 * First download the repository.
 * `cd` into repository folder
-* Run `docker compose up --build`
+* Run `docker compose up --build` inside main repository folder (not frontend)
 * Go to browser, type `http://localhost:3000` and enjoy the website
 ## Prerequisites
 * Have Git installed
