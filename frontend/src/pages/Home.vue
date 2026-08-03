@@ -3,7 +3,7 @@
 <nav class="navbar">
       <div class="logo">Cult of the Tree</div>
       <ul class="nav-links">
-        <li v-if="userStatus === 'golden'">
+        <li v-if="userStatus === 'gold'">
           <router-link to="/control-panel">Control Panel</router-link>
         </li>
         <li>
