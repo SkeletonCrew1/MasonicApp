@@ -11,7 +11,7 @@ This code is implementation of our daily inquisitor service. This code allows us
 ## How to run?
 * First download the repository.
 * `cd` into repository folder
-* Run `docker compose up --build`
+* Run `docker compose up --build` inside main repository folder (not daily-inquisitor)
 ## Prerequisites
 * Have Git installed
 * Have `Docker` and `Docker Compose` installed
