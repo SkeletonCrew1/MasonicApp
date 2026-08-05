@@ -6,6 +6,3 @@ output "user_passwords" {
   description = "A map of usernames to their initial temporary passwords"
   sensitive   = true
 }
-
-# Command to output credentials to a json file
-# terraform output -json user_passwords > passwords.json

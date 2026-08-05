@@ -33,4 +33,7 @@ terraform init
 
 # Apply changes.
 terraform apply
+
+# Command to output credentials to a json file
+terraform output -json user_passwords > passwords.json
 ```
