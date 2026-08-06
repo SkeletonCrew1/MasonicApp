@@ -11,7 +11,7 @@ This code is implementation of our daily password service. This code allows us t
 ## How to run?
 * First download the repository.
 * `cd` into repository folder
-* Run `docker compose up --build`
+* Run `docker compose up --build` inside main repository folder (not daily-password)
 ## Prerequisites
 * Have Git installed
 * Have `Docker` and `Docker Compose` installed

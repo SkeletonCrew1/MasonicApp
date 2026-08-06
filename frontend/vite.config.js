@@ -1,30 +1,10 @@
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 
-const env = loadEnv(
-    'all',
-    process.cwd()
-);
-
-const AUTH_SERVICE = env.VITE_AUTH_SERVICE_URL;
-
 export default defineConfig({
-
+  plugins: [vue()],
   server: {
-    proxy: {
-      '/register': AUTH_SERVICE + '/register',
-    },
+    host: true,
+    port: 5173,
   },
-  plugins: [vue({
-    template: {
-      compilerOptions: {
-        // Enable JSX
-        isCustomElement: (tag) => tag.includes('-')
-      }
-    }
-  })],
-  esbuild: {
-    jsxFactory: 'h',
-    jsxFragment: 'Fragment'
-  }
 });
