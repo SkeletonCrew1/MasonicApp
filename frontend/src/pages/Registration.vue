@@ -102,7 +102,7 @@ const router = useRouter();
 const user_email = ref("");
 const user_password = ref("");
 const daily_password = ref("");
-const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL
+
 
 async function Register() {
     const user = {
@@ -112,7 +112,7 @@ async function Register() {
     };
     
     try {
-        const response = await fetch(`${AUTH_SERVICE_URL}/register`, {
+        const response = await fetch(`/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
