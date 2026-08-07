@@ -11,7 +11,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket       = "masonicapp-terraform-state"
+    bucket       = "masonicapp-s3bucket"
     key          = "state/users/terraform.tfstate"
     use_lockfile = true
     region       = "us-east-1"
