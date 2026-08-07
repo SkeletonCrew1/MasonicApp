@@ -22,5 +22,5 @@ resource "aws_iam_user_policy_attachment" "users" {
   for_each = toset(local.users)
 
   user       = aws_iam_user.users[each.value].name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
 }
