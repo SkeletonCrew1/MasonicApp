@@ -8,7 +8,7 @@ create table if not exists Users (
 );
 
 create table if not exists BannedIps (
-    IpId serial primary key ,
+    IpId serial primary key,
     BannedIp varchar(40) not null
 );
 
@@ -19,4 +19,8 @@ create table if not exists Messages (
     MessageStatus varchar(20) not null,
     SenderId int not null references Users(UserId) not null,
     CreatedAt timestamp with time zone not null
+);
+
+create table if not exists Blacklist (
+    BannedEmail text primary key
 );

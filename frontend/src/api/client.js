@@ -58,3 +58,43 @@ export function promoteUser(userDisplayName) {
 export function deleteAllData() {
     return request("/delete-all/", { method: "POST" });
 }
+
+
+const VOTING_API_BASE = "http://localhost:4242"; 
+
+async function votingRequest(path, options = {}) {
+    const headers = { "Content-Type": "application/json" };
+
+    const res = await fetch(`${VOTING_API_BASE}${path}`, {
+        headers: { ...headers, ...(options.headers || {}) },
+        credentials: "include",
+        ...options,
+    });
+    
+    if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || body.message || "Voting request failed");
+    }
+    return res.json();
+}
+
+export function getVotings(userId, status) {
+    return votingRequest("/get_votings", {
+        method: "POST",
+        body: JSON.stringify({ user_id: userId, status })
+    }); 
+}
+
+export function createVoting(votingSubject, votingCategory) {
+    return votingRequest("/create_voting", {
+        method: "POST",
+        body: JSON.stringify({ voting_subject: votingSubject, voting_category: votingCategory })
+    });
+}
+
+export function addVote(votingId, voterId) {
+    return votingRequest("/vote", {
+        method: "POST",
+        body: JSON.stringify({ voting_id: votingId, voter_id: voterId })
+    });
+}
