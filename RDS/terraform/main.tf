@@ -3,7 +3,7 @@ resource "aws_db_instance" "databases" {
 
   identifier             = "${var.project}-db-${each.key}"
   engine                 = "postgres"
-  engine_version         = "14"
+  engine_version         = "18"
   instance_class         = "db.t3.micro"
   allocated_storage      = 10
 
