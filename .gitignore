@@ -5,7 +5,11 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
-
+terraform/iam-users/.terraform
+terraform/iam-users/.terraform.lock.hcl
+terraform/iam-users/passwords.json
+terraform/s3-bucket-for-state/.terraform
+terraform/s3-bucket-for-state/.terraform.lock.hcl
 # Django
 *.log
 db.sqlite3

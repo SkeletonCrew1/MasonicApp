@@ -56,7 +56,7 @@
 import { ref, onMounted } from "vue";
 import { deleteAllData, inviteUser, promoteUser, sendBroadcast, banIp } from "../api/client";
 const emit = defineEmits(["close"]);
-const statuses = ["bronze", "silver", "golden"];
+const statuses = ["bronze", "silver", "gold"];
 
 
 const broadcastMessage = ref("");

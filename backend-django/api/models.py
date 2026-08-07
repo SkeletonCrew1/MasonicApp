@@ -6,7 +6,7 @@ class User(models.Model):
     status_choices = [
     ("bronze", "Bronze"),
     ("silver", "Silver"),
-    ("golden", "Golden"),
+    ("gold", "Gold"),
     ]  
 
     userid = models.BigAutoField(primary_key=True)
