@@ -26,12 +26,21 @@ git clone https://github.com/SkeletonCrew1/MasonicApp.git
 git checkout SKEL-2-68-create-iam-users
 
 # Change working directory.
+cd MasonicApp/terraform/s3-bucket-for-state
+
+# Initialize the working directory for Terraform.
+terraform init
+
+# Apply changes for creating S3bucket.
+terraform apply
+
+# Change working directory.
 cd MasonicApp/terraform/iam-users
 
 # Initialize the working directory for Terraform.
 terraform init
 
-# Apply changes.
+# Apply changes for creating IAM users.
 terraform apply
 
 # Command to output credentials to a json file
