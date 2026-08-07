@@ -1,7 +1,11 @@
-variable "aws_region" {}
-variable "project" {}
-variable "databases" { type = set(string) }
-variable "vpc_cidr" {}
-variable "subnet_1_cidr" {}
-variable "subnet_2_cidr" {}
-variable "db_password" { sensitive = true }
+variable "aws_region" {
+    description = "AWS region for deployment"
+    type        = string
+    default     = "eu-north-1"
+}
+variable "db_password" { 
+    description = "Password for the database for nov TF_VAR"
+    type        = string
+    sensitive   = true 
+    default     = null
+}
