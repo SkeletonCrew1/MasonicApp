@@ -1,3 +1,16 @@
+# --- macOS ---
+.DS_Store
+
+# --- Terraform ---
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfplan
+*.tfvars
+!terraform.tfvars.example
+.terraform.lock.hcl
+
 # Python
 __pycache__/
 *.pyc
@@ -21,6 +34,8 @@ frontend/.vite/
 .env
 .env.*
 !.env.example
+config.env
+passwords.json
 config.env
 
 # IDE / OS
