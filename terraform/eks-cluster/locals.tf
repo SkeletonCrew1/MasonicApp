@@ -1,8 +1,8 @@
 locals {
   env                  = "development"
-  region               = "eu-west-1"
-  zone1                = "eu-west-1a"
-  zone2                = "eu-west-1b"
+  region               = "eu-north-1"
+  zone1                = "eu-north-1a"
+  zone2                = "eu-north-1b"
   eks_name             = "eks-cluster"
   eks_version          = "1.36"
   vpc_cidr             = "10.0.0.0/16"
