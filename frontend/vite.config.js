@@ -29,28 +29,4 @@ export default defineConfig({
 
   },
 });
-// const AUTH_SERVICE = env.VITE_AUTH_SERVICE_URL;
 
-// export default defineConfig({
-
-//   server: {
-//     proxy: {
-//       '/register': AUTH_SERVICE + '/register',
-//     },
-//   },
-//   plugins: [vue({
-//     template: {
-//       compilerOptions: {
-//         // Enable JSX
-//         isCustomElement: (tag) => tag.includes('-')
-//       }
-//     }
-//   })],
-//   esbuild: {
-//     jsxFactory: 'h',
-//     jsxFragment: 'Fragment'
-//   },
-//   host: true,
-//   port: 5173,
-//   base: '/',
-// });
