@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1"
+  region = "eu-north-1"
 }
 
 terraform {
@@ -14,7 +14,7 @@ terraform {
     bucket       = "masonicapp-s3bucket"
     key          = "state/users/terraform.tfstate"
     use_lockfile = true
-    region       = "us-east-1"
+    region       = "eu-north-1"
     encrypt      = true
   }
 }
