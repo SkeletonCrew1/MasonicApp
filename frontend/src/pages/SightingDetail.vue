@@ -13,7 +13,7 @@
         
         <div class="image-wrapper">
           <img v-if="sighting.SightingPicture" 
-               :src="`${POSTING_SERVICE_URL}` + sighting.SightingPicture" 
+               :src="`/posting` + sighting.SightingPicture" 
                :alt="sighting.SightingName" class="detail-image" />
         </div>
 
@@ -68,11 +68,11 @@ const customIcon = L.divIcon({
 const route = useRoute();
 const sighting = ref(null);
 const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL;
-const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
+
 
 onMounted(async() =>{
   try {
-    const response = await fetch(`${AUTH_SERVICE_URL}/protected`, {
+    const response = await fetch(`/auth/protected`, {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
@@ -93,7 +93,7 @@ onMounted(async () => {
   const id = route.params.id;
 
   try {
-    const response = await fetch(`${POSTING_SERVICE_URL}/sighting?id=${id}`, {
+    const response = await fetch(`/posting/sighting?id=${id}`, {
       credentials: "include"
     });
     if (!response.ok) throw new Error("Failed to fetch sighting details");
@@ -130,7 +130,7 @@ onMounted(async () => {
 
 async function markSeenToo() {
   try {
-    const response = await fetch(`${POSTING_SERVICE_URL}/seen-too`, {
+    const response = await fetch(`/posting/seen-too`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ postId: String(sighting.value.SightingId) }),

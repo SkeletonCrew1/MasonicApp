@@ -1,20 +1,24 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 
-// const env = loadEnv(
-//     'all',
-//     process.cwd()
-// );
 
+const AUTH_SERVICE_URL = process.env.VITE_AUTH_SERVICE_URL;
+const POSTING_SERVICE_URL = process.env.VITE_POSTING_SERVICE_URL;
 export default defineConfig({
+  
   plugins: [vue()],
   server: {
     proxy: {
       '/auth': {
-        target: 'http://auth-service:8081',
+        target: AUTH_SERVICE_URL,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/auth/, '')
-      }
+      },
+      '/posting': {
+        target: POSTING_SERVICE_URL,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/posting/, '')
+      },
     }
 
   },

@@ -64,6 +64,26 @@ const selectedStatuses = ref([...statuses]);
 const sendingBroadcast = ref(false);
 const broadcastMsg = ref("");
 
+
+onMounted(async() =>{
+    try {
+        const response = await fetch(`/auth/protected`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials : "include"
+        });
+        
+        if (!response.ok) {
+        router.push('/');
+        } 
+    } catch (error) {
+        console.error(error);
+        alert("Cannot connect to the server.");
+    }
+})
+
 async function doBroadcast() {
     if (!broadcastMessage.value.trim() || !selectedStatuses.value.length) return;
     try {

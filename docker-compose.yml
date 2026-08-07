@@ -26,6 +26,7 @@ services:
       context: ./frontend
       args:
         - VITE_POSTING_SERVICE_URL=${VITE_POSTING_SERVICE_URL}
+        - VITE_AUTH_SERVICE_URL=${VITE_AUTH_SERVICE_URL}
     networks:
       - frontend
       - backend
@@ -136,6 +137,7 @@ services:
       - backend
     build:
       context: ./posting
+    container_name: posting
     ports:
       - "8085:8085"
     depends_on:
