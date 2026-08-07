@@ -115,9 +115,9 @@ def user_promotion(request):
     if user.userstatus == "bronze":
         user.userstatus = "silver"
     elif user.userstatus == "silver":
-        user.userstatus = "gold"
+        user.userstatus = "golden"
     else:
-        return JsonResponse({"message": f"{user.userdisplayname} already with 'gold' status"}, status=200)
+        return JsonResponse({"message": f"{user.userdisplayname} already with 'golden' status"}, status=200)
 
     user.save(update_fields=["userstatus"])
     return JsonResponse({"message": f"{user.userdisplayname} promoted to {user.userstatus} status"}, status=200)

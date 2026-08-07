@@ -4,6 +4,7 @@ import vue from "@vitejs/plugin-vue";
 
 const AUTH_SERVICE_URL = process.env.VITE_AUTH_SERVICE_URL;
 const POSTING_SERVICE_URL = process.env.VITE_POSTING_SERVICE_URL;
+const API_BASE = process.env.VITE_BACKEND_DJANGO_URL;
 export default defineConfig({
   
   plugins: [vue()],
@@ -18,6 +19,11 @@ export default defineConfig({
         target: POSTING_SERVICE_URL,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/posting/, '')
+      },
+      '/backend': {
+        target: API_BASE,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/backend/, '')
       },
     }
 

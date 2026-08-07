@@ -1,4 +1,4 @@
-FROM golang:latest
+FROM golang:1.26.5-alpine
 
 WORKDIR /app
 
@@ -11,6 +11,6 @@ COPY . .
 
 RUN go build -o server ./cmd/server
 
-EXPOSE 8082
+
 
 CMD ["./server"]

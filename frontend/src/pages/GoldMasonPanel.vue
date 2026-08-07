@@ -53,10 +53,10 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { deleteAllData, inviteUser, promoteUser, sendBroadcast, banIp } from "../api/client";
 const emit = defineEmits(["close"]);
-const statuses = ["bronze", "silver", "gold"];
+const statuses = ["bronze", "silver", "golden"];
 
 
 const broadcastMessage = ref("");

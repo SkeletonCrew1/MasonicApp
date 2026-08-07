@@ -1,7 +1,6 @@
-const API_BASE = "http://localhost:8000/api";
 
 async function request(path, options = {}) {
-    const res = await fetch(`${API_BASE}${path}`, {
+    const res = await fetch(`/backend${path}`, {
         headers: { "Content-Type": "application/json" },
         ...options,
     });
