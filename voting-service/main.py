@@ -36,7 +36,7 @@ def create_voting():
     subject_status = subject_data.user_status
 
     voting_exist = Voting.query.filter(
-            (Voting.voting_subject == voting_subject) | (Voting.voting_category == voting_category)
+            (Voting.voting_subject == voting_subject) & (Voting.voting_category == voting_category)
             ).first()
     
     if voting_exist is not None:
