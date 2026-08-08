@@ -89,6 +89,43 @@ services:
     networks:
       - backend
     env_file: .env
+
+  voting-db:
+    image: postgres:18
+    container_name: voting-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${VOTING_DB_NAME}
+    ports:
+      - "5434:5432"
+    networks:
+      - backend 
+    volumes:
+      - voting_data_sql:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    env_file: .env
+  
+  voting-flyway:
+    image: flyway/flyway:13
+    entrypoint: ["flyway", "-url=jdbc:${VOTING_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-baselineVersion=0", "-validateMigrationNaming=true", "migrate"] 
+    volumes:
+      - ./db/migrations/voting-db:/flyway/sql
+    depends_on:
+      voting-db:
+        condition: service_healthy
+    networks:
+      - backend
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${VOTING_DB_NAME}
+      DATABASE_URL: ${VOTING_DATABASE_URL}
+    env_file: .env
   
   auth-service:
     build:
@@ -148,6 +185,11 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
+<<<<<<< HEAD
+=======
+    ports:
+      - "8090:8080"
+>>>>>>> main
 
   password-service:
     networks:
@@ -176,6 +218,24 @@ services:
         condition: service_started
     env_file:
       - .env
+  
+  voting-service:
+    networks:
+      - backend
+      - frontend
+    build:
+      context: ./voting-service
+      dockerfile: Dockerfile
+    depends_on:
+      main-flyway:
+        condition: service_completed_successfully
+      voting-flyway:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    ports:
+      - "4242:4242"
+    
 
 networks:
   backend:
@@ -189,3 +249,4 @@ volumes:
   main_data_sql:
   uploads_data:
   map_data_sql:
+  voting_data_sql:
