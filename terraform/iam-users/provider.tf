@@ -11,10 +11,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket       = "masonicapp-s3bucket"
+    bucket       = "masonicapp-terraform-state"
     key          = "state/users/terraform.tfstate"
     use_lockfile = true
-    region       = "eu-north-1"
+    region       = "us-east-1"
     encrypt      = true
   }
 }

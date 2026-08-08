@@ -1,9 +1,9 @@
 resource "aws_s3_bucket" "main" {
-  bucket = "masonicapp-s3bucket"
+  bucket = "masonicapp-terraform-state"
 
   tags = {
     ManagedBy = "Terraform"
-    Name      = "masonicapp-s3bucket"
+    Name      = "masonicapp-terraform-state"
   }
 }
 
