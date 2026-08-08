@@ -87,7 +87,7 @@ const submitVote = async (votingId) => {
     await addVote(votingId, currentUserId.value);
     await fetchVotingsData(); 
   } catch (error) {
-    alert(error.message || 'Voting');
+    alert(error.message || 'Voting conflict');
   }
 };
 

@@ -49,8 +49,7 @@ const lat = ref("Click map");
 const lng = ref("Click map");
 const showAddButton = ref(false);
 const userStatus = ref("bronze");
-const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL;
-const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
+
 
 async function loadSightings(map) {
   try {
