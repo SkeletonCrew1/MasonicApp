@@ -11,4 +11,11 @@ locals {
   pub_subnet_cidr1     = "10.0.64.0/19"
   pub_subnet_cidr2     = "10.0.96.0/19"
   all_users_cird_block = "0.0.0.0/0"
+  users = [
+    "Roman_Misiuryn",
+    "Vitalii_Oliinyk",
+    "Oleg_Konovaliuk",
+    "Anastasia_Kosheleva",
+    "Maksym_Klimukh"
+  ]
 }
