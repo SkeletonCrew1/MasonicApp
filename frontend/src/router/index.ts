@@ -6,12 +6,8 @@ import SightingDetail from '../pages/SightingDetail.vue';
 import GoldMasonPanel from "../pages/GoldMasonPanel.vue"
 import Register from "../pages/Registration.vue";
 import Login from "../pages/Login.vue";
-<<<<<<< HEAD
-import Registration from "../pages/Registration.vue";
-=======
 import VotingPage from '../pages/VotingPage.vue';
 import AddVoting from '../pages/AddVoting.vue';
->>>>>>> main
 
 const router = createRouter({
     history: createWebHistory(),

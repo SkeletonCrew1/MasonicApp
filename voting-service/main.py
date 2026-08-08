@@ -11,7 +11,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True,origins = [FRONTEND_SERVICE_URL,])
 
 app.config['SQLALCHEMY_DATABASE_URI'] = MAIN_DATABASE_URL
 

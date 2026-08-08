@@ -20,7 +20,3 @@ create table if not exists Messages (
     SenderId int not null references Users(UserId) not null,
     CreatedAt timestamp with time zone not null
 );
-
-create table if not exists Blacklist (
-    BannedEmail text primary key
-);
