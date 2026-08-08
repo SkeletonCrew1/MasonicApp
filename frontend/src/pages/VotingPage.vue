@@ -55,20 +55,23 @@ const currentUserStatus = ref(null);
 const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL;
 const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
 
-async function checkUserStatus() {
+const checkUserStatus = async () => {
   try {
     const response = await fetch(`/posting/user-status`, {
       credentials: "include"
     });
-    alert(response)
     if (response.ok) {
       const data = await response.json();
-      userStatus.value = data.status;
+      currentUserStatus.value = data.status;
+      currentUserId.value = data.userid || data.id || 1; 
+      return true;
     }
+    return false;
   } catch (err) {
     console.error("Failed to fetch user status", err);
+    return false;
   }
-}
+};
 
 const fetchVotingsData = async () => {
   try {
@@ -92,7 +95,7 @@ const goToAddVoting = () => router.push('/add-voting');
 
 const Logout = async () => {
   try {
-    const response = await fetch(`$/auth/logout`, {
+    const response = await fetch(`/auth/logout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include"

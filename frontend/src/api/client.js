@@ -64,7 +64,7 @@ export function deleteAllData() {
 async function votingRequest(path, options = {}) {
     const headers = { "Content-Type": "application/json" };
 
-    const res = await fetch(`$/voting${path}`, {
+    const res = await fetch(`/voting${path}`, {
         headers: { ...headers, ...(options.headers || {}) },
         credentials: "include",
         ...options,

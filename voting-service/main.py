@@ -1,6 +1,6 @@
 import requests
 from flask import Flask, request, make_response
-from config import MAIN_DATABASE_URL, VOTING_DATABASE_URL, MAIL_SERVICE_URL, PROMOTION_URL
+from config import MAIN_DATABASE_URL, VOTING_DATABASE_URL, MAIL_SERVICE_URL, PROMOTION_URL,FRONTEND_SERVICE_URL
 from models import db, Voting, Vote, User, Blacklist
 from sqlalchemy.exc import IntegrityError
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -11,7 +11,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-CORS(app, supports_credentials=True,origins = [FRONTEND_SERVICE_URL,])
+CORS(app, supports_credentials=True,origins = [FRONTEND_SERVICE_URL])
 
 app.config['SQLALCHEMY_DATABASE_URI'] = MAIN_DATABASE_URL
 
