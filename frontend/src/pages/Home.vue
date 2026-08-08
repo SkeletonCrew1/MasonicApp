@@ -49,12 +49,11 @@ const lat = ref("Click map");
 const lng = ref("Click map");
 const showAddButton = ref(false);
 const userStatus = ref("bronze");
-const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL;
-const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
+
 
 async function loadSightings(map) {
   try {
-    const response = await fetch(`${POSTING_SERVICE_URL}/sightings`, {
+    const response = await fetch(`/posting/sightings`, {
       credentials: "include"
     });
     if (!response.ok) throw new Error("Failed to fetch");
@@ -65,7 +64,7 @@ async function loadSightings(map) {
       popupContent.className = 'sighting-popup';
       popupContent.innerHTML = `
         <h3>${sighting.SightingName}</h3>
-        ${sighting.SightingPicture ? `<img src="${POSTING_SERVICE_URL}${sighting.SightingPicture}" class="popup-image" />` : ''}
+        ${sighting.SightingPicture ? `<img src="${'/posting'}${sighting.SightingPicture}" class="popup-image" />` : ''}
         <button class="open-page-btn" data-id="${sighting.SightingId}">Open Page</button>
       `;
 
@@ -85,7 +84,7 @@ async function loadSightings(map) {
 
 async function checkUserStatus() {
   try {
-    const response = await fetch(`${POSTING_SERVICE_URL}/user-status`, {
+    const response = await fetch(`/posting/user-status`, {
       credentials: "include"
     });
     if (response.ok) {
@@ -99,7 +98,7 @@ async function checkUserStatus() {
 
 onMounted(async() =>{
   try {
-    const response = await fetch(`${AUTH_SERVICE_URL}/protected`, {
+    const response = await fetch(`/auth/protected`, {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
@@ -169,7 +168,7 @@ function goToAddSighting() {
 async function Logout() {
     
     try {
-        const response = await fetch(`${AUTH_SERVICE_URL}/logout`, {
+        const response = await fetch(`/auth/logout`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
