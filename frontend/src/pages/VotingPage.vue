@@ -57,7 +57,7 @@ const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
 
 const checkUserStatus = async () => {
   try {
-    const response = await fetch(`${POSTING_SERVICE_URL}/user-status`, {
+    const response = await fetch(`/posting/user-status`, {
       credentials: "include"
     });
     if (response.ok) {
@@ -87,7 +87,7 @@ const submitVote = async (votingId) => {
     await addVote(votingId, currentUserId.value);
     await fetchVotingsData(); 
   } catch (error) {
-    alert(error.message || 'Конфлікт голосування');
+    alert(error.message || 'Voting conflict');
   }
 };
 
@@ -95,7 +95,7 @@ const goToAddVoting = () => router.push('/add-voting');
 
 const Logout = async () => {
   try {
-    const response = await fetch(`${AUTH_SERVICE_URL}/logout`, {
+    const response = await fetch(`/auth/logout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include"

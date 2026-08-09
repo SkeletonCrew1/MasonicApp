@@ -98,7 +98,7 @@ const router = useRouter();
 const user_email = ref("");
 const user_password = ref("");
 const daily_password = ref("");
-const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL
+
 
 async function Login() {
     const user = {
@@ -108,7 +108,7 @@ async function Login() {
     };
     
     try {
-        const response = await fetch(`${AUTH_SERVICE_URL}/login`, {
+        const response = await fetch(`/auth/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
