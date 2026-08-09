@@ -30,6 +30,7 @@ This documentation describes how to create an EKS cluster and manage policies us
 5. Run terraform init
 6. Run terraform apply 
 7. Run the following commands and paste the AWS user ID there.
+aws eks update-kubeconfig --region eu-north-1 --name eks-cluster
 aws sts assume-role --role-arn arn:aws:iam::<USER-ID>:role/eks-admin --role-session-name session
 aws eks update-kubeconfig --region eu-north-1 --name eks-cluster --role-arn arn:aws:iam::<USER-ID>:role/eks-admin
 ```
