@@ -64,6 +64,8 @@ resource "aws_iam_policy" "shell-policy" {
           "s3:*",
           "ec2:*",
           "eks:*",
+          "secretsmanager:*",
+          "route53:*",
         ]
         Resource = "*"
       }
