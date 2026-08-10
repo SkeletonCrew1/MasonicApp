@@ -3,9 +3,23 @@ variable "aws_region" {
     type        = string
     default     = "eu-north-1"
 }
-variable "db_password" { 
-    description = "Password for the database for nov TF_VAR"
+
+variable "env" {
+    description = "Environment name (e.g., dev, test, prod)"
     type        = string
-    sensitive   = true 
-    default     = null
+}
+
+variable "vpc_cidr" {
+    description = "CIDR block for the VPC"
+    type        = string
+}
+
+variable "subnet_cidr1" {
+    description = "CIDR block for the first subnet"
+    type        = string
+}
+
+variable "subnet_cidr2" {
+    description = "CIDR block for the second subnet"
+    type        = string
 }
