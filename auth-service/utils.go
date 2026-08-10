@@ -85,7 +85,7 @@ func GetUserId(db *sql.DB, email string) string {
 }
 
 func userInvited(db *sql.DB, email string) bool {
-	row := db.QueryRow("select BannedEmail from Blacklist where BannedEmail= $1", email)
+	row := db.QueryRow("select InvitedEmail from WhiteList where InvitedEmail= $1", email)
 	temp := ""
 	row.Scan(&temp)
 	if temp != "" {
