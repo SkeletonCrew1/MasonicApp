@@ -1,5 +1,5 @@
 resource "aws_iam_role" "eks" {
-  name = "${local.env}-${local.eks_name}-eks-cluster"
+  name = "eks-cluster-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -16,7 +16,7 @@ resource "aws_iam_role" "eks" {
   })
 
   tags = {
-    Name = "${local.env}-${local.eks_name}-role"
+    Name = "eks-cluster-role"
   }
 }
 
