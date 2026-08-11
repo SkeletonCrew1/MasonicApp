@@ -3,8 +3,6 @@ services:
   main-db:
     image: postgres:18
     container_name: main-db
-    ports:
-      - "5432:5432"
     networks:
       - backend 
     volumes:
@@ -26,6 +24,9 @@ services:
       context: ./frontend
       args:
         - VITE_POSTING_SERVICE_URL=${VITE_POSTING_SERVICE_URL}
+        - VITE_AUTH_SERVICE_URL=${VITE_AUTH_SERVICE_URL}
+        - VITE_BACKEND_DJANGO_URL=${VITE_BACKEND_DJANGO_URL}
+        - VITE_VOTING_API_BASE=${VITE_VOTING_API_BASE}
     networks:
       - frontend
       - backend
@@ -49,7 +50,7 @@ services:
           action: restart
 
   main-flyway:
-    image: flyway/flyway:13
+    image: flyway/flyway:13.2-alpine
     entrypoint: ["flyway", "-url=jdbc:${MAIN_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-baselineVersion=0", "-validateMigrationNaming=true", "migrate"]
     volumes:
       - ./db/migrations/main-db:/flyway/sql
@@ -67,8 +68,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${MAP_DB_NAME}
-    ports:
-      - "5433:5432"
     networks:
       - backend 
     volumes:
@@ -81,7 +80,7 @@ services:
     env_file: .env
   
   map-flyway:
-    image: flyway/flyway:13
+    image: flyway/flyway:13.2-alpine
     entrypoint: ["flyway", "-url=jdbc:${MAP_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-baselineVersion=0", "-validateMigrationNaming=true", "migrate"] 
     volumes:
       - ./db/migrations/mysterymap-db:/flyway/sql
@@ -90,6 +89,41 @@ services:
         condition: service_healthy
     networks:
       - backend
+    env_file: .env
+
+  voting-db:
+    image: postgres:18
+    container_name: voting-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${VOTING_DB_NAME}
+    networks:
+      - backend 
+    volumes:
+      - voting_data_sql:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    env_file: .env
+  
+  voting-flyway:
+    image: flyway/flyway:13.2-alpine
+    entrypoint: ["flyway", "-url=jdbc:${VOTING_DATABASE_URL}", "-user=${POSTGRES_USER}", "-password=${POSTGRES_PASSWORD}", "-baselineOnMigrate=true", "-baselineVersion=0", "-validateMigrationNaming=true", "migrate"] 
+    volumes:
+      - ./db/migrations/voting-db:/flyway/sql
+    depends_on:
+      voting-db:
+        condition: service_healthy
+    networks:
+      - backend
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${VOTING_DB_NAME}
+      DATABASE_URL: ${VOTING_DATABASE_URL}
     env_file: .env
   
   auth-service:
@@ -102,11 +136,10 @@ services:
         condition: service_healthy
       main-flyway:
         condition: service_completed_successfully
-    ports:
-      - "8081:8081"
     networks:
       - backend
     env_file: .env
+
   backend-django:
     build:
       context: ./backend-django
@@ -121,8 +154,6 @@ services:
         condition: service_completed_successfully
     env_file:
       - .env
-    ports:
-      - "8000:8000"
     networks:
       - backend 
       - frontend
@@ -136,8 +167,7 @@ services:
       - backend
     build:
       context: ./posting
-    ports:
-      - "8085:8085"
+    container_name: posting
     depends_on:
       map-db:
         condition: service_healthy
@@ -154,8 +184,6 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
-    ports:
-      - "8080:8080"
 
   password-service:
     networks:
@@ -184,6 +212,23 @@ services:
         condition: service_started
     env_file:
       - .env
+  
+  voting-service:
+    networks:
+      - backend
+      - frontend
+    container_name: voting-service
+    build:
+      context: ./voting-service
+      dockerfile: Dockerfile
+    depends_on:
+      main-flyway:
+        condition: service_completed_successfully
+      voting-flyway:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    
 
 networks:
   backend:
@@ -197,3 +242,4 @@ volumes:
   main_data_sql:
   uploads_data:
   map_data_sql:
+  voting_data_sql:

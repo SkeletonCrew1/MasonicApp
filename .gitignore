@@ -18,7 +18,15 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
-
+terraform/iam-users/.terraform
+terraform/iam-users/.terraform.lock.hcl
+terraform/iam-users/passwords.json
+terraform/s3-bucket-for-state/.terraform
+terraform/s3-bucket-for-state/.terraform.lock.hcl
+backend-django/api/__pycache__/models.cpython-312.pyc
+backend-django/api/__pycache__/urls.cpython-312.pyc
+backend-django/api/__pycache__/views.cpython-312.pyc
+backend-django/core/__pycache__/settings.cpython-312.pyc
 # Django
 *.log
 db.sqlite3
@@ -41,4 +49,3 @@ config.env
 # IDE / OS
 .vscode/
 .idea/
-.DS_Store

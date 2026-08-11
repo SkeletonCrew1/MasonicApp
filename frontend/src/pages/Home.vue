@@ -1,13 +1,19 @@
 <template>
   <div class="page">
-<nav class="navbar">
-      <div class="logo">Cult of the Tree</div>
+    <nav class="navbar">
+      <router-link to="/home" class="logo">Cult of the Tree</router-link>
       <ul class="nav-links">
-        <li v-if="userStatus === 'gold'">
-          <router-link to="/control-panel">Control Panel</router-link>
+        <li v-if="userStatus?.trim().toLowerCase() === 'gold'">
+          <router-link to="/control-panel">Gold User page</router-link>
         </li>
         <li>
-          <a href="#" @click="Logout">Logout</a>
+          <router-link to="/voting-page">Voting</router-link>
+        </li>
+        <li class="user-greeting" v-if="currentUsername">
+          {{ currentUsername }}
+        </li>
+        <li>
+          <a href="#" @click.prevent="Logout">Logout</a>
         </li>
       </ul>
     </nav>
@@ -43,12 +49,11 @@ const lat = ref("Click map");
 const lng = ref("Click map");
 const showAddButton = ref(false);
 const userStatus = ref("bronze");
-const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL;
-const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
+
 
 async function loadSightings(map) {
   try {
-    const response = await fetch(`${POSTING_SERVICE_URL}/sightings`, {
+    const response = await fetch(`/posting/sightings`, {
       credentials: "include"
     });
     if (!response.ok) throw new Error("Failed to fetch");
@@ -59,7 +64,7 @@ async function loadSightings(map) {
       popupContent.className = 'sighting-popup';
       popupContent.innerHTML = `
         <h3>${sighting.SightingName}</h3>
-        ${sighting.SightingPicture ? `<img src="${POSTING_SERVICE_URL}${sighting.SightingPicture}" class="popup-image" />` : ''}
+        ${sighting.SightingPicture ? `<img src="${'/posting'}${sighting.SightingPicture}" class="popup-image" />` : ''}
         <button class="open-page-btn" data-id="${sighting.SightingId}">Open Page</button>
       `;
 
@@ -79,7 +84,7 @@ async function loadSightings(map) {
 
 async function checkUserStatus() {
   try {
-    const response = await fetch(`${POSTING_SERVICE_URL}/user-status`, {
+    const response = await fetch(`/posting/user-status`, {
       credentials: "include"
     });
     if (response.ok) {
@@ -93,7 +98,7 @@ async function checkUserStatus() {
 
 onMounted(async() =>{
   try {
-    const response = await fetch(`${AUTH_SERVICE_URL}/protected`, {
+    const response = await fetch(`/auth/protected`, {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
@@ -163,7 +168,7 @@ function goToAddSighting() {
 async function Logout() {
     
     try {
-        const response = await fetch(`${AUTH_SERVICE_URL}/logout`, {
+        const response = await fetch(`/auth/logout`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 
 
-FRONTEND_PAGE = os.getenv("MAIN_PAGE")
-MAIL_SERVICE_URL = os.getenv("MAIL_URL")
+FRONTEND_PAGE = os.getenv("FRONTEND_SERVICE_URL")
+MAIL_SERVICE_URL = os.getenv("MAIL_SERVICE_URL")
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent

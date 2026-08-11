@@ -53,7 +53,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { deleteAllData, inviteUser, promoteUser, sendBroadcast, banIp } from "../api/client";
 const emit = defineEmits(["close"]);
 const statuses = ["bronze", "silver", "gold"];
@@ -63,6 +63,26 @@ const broadcastMessage = ref("");
 const selectedStatuses = ref([...statuses]);
 const sendingBroadcast = ref(false);
 const broadcastMsg = ref("");
+
+
+onMounted(async() =>{
+    try {
+        const response = await fetch(`/auth/protected`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials : "include"
+        });
+        
+        if (!response.ok) {
+        router.push('/');
+        } 
+    } catch (error) {
+        console.error(error);
+        alert("Cannot connect to the server.");
+    }
+})
 
 async function doBroadcast() {
     if (!broadcastMessage.value.trim() || !selectedStatuses.value.length) return;

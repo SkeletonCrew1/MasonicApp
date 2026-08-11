@@ -84,6 +84,16 @@ func GetUserId(db *sql.DB, email string) string {
 	return value
 }
 
+func userInvited(db *sql.DB, email string) bool {
+	row := db.QueryRow("select InvitedEmail from WhiteList where InvitedEmail= $1", email)
+	temp := ""
+	row.Scan(&temp)
+	if temp != "" {
+		return true
+	}
+	return false
+}
+
 func UserExists(db *sql.DB, username string) bool {
 	sqlStmt := `SELECT UserDisplayName FROM users WHERE UserDisplayName = $1`
 	err := db.QueryRow(sqlStmt, username).Scan(&username)

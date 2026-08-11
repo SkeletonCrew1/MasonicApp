@@ -1,0 +1,32 @@
+# Prometheus Setup
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+kubectl create namespace monitoring
+
+helm install prometheus prometheus-community/prometheus --namespace monitoring --set server.persistentVolume.enabled=false --set alertmanager.enabled=false --set prometheus-pushgateway.enabled=false
+
+
+
+# Grafana Setup
+
+helm repo add grafana-community https://grafana-community.github.io/helm-charts
+
+kubectl create secret generic grafana-smtp-secret --namespace monitoring --from-literal=user="<email address>" --from-literal=password="<email app password>"
+
+helm upgrade --install grafana grafana-community/grafana --namespace monitoring --values grafana-values.yaml
+
+
+
+# Additional
+
+# To get grafana values.yaml files
+helm show values grafana/grafana > grafana-values.yaml
+
+# To see grafana password
+kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+# To connect to kubernetes cluster and expose grafana, though first make sure you are logged in via "aws configure" command
+aws sts assume-role   --role-arn arn:aws:iam::239635360279:role/eks-admin   --role-session-name session
+aws eks update-kubeconfig   --region eu-north-1   --name eks-cluster   --role-arn arn:aws:iam::239635360279:role/eks-admin
+kubectl port-forward svc/grafana -n monitoring 3000:80

@@ -8,7 +8,7 @@ create table if not exists Users (
 );
 
 create table if not exists BannedIps (
-    IpId serial primary key ,
+    IpId serial primary key,
     BannedIp varchar(40) not null
 );
 
