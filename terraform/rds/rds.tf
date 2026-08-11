@@ -8,7 +8,7 @@ resource "aws_db_instance" "main" {
     db_name                     = local.db_name
     username                    = local.db_user
 
-    manage_master_user_password = true
+    password                    = random_password.db_password.result
 
     db_subnet_group_name   = aws_db_subnet_group.main.name
     vpc_security_group_ids = [aws_security_group.rds.id]
