@@ -94,6 +94,16 @@ func userInvited(db *sql.DB, email string) bool {
 	return false
 }
 
+func userExluded(db *sql.DB, email string) bool {
+	row := db.QueryRow("select BannedEmail from Blacklist where BannedEmail= $1", email)
+	temp := ""
+	row.Scan(&temp)
+	if temp != "" {
+		return true
+	}
+	return false
+}
+
 func UserExists(db *sql.DB, username string) bool {
 	sqlStmt := `SELECT UserDisplayName FROM users WHERE UserDisplayName = $1`
 	err := db.QueryRow(sqlStmt, username).Scan(&username)
