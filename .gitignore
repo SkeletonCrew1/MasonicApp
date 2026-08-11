@@ -35,3 +35,8 @@ config.env
 .vscode/
 .idea/
 .DS_Store
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+passwords.json
