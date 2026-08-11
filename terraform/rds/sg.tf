@@ -1,5 +1,5 @@
 resource "aws_security_group" "rds" {
-    name   = "${local.env}-rds-sg"
+    name   = "${local.env}-rds-paranormal-sg"
     vpc_id = aws_vpc.main.id
 
     ingress {

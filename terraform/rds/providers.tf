@@ -7,6 +7,13 @@ terraform {
             version = ">= 6.0"
         }
     }
+
+    backend "s3" {
+        bucket       = "masons-infra-tfstate"
+        region       = "eu-north-1"
+        encrypt      = true
+        use_lockfile = true
+    }
 }
 
 provider "aws" {

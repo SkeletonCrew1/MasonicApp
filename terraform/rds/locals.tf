@@ -7,6 +7,6 @@ locals {
     subnet_cidr1 = var.subnet_cidr1
     subnet_cidr2 = var.subnet_cidr2
 
-    db_name      = "pg_db"
-    db_user      = "dbuser"
+    db_name      = "paranormal_db"
+    db_user      = "miraculous"
 }
