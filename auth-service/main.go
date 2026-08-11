@@ -162,6 +162,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	hashedPassword, _ := hashPassword(user_password)
 	email_exist := EmailExists(db, user_email)
+	user_exluded := userExluded(db, user_email)
 
 	user_fake_name := GetUserDisplayName(db, user_email)
 	user_status := GetUserStatus(db, user_email)
@@ -176,6 +177,12 @@ func login(w http.ResponseWriter, r *http.Request) {
 	if !checkPasswordHash(user_password, hashedPassword) {
 		er := http.StatusUnauthorized
 		http.Error(w, "Invalid   password", er)
+
+		return
+	}
+	if user_exluded {
+		er := http.StatusUnauthorized
+		http.Error(w, "User has been excluded", er)
 
 		return
 	}
