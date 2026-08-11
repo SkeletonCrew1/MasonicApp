@@ -167,6 +167,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	user_fake_name := GetUserDisplayName(db, user_email)
 	user_status := GetUserStatus(db, user_email)
 	user_id := GetUserId(db, user_email)
+	is_inquisitor := getUserInquisitor(db, user_email)
 
 	if email_exist != true {
 		er := http.StatusMethodNotAllowed
@@ -191,7 +192,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Wrong daily password", er)
 		return
 	}
-	tokenString, err := createToken(secretKey, user_fake_name, user_status, user_id)
+	tokenString, err := createToken(secretKey, user_fake_name, user_status, user_id, is_inquisitor)
 	if err != nil {
 
 		er := http.StatusInternalServerError

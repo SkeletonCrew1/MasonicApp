@@ -67,6 +67,26 @@ func GetUserDisplayName(db *sql.DB, email string) string {
 func GetUserId(db *sql.DB, email string) string {
 
 	var value string
+	rows, err := db.Query("SELECT UserIsInquisitor FROM users WHERE UserEmail = $1;", email)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		if err := rows.Scan(&value); err != nil {
+			log.Fatal(err)
+		}
+
+	}
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return value
+}
+
+func getUserInquisitor(db *sql.DB, email string) string {
+
+	var value string
 	rows, err := db.Query("SELECT UserId FROM users WHERE UserEmail = $1;", email)
 	if err != nil {
 		log.Fatal(err)
@@ -139,12 +159,13 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func createToken(secretKey []byte, username string, status string, userid string) (string, error) {
+func createToken(secretKey []byte, username string, status string, userid string, is_inquisitor string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"username": username,
-			"status":   status,
-			"userid":   userid,
+			"username":      username,
+			"status":        status,
+			"userid":        userid,
+			"is_inquisitor": is_inquisitor,
 		})
 
 	tokenString, err := token.SignedString(secretKey)
