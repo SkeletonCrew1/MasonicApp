@@ -1,7 +1,7 @@
 resource "aws_db_instance" "main" {
     identifier                  = "pg-${local.env}"
     engine                      = "postgres"
-    engine_version              = "16"
+    engine_version              = "18"
     instance_class              = "db.t4g.micro"
     allocated_storage           = 20
 
