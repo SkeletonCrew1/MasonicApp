@@ -107,8 +107,15 @@ func register(w http.ResponseWriter, r *http.Request) {
 
 	email_exist := EmailExists(db, user_email)
 	if email_exist == true {
-		er := http.StatusMethodNotAllowed
-		http.Error(w, "email registered", er)
+		er := http.StatusBadRequest
+		http.Error(w, "Email registered", er)
+		return
+	}
+
+	invited := userInvited(db, user_email)
+	if invited != true {
+		er := http.StatusUnauthorized
+		http.Error(w, "You are not invited", er)
 		return
 	}
 
