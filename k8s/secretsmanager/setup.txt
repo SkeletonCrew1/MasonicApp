@@ -1,0 +1,83 @@
+eksctl utils associate-iam-oidc-provider --region=eu-north-1 --cluster=eks-cluster --approve
+
+helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+helm repo update
+
+helm install csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver \
+    --namespace kube-system
+
+kubectl annotate csidriver secrets-store.csi.k8s.io meta.helm.sh/release-name=csi-secrets-store --overwrite
+
+helm repo update
+
+helm upgrade csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver \
+  --namespace kube-system \
+  --set syncSecret.enabled=true \
+  --set enableSecretRotation=true
+
+kubectl apply -n kube-system -f https://raw.githubusercontent.com/aws/secrets-store-csi-driver-provider-aws/main/deployment/aws-provider-installer.yaml
+
+eksctl create addon --cluster eks-cluster --name eks-pod-identity-agent --region eu-north-1
+
+eksctl create iamserviceaccount \
+    --cluster=eks-cluster \
+    --namespace=application \
+    --name=app-service-account \
+    --role-name=eks-secrets-manager-role-app \
+    --attach-policy-arn=arn:aws:iam::aws:policy/SecretsManagerReadWrite \
+    --approve \
+    --region=eu-north-1 \
+    --override-existing-serviceaccounts
+
+kubectl patch csidriver secrets-store.csi.k8s.io --type='json' -p='[
+  {
+    "op": "add",
+    "path": "/spec/tokenRequests",
+    "value": [
+      {
+        "audience": "sts.amazonaws.com"
+      }
+    ]
+  },
+  {
+    "op": "add",
+    "path": "/spec/requiresRepublish",
+    "value": true
+  }
+]'
+
+kubectl patch csidriver secrets-store.csi.k8s.io --type='json' -p='[
+  {
+    "op": "add",
+    "path": "/spec/tokenRequests",
+    "value": [
+      {
+        "audience": "sts.amazonaws.com"
+      },
+      {
+        "audience": "pods.eks.amazonaws.com"
+      }
+    ]
+  },
+  {
+    "op": "add",
+    "path": "/spec/requiresRepublish",
+    "value": true
+  }
+]'
+
+aws iam update-assume-role-policy \
+  --role-name eks-secrets-manager-role-app \
+  --policy-document file://trust-policy.json
+
+eksctl create podidentityassociation \
+    --cluster eks-cluster \
+    --namespace application \
+    --service-account-name app-service-account \
+    --role-arn arn:aws:iam::<account id>:role/eks-secrets-manager-role-app \
+    --region eu-north-1
+
+kubectl annotate serviceaccount app-service-account -n application eks.amazonaws.com/role-arn=arn:aws:iam::<account id>:role/eks-secrets-manager-role-app --overwrite
+
+kubectl rollout restart daemonset csi-secrets-store-provider-aws -n kube-system
+kubectl rollout restart daemonset csi-secrets-store-secrets-store-csi-driver -n kube-system

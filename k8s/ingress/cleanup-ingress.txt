@@ -1,0 +1,16 @@
+helm uninstall aws-load-balancer-controller --namespace kube-system
+
+kubectl delete -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/helm/aws-load-balancer-controller/crds/crds.yaml
+
+eksctl delete addon --cluster eks-cluster --name aws-ebs-csi-driver --region eu-north-1
+
+
+eksctl delete iamserviceaccount --cluster eks-cluster --namespace kube-system --name aws-load-balancer-controller --region eu-north-1
+
+eksctl delete iamserviceaccount --cluster eks-cluster --namespace kube-system --name ebs-csi-controller-sa --region eu-north-1
+
+aws iam detach-role-policy --role-name AmazonEKSLoadBalancerControllerRole --policy-arn arn:aws:iam::<account id>:policy/AWSLoadBalancerControllerIAMPolicy
+aws iam delete-role --role-name AmazonEKSLoadBalancerControllerRole
+aws iam delete-policy --policy-arn arn:aws:iam::<account id>:policy/AWSLoadBalancerControllerIAMPolicy
+
+aws ec2 delete-tags --resources <public subnet 1 id> <public subnet 2 id> --tags Key=kubernetes.io/role/elb Key=kubernetes.io/cluster/eks-cluster

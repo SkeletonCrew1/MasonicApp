@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mail-deployment
+  namespace: application
+  labels:
+    app: masonicapp
+    microservice: mail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      microservice: mail
+  template:
+    metadata:
+      name: masonic-mail
+      labels:
+        app: masonicapp
+        microservice: mail
+    spec:
+      serviceAccountName: app-service-account
+      containers:
+      - name: mail-container
+        image: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-mail:latest
+        env:
+          - name: SENDER
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: SENDER
+          - name: PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: PASSWORD
+          - name: SMTPHOST
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: SMTPHOST
+          - name: SMTPPORT
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: SMTPPORT
+        volumeMounts:
+        - name: secrets-volume
+          mountPath: "/mnt/secrets"
+          readOnly: true
+      volumes:
+      - name: secrets-volume
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "aws-secrets-all"

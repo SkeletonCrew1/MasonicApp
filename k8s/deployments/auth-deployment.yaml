@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+  namespace: application
+  labels:
+    app: masonicapp
+    microservice: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      microservice: auth
+  template:
+    metadata:
+      name: masonic-auth
+      labels:
+        app: masonicapp
+        microservice: auth
+    spec:
+      serviceAccountName: app-service-account
+      containers:
+      - name: auth-container
+        image: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-auth:latest
+        env:
+          - name: AUTH_URL
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: AUTH_URL
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: SECRET_KEY
+        volumeMounts:
+        - name: secrets-volume
+          mountPath: "/mnt/secrets"
+          readOnly: true
+      volumes:
+      - name: secrets-volume
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "aws-secrets-all"
