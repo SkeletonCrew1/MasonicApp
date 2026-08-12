@@ -9,8 +9,9 @@ terraform {
     }
 
     backend "s3" {
-        bucket       = "masons-infra-tfstate"
-        region       = "eu-north-1"
+        bucket       = "masonicapp-terraform-state"
+        key          = "rds/terraform.tfstate"
+        region       = "us-east-1"
         encrypt      = true
         use_lockfile = true
     }
