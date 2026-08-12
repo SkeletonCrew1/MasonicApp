@@ -1,7 +1,6 @@
 variable "aws_region" {
     description = "AWS region for deployment"
     type        = string
-    default     = "eu-north-1"
 }
 
 variable "env" {
@@ -22,4 +21,16 @@ variable "subnet_cidr1" {
 variable "subnet_cidr2" {
     description = "CIDR block for the second subnet"
     type        = string
+}
+
+variable "db_name" {
+    description = "Database name"
+    type        = string
+    default     = "paranormal_db"
+}
+
+variable "db_user" {
+    description = "Database master username"
+    type        = string
+    default     = "miraculous"
 }
