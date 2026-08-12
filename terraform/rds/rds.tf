@@ -1,7 +1,8 @@
 resource "aws_db_instance" "main" {
     identifier                  = "paranormal-${local.env}"
     engine                      = "postgres"
-    engine_version              = "16"
+    engine_version              = "18"
+    allow_major_version_upgrade = true
     instance_class              = "db.t4g.micro"
     allocated_storage           = 20
 
