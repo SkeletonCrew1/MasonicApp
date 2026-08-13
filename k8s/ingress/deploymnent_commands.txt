@@ -53,17 +53,3 @@ aws eks describe-cluster --name eks-cluster --region eu-north-1 --query "cluster
 
 # Get all subnet IDs
 aws ec2 describe-subnets --filters "Name=vpc-id,Values=<VPC ID>" --query "Subnets[*].[SubnetId, MapPublicIpOnLaunch]" --output text
-
-# Get all RDS endpoints
-aws rds describe-db-instances --query "DBInstances[*].[DBInstanceIdentifier, Endpoint.Address, Endpoint.Port]" --output text
-
-# To detach existing role
-aws iam detach-role-policy \
-  --role-name AmazonEKSLoadBalancerControllerRole \
-  --policy-arn arn:aws:iam::<account id>:policy/AWSLoadBalancerControllerIAMPolicy
-
-# To delete existing role
-aws iam delete-role --role-name AmazonEKSLoadBalancerControllerRole
-
-# To get OIDC ID
-kubectl patch ingress your-ingress-name -n application --type="json" -p='[{"op": "remove", "path": "/metadata/finalizers"}]'

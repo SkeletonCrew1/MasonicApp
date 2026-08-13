@@ -1,58 +1,48 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: password-deployment
-  namespace: application
+  name: frontend-deployment
+  namespace: {{ .Values.namespace }}
   labels:
     app: masonicapp
-    microservice: password
+    microservice: frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      microservice: password
+      microservice: frontend
   template:
     metadata:
-      name: masonic-password
+      name: masonic-frontend
       labels:
         app: masonicapp
-        microservice: password
+        microservice: frontend
     spec:
       serviceAccountName: app-service-account
       containers:
-      - name: password-container
-        image: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-password:latest
+      - name: frontend-container
+        image: {{ .Values.frontendImage }}
         env:
-          - name: USERS_DB_HOST
+          - name: VITE_POSTING_SERVICE_URL
             valueFrom:
               secretKeyRef:
                 name: app-aws-secrets-map
-                key: USERS_DB_HOST
-          - name: USERS_DB_PORT
+                key: VITE_POSTING_SERVICE_URL
+          - name: VITE_AUTH_SERVICE_URL
             valueFrom:
               secretKeyRef:
                 name: app-aws-secrets-map
-                key: USERS_DB_PORT
-          - name: USERS_DB_USER
+                key: VITE_AUTH_SERVICE_URL
+          - name: VITE_BACKEND_DJANGO_URL
             valueFrom:
               secretKeyRef:
                 name: app-aws-secrets-map
-                key: USERS_DB_USER
-          - name: USERS_DB_PASSWORD
+                key: VITE_BACKEND_DJANGO_URL
+          - name: VITE_VOTING_API_BASE
             valueFrom:
               secretKeyRef:
                 name: app-aws-secrets-map
-                key: USERS_DB_PASSWORD
-          - name: USERS_DB_NAME
-            valueFrom:
-              secretKeyRef:
-                name: app-aws-secrets-map
-                key: USERS_DB_NAME
-          - name: MAIL_SERVICE_URL
-            valueFrom:
-              secretKeyRef:
-                name: app-aws-secrets-map
-                key: MAIL_SERVICE_URL
+                key: VITE_VOTING_API_BASE
         volumeMounts:
         - name: secrets-volume
           mountPath: "/mnt/secrets"

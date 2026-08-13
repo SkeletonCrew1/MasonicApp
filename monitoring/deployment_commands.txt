@@ -44,6 +44,4 @@ helm show values grafana/grafana > grafana-values.yaml
 kubectl get secret --namespace monitoring grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
 
 # To connect to kubernetes cluster and expose grafana, though first make sure you are logged in via "aws configure" command
-aws sts assume-role   --role-arn arn:aws:iam::<account id>:role/eks-admin   --role-session-name session
-aws eks update-kubeconfig   --region eu-north-1   --name eks-cluster   --role-arn arn:aws:iam::<account id>:role/eks-admin
 kubectl port-forward svc/grafana -n monitoring 3000:80

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: posting-deployment
-  namespace: application
+  namespace: {{ .Values.namespace }}
   labels:
     app: masonicapp
     microservice: posting
@@ -21,7 +21,7 @@ spec:
       serviceAccountName: app-service-account
       containers:
       - name: posting-container
-        image: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-posting:latest
+        image: {{ .Values.postingImage }}
         env:
           - name: MAP_DB_HOST
             valueFrom:
