@@ -17,7 +17,8 @@ aws eks update-kubeconfig   --region eu-north-1   --name eks-cluster   --role-ar
 Do not forget to change "account id" to actual value.
 * Given you are inside project repostitory, run `cd k8s\secretsmanager` and run all the commands inside `setup.txt` in exact order.
 * Given you are inside project repostitory, run `cd k8s\ingress`and run all the commands inside `deployment_commands.txt` in order.
-* Given you are inside project repostitory, run `cd k8s` and then run `helm install masonic ./masonic-chart/masonic/ --namespace application --create-namespace` to start our whole application.
+* Given you are inside project repostitory, run `cd k8s` and then run `helm install masonic ./masonic-chart/masonic/ --namespace application --create-namespace --values ./masonic-chart/masonic/values-stage.yaml` to start our whole application.
+NOTE! if you make a deployment to production or dev stage change `./masonic-chart/masonic/values-stage.yaml` to respective values file.
 
 ## How to clean up cluster and application?
 Stopping our application is really easy, just run `helm uninstall masonic -n application`.
