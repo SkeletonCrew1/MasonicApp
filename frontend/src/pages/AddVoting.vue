@@ -21,7 +21,7 @@
               <div class="indicator"></div>
               <span>Promote</span>
             </label>
-            <label v-if="userStatus?.trim().toLowerCase() === 'gold'" class="neu-radio">
+            <label v-if="is_inquisitor" class="neu-radio">
               <input type="radio" value="exclude" v-model="votingCategory" />
               <div class="indicator"></div>
               <span>Exclude</span>
@@ -52,7 +52,7 @@ import Cookies from 'js-cookie';
 const router = useRouter();
 const votingCategory = ref('');
 const votingSubject = ref('');
-var response
+const is_inquisitor =ref(false) ;
 const submitNewVoting = async () => {
   if (!votingCategory.value || !votingSubject.value.trim()) {
     alert('Error: empty fields');
@@ -86,10 +86,11 @@ onMounted(async () => {
 
     
     const data = await response.json();
+    is_inquisitor.value = String(data["text"]).trim().toLowerCase() === 'true';
     
-
   } catch (error) {
     console.error(error);
+    
     alert("Cannot connect to the server or process response.");
   }
 });

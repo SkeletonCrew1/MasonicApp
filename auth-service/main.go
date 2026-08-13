@@ -282,8 +282,6 @@ func check_inquisitor(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(response)
 
-	w.WriteHeader(http.StatusOK)
-
 }
 
 func enableCORS(next http.Handler) http.Handler {
