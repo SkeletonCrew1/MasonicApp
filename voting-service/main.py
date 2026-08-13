@@ -8,6 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 from pytz import timezone
 from flask_cors import CORS
 
+
 app = Flask(__name__)
 
 CORS(app, supports_credentials=True,origins = [FRONTEND_SERVICE_URL])
@@ -29,8 +30,6 @@ def create_voting():
     voting_category = data.get("voting_category")
     subject_data = User.query.filter_by(user_display_name=voting_subject).first()
 
-
-
     if subject_data is None:
         return make_response({"error": "Selected user not found"}, 404)
 
@@ -51,7 +50,6 @@ def create_voting():
         voting_category=voting_category,
         subject_status=subject_status
         )
-    
     db.session.add(new_voting)
     db.session.commit()
     return make_response({"message": "New voting was created"}, 200)
@@ -126,6 +124,8 @@ def promote(user_name: str, email: str):
         requests.post(MAIL_SERVICE_URL, json=notification)
 
 
+# This endpoint gives ability to trigger function without scheduler
+# @app.route("/summarize", methods=['GET'])
 def summarize_votings():
     with app.app_context():
         all_voters_count = len(list(User.query.all()))

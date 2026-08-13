@@ -73,6 +73,8 @@ const name = ref("");
 const date = ref("");
 const description = ref("");
 const pictureInput = ref(null);
+const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL;
+const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
 
 let map = null;
 let marker = null;
