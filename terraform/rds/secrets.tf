@@ -17,5 +17,6 @@ resource "aws_secretsmanager_secret_version" "db_password" {
         password = random_password.db_password.result
         engine   = "postgres"
         port     = 5432
+        host     = aws_db_instance.main.address
      })
 }
