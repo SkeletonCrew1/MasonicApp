@@ -87,7 +87,7 @@ func GetUserId(db *sql.DB, email string) string {
 func getUserInquisitor(db *sql.DB, email string) string {
 
 	var value string
-	rows, err := db.Query("SELECT UserId FROM users WHERE UserEmail = $1;", email)
+	rows, err := db.Query("SELECT UserIsInquisitor FROM users WHERE UserEmail = $1;", email)
 	if err != nil {
 		log.Fatal(err)
 	}

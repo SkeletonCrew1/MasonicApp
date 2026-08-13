@@ -52,8 +52,6 @@ const votings = ref([]);
 
 const currentUserId = ref(null);
 const currentUserStatus = ref(null);
-const POSTING_SERVICE_URL = import.meta.env.VITE_POSTING_SERVICE_URL;
-const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
 
 const checkUserStatus = async () => {
   try {
@@ -118,6 +116,9 @@ onMounted(async () => {
   }
   await fetchVotingsData();
 });
+
+
+
 </script>
 
 <style scoped>

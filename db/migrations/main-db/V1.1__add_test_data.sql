@@ -1,5 +1,7 @@
 INSERT INTO users (UserDisplayName, UserPassword, UserStatus, UserEmail, UserIsInquisitor)
 VALUES ('bob', 'Pass123faregf', 'gold', 'olegkonovaluk19@gmail.com', '0');
+INSERT INTO users (UserDisplayName, UserPassword, UserStatus, UserEmail, UserIsInquisitor)
+VALUES ('bob2', 'Pass123faregf', 'gold', 'olegkonovaluk15@gmail.com', '0');
 
 
 INSERT INTO bannedips ( BannedIp)
