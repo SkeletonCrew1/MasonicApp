@@ -10,3 +10,6 @@ type CustomClaims struct {
 	status   bool   `json:"status"`
 	userid   string `json:"userid"`
 }
+type Message struct {
+	Text string `json:"text"`
+}

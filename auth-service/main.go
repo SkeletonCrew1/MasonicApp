@@ -40,6 +40,7 @@ func main() {
 	mux.HandleFunc("/login", login)
 	mux.HandleFunc("/logout", logout)
 	mux.HandleFunc("/protected", protected)
+	mux.HandleFunc("/check_inquisitor", check_inquisitor)
 
 	log.Fatal(http.ListenAndServe(":8081", enableCORS(mux)))
 }
@@ -167,6 +168,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	user_fake_name := GetUserDisplayName(db, user_email)
 	user_status := GetUserStatus(db, user_email)
 	user_id := GetUserId(db, user_email)
+	is_inquisitor := getUserInquisitor(db, user_email)
 
 	if email_exist != true {
 		er := http.StatusMethodNotAllowed
@@ -191,7 +193,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Wrong daily password", er)
 		return
 	}
-	tokenString, err := createToken(secretKey, user_fake_name, user_status, user_id)
+	tokenString, err := createToken(secretKey, user_fake_name, user_status, user_id, is_inquisitor)
 	if err != nil {
 
 		er := http.StatusInternalServerError
@@ -243,7 +245,7 @@ func protected(w http.ResponseWriter, r *http.Request) {
 	var claims = jwt.MapClaims{}
 	JWT_value := GetJWTValue(w, r)
 	token, err := jwt.ParseWithClaims(JWT_value, &claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(secretKey), nil // Ensure 'secret' is your HS256 key
+		return []byte(secretKey), nil
 	})
 
 	if err != nil || !token.Valid {
@@ -251,6 +253,34 @@ func protected(w http.ResponseWriter, r *http.Request) {
 		log.Println("Invalid token", err)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func check_inquisitor(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		er := http.StatusMethodNotAllowed
+		http.Error(w, "Invalid method", er)
+		return
+	}
+
+	var secretKey = []byte(os.Getenv("SECRET_KEY"))
+	var claims = jwt.MapClaims{}
+	JWT_value := GetJWTValue(w, r)
+	token, err := jwt.ParseWithClaims(JWT_value, &claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secretKey), nil
+	})
+
+	if err != nil || !token.Valid {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		log.Println("Invalid token", err)
+		return
+	}
+	var body string = fmt.Sprint(claims["is_inquisitor"])
+
+	response := Message{
+		Text: body,
+	}
+	json.NewEncoder(w).Encode(response)
 
 }
 
