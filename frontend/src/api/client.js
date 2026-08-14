@@ -58,9 +58,6 @@ export function deleteAllData() {
     return request("/delete-all/", { method: "POST" });
 }
 
-
-
-
 async function votingRequest(path, options = {}) {
     const headers = { "Content-Type": "application/json" };
 

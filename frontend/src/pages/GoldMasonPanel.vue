@@ -142,9 +142,11 @@ async function doInvite() {
 
 
 async function doDeleteAll() {
-    if (!confirm("Delete all data?")) return;
-    try { await deleteAllData(); alert("Deleted"); }
-    catch (e) { alert("Error"); }
+    if (!confirm("Do you really want to delete all data?")) return;
+    try { 
+        const data = await deleteAllData();
+        alert(data.message);
+    } catch (e) { alert("Error"); }
 }
 
 </script>

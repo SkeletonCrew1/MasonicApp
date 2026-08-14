@@ -1,7 +1,9 @@
 import json
 import requests
 from django.conf import settings
+from django.db import connections
 from django.http import JsonResponse
+from django.core.management import call_command
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from .models import BannedIP, User, WhiteList
@@ -89,15 +91,21 @@ def bans_list(request):
     bans = list(BannedIP.objects.values("ipid", "bannedip"))
     return JsonResponse(bans, safe=False)
 
-
-# ---------- Delete all ----------
+# Delete all data from databases
 @csrf_exempt
 @require_http_methods(["POST"])
 def delete_all(request):
-    User.objects.all().delete()
-    return JsonResponse({"deleted": True})
-@csrf_exempt
+    for db_name in connections.databases:
+        conn = connections[db_name]
+        cursor = conn.cursor()
 
+        tables = conn.introspection.table_names()
+
+        for table in tables:
+            cursor.execute(f"TRUNCATE TABLE {table} RESTART IDENTITY CASCADE;")
+        cursor.close()
+
+    return JsonResponse({"message": "All data deleted sucessfully"}, status=200)
 
 # promotion feature                                                                      
 @csrf_exempt

@@ -21,7 +21,7 @@
               <div class="indicator"></div>
               <span>Promote</span>
             </label>
-            <label class="neu-radio">
+            <label v-if="is_inquisitor" class="neu-radio">
               <input type="radio" value="exclude" v-model="votingCategory" />
               <div class="indicator"></div>
               <span>Exclude</span>
@@ -43,14 +43,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { createVoting } from '../api/client.js'; 
-
+import Cookies from 'js-cookie';
+// import VueJwtDecode from 'vue-jwt-decode'
+// import VueCookies from 'vue-cookies'
 const router = useRouter();
 const votingCategory = ref('');
 const votingSubject = ref('');
-
+const is_inquisitor =ref(false) ;
 const submitNewVoting = async () => {
   if (!votingCategory.value || !votingSubject.value.trim()) {
     alert('Error: empty fields');
@@ -60,10 +62,39 @@ const submitNewVoting = async () => {
   try {
     await createVoting(votingSubject.value.trim(), votingCategory.value);
     router.push('/voting-page');
+
   } catch (error) {
     alert(`Backend error: ${error.message}`);
   }
+
 };
+
+onMounted(async () => {
+  try {
+    const response = await fetch('/auth/check_inquisitor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    
+    const data = await response.json();
+    is_inquisitor.value = String(data["text"]).trim().toLowerCase() === 'true';
+    
+  } catch (error) {
+    console.error(error);
+    
+    alert("Cannot connect to the server or process response.");
+  }
+});
+
 </script>
 
 <style scoped>

@@ -6,7 +6,7 @@ import (
 )
 
 func GetFilteredUsers(db *sql.DB) ([]models.User, error) {
-	rows, err := db.Query(`SELECT UserId, UserDisplayName, UserPassword, UserStatus, UserEmail, UserIsInquisitor FROM "users" WHERE UserStatus IN ('golden', 'silver')`)
+	rows, err := db.Query(`SELECT UserId, UserDisplayName, UserPassword, UserStatus, UserEmail, UserIsInquisitor FROM "users" WHERE UserStatus IN ('gold', 'silver')`)
 	if err != nil {
 		return nil, err
 	}
