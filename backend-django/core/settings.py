@@ -7,7 +7,7 @@ MAIL_SERVICE_URL = os.getenv("MAIL_SERVICE_URL")
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = os.environ["SECRET_KEY"]
+
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
