@@ -36,3 +36,9 @@ aws eks update-kubeconfig --region eu-north-1 --name eks-cluster
 aws sts assume-role --role-arn arn:aws:iam::<USER-ID>:role/eks-admin --role-session-name session
 aws eks update-kubeconfig --region eu-north-1 --name eks-cluster --role-arn arn:aws:iam::<USER-ID>:role/eks-admin
 ```
+
+## Additional:
+Jenkins, ArgoCD and Grafana passwords are stored in AWS Secrets Manager.
+To expose grafana use: `kubectl port-forward svc/grafana -n monitoring 3000:80`
+To expose ArgoCD use: `kubectl port-forward svc/argocd-server -n argocd 443:443`
+To expose Jenkins use: `kubectl --namespace jenkins port-forward svc/jenkins 8080:8080`
