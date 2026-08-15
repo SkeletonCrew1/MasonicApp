@@ -1,0 +1,7 @@
+aws_region   = "eu-north-1"
+env          = "development"
+vpc_cidr     = "10.0.0.0/16"
+subnet_cidr1 = "10.0.0.0/19"
+subnet_cidr2 = "10.0.32.0/19"
+db_name      = "paranormal_db"
+db_user      = "miraculous"
