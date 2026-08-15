@@ -13,14 +13,19 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = ">= 2.23.0"
     }
+
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.12.0"
+    }
   }
 
   backend "s3" {
-    bucket       = "masonicapp-terraform-state"
-    key          = "state/eks-cluster/terraform.tfstate"
+    bucket         = "masonicapp-terraform-state-stage"
+    key            = "state/eks-cluster/terraform.tfstate"
     use_lockfile = true
-    region       = "us-east-1"
-    encrypt      = true
+    region         = "eu-north-1"
+    encrypt        = true
   }
 }
 
@@ -37,10 +42,23 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
   token                  = data.aws_eks_cluster_auth.eks-auth.token
 
-
   exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args        = ["eks", "get-token", "--cluster-name", aws_eks_cluster.eks.name]
+  }
+}
+
+provider "helm" {
+  kubernetes = {
+    host                   = data.aws_eks_cluster.eks.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.eks-auth.token
+
+    exec = {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "aws"
       args        = ["eks", "get-token", "--cluster-name", aws_eks_cluster.eks.name]
     }
+  }
 }
