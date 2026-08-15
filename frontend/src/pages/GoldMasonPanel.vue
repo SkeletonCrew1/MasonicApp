@@ -67,7 +67,7 @@ const broadcastMsg = ref("");
 
 onMounted(async() =>{
     try {
-        const response = await fetch(`/auth/protected`, {
+        const response = await fetch(`/api/auth/protected`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
