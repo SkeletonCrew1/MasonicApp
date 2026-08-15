@@ -1,9 +1,6 @@
 # K8S
 ## What is this folder?
-This folder specifically is fodler for our application Kubernetes implementation and all of its dependencies.
-Folders breakdown:
-* secretsmanager - is a folder for our application secrets manager dependency installation and cleanup commands and a policy file used for it.
-
+This folder specifically is fodler for our application Kubernetes implementation.
 ## How to run?
 * Clone this repository.
 * Log into AWS using `aws configure` command and providing your credentials and you must have enough permissions to perform these actions.
