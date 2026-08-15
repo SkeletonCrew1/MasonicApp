@@ -19,6 +19,8 @@ This documentation describes how to create an EKS cluster and manage policies us
 - `eks.tf` defines an EKS cluster.
 - `nodes.tf` defines nodes configuration. 
 - `eks-admin-role.tf` defines an admin role for managing the EKS cluster.
+- `aws-lb-controller.tf` sets up AWS Load Balancer Controller.
+- `secrets-csi-driver.f` sets up secrets manager driver for our EKS cluster.
 
 ## Usage
 
