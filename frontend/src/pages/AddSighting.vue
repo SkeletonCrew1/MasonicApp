@@ -81,7 +81,7 @@ let marker = null;
 
 onMounted(async() =>{
   try {
-    const response = await fetch(`/auth/protected`, {
+    const response = await fetch(`/api/auth/protected`, {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
@@ -100,7 +100,7 @@ onMounted(async() =>{
 
 onMounted(async () => {
   try {
-    const res = await fetch(`/posting/user-status`, { credentials: "include" });
+    const res = await fetch(`/api/posting/user-status`, { credentials: "include" });
     if (res.ok) {
       const data = await res.json();
       if (data.status === "bronze") {
@@ -178,7 +178,7 @@ async function submit() {
   };
 
   try {
-    const response = await fetch(`/posting/sightings`, {
+    const response = await fetch(`/api/posting/sightings`, {
       method: "POST",
       credentials: "include",
       headers: {

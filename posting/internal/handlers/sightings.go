@@ -2,32 +2,72 @@ package handlers
 
 import (
 	"backend/internal/models"
+	"bytes"
+	"context"
 	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/golang-jwt/jwt/v5"
 )
+
+func getS3PresignClient() (*s3.PresignClient, string, error) {
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		return nil, "", err
+	}
+	client := s3.NewFromConfig(cfg)
+	presignClient := s3.NewPresignClient(client)
+	bucket := os.Getenv("S3_BUCKET_NAME")
+	return presignClient, bucket, nil
+}
+
+func generatePresignedURL(objectKey string) (string, error) {
+	if objectKey == "" {
+		return "", nil
+	}
+	presignClient, bucket, err := getS3PresignClient()
+	if err != nil {
+		return "", err
+	}
+
+	req, err := presignClient.PresignGetObject(context.TODO(), &s3.GetObjectInput{
+		Bucket: &bucket,
+		Key:    &objectKey,
+	}, s3.WithPresignExpires(15*time.Minute))
+
+	if err != nil {
+		return "", err
+	}
+	return req.URL, nil
+}
 
 func AddSighting(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		status, err := getUserStatusFromRequest(r)
 		if err != nil || (status != "silver" && status != "golden" && status != "gold") {
+			log.Println("Auth error in AddSighting:", err, "Status:", status)
 			http.Error(w, "Forbidden: insufficient permissions to create posts", http.StatusForbidden)
 			return
 		}
 
 		var sighting models.Sighting
 		if err := json.NewDecoder(r.Body).Decode(&sighting); err != nil {
+			log.Println("JSON decode error:", err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
+		var s3ObjectKey string
 		if sighting.Picture != "" {
 			idx := strings.Index(sighting.Picture, ",")
 			if idx != -1 {
@@ -36,25 +76,43 @@ func AddSighting(db *sql.DB) http.HandlerFunc {
 
 			data, err := base64.StdEncoding.DecodeString(sighting.Picture)
 			if err != nil {
+				log.Println("Base64 decode error:", err)
 				http.Error(w, "Invalid image data", http.StatusBadRequest)
 				return
 			}
 
 			filename := fmt.Sprintf("%d.png", time.Now().UnixNano())
-			filePath := "uploads/" + filename
-			if err := os.WriteFile(filePath, data, 0644); err != nil {
-				http.Error(w, "Failed to save image", http.StatusInternalServerError)
+			s3ObjectKey = "uploads/" + filename
+
+			cfg, err := config.LoadDefaultConfig(context.TODO())
+			if err != nil {
+				log.Println("AWS LoadDefaultConfig error:", err)
+				http.Error(w, "Failed to connect to AWS", http.StatusInternalServerError)
 				return
 			}
-			sighting.Picture = "/uploads/" + filename
+			s3Client := s3.NewFromConfig(cfg)
+			bucket := os.Getenv("S3_BUCKET_NAME")
+
+			_, err = s3Client.PutObject(context.TODO(), &s3.PutObjectInput{
+				Bucket:      aws.String(bucket),
+				Key:         aws.String(s3ObjectKey),
+				Body:        bytes.NewReader(data),
+				ContentType: aws.String("image/png"),
+			})
+			if err != nil {
+				log.Println("S3 PutObject error:", err)
+				http.Error(w, "Failed to upload image to S3", http.StatusInternalServerError)
+				return
+			}
 		}
 
 		_, err = db.Exec(`
-			INSERT INTO sightings (SightingName, SightingLatitude, SightingLongitude, SightingDiscoveryDate, SightingPicture, SightingDescription)
-			VALUES($1, $2, $3, $4, $5, $6)
-		`, sighting.Name, sighting.Latitude, sighting.Longitude, sighting.Date, sighting.Picture, sighting.Description)
+            INSERT INTO sightings (SightingName, SightingLatitude, SightingLongitude, SightingDiscoveryDate, SightingPicture, SightingDescription)
+            VALUES($1, $2, $3, $4, $5, $6)
+        `, sighting.Name, sighting.Latitude, sighting.Longitude, sighting.Date, s3ObjectKey, sighting.Description)
 
 		if err != nil {
+			log.Println("Database insert error:", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -82,9 +140,17 @@ func GetSightings(db *sql.DB) http.HandlerFunc {
 		var sightings []models.Sighting
 		for rows.Next() {
 			var s models.Sighting
-			if err := rows.Scan(&s.ID, &s.Name, &s.Latitude, &s.Longitude, &s.Date, &s.Picture, &s.Description); err != nil {
+			var s3Key string
+			if err := rows.Scan(&s.ID, &s.Name, &s.Latitude, &s.Longitude, &s.Date, &s3Key, &s.Description); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
+			}
+
+			if s3Key != "" {
+				presignedURL, err := generatePresignedURL(s3Key)
+				if err == nil {
+					s.Picture = presignedURL
+				}
 			}
 
 			db.QueryRow("SELECT COUNT(*) FROM SeenToo WHERE post = $1", fmt.Sprintf("%d", s.ID)).Scan(&s.SeenCount)
@@ -112,12 +178,20 @@ func GetSightingByID(db *sql.DB) http.HandlerFunc {
 
 		id := r.URL.Query().Get("id")
 		var s models.Sighting
+		var s3Key string
 		err = db.QueryRow("SELECT SightingId, SightingName, SightingLatitude, SightingLongitude, SightingDiscoveryDate, SightingPicture, SightingDescription FROM Sightings WHERE SightingId = $1", id).
-			Scan(&s.ID, &s.Name, &s.Latitude, &s.Longitude, &s.Date, &s.Picture, &s.Description)
+			Scan(&s.ID, &s.Name, &s.Latitude, &s.Longitude, &s.Date, &s3Key, &s.Description)
 
 		if err != nil {
 			http.Error(w, "Sighting not found", http.StatusNotFound)
 			return
+		}
+
+		if s3Key != "" {
+			presignedURL, err := generatePresignedURL(s3Key)
+			if err == nil {
+				s.Picture = presignedURL
+			}
 		}
 
 		db.QueryRow("SELECT COUNT(*) FROM SeenToo WHERE post = $1", id).Scan(&s.SeenCount)
@@ -132,6 +206,10 @@ func GetSightingByID(db *sql.DB) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(s)
 	}
+}
+
+func awsString(v string) *string {
+	return &v
 }
 
 func getUserStatusFromRequest(r *http.Request) (string, error) {

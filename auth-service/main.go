@@ -36,11 +36,10 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/register", register)
-	mux.HandleFunc("/login", login)
-	mux.HandleFunc("/logout", logout)
-	mux.HandleFunc("/protected", protected)
-	mux.HandleFunc("/check_inquisitor", check_inquisitor)
+	mux.HandleFunc("/api/auth/register", register)
+	mux.HandleFunc("/api/auth/login", login)
+	mux.HandleFunc("/api/auth/logout", logout)
+	mux.HandleFunc("/api/auth/protected", protected)
 
 	log.Fatal(http.ListenAndServe(":8081", enableCORS(mux)))
 }
@@ -121,8 +120,8 @@ func register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	query := `
-		INSERT INTO users (UserDisplayName,UserPassword,UserStatus,UserEmail,UserIsInquisitor)
-		VALUES ($1, $2, $3, $4, $5);
+        INSERT INTO users (UserDisplayName,UserPassword,UserStatus,UserEmail,UserIsInquisitor)
+        VALUES ($1, $2, $3, $4, $5);
 	`
 	_, err = db.Exec(query, user_fake_name, hashedPassword, user_rank, user_email, user_is_inqusitor)
 	if err != nil {
@@ -209,7 +208,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
-		Secure:   true,
+		Secure:   false,
 	})
 
 	fmt.Fprint(w, "Login successfull")

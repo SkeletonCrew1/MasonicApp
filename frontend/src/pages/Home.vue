@@ -53,7 +53,7 @@ const userStatus = ref("bronze");
 
 async function loadSightings(map) {
   try {
-    const response = await fetch(`/posting/sightings`, {
+    const response = await fetch(`/api/posting/sightings`, {
       credentials: "include"
     });
     if (!response.ok) throw new Error("Failed to fetch");
@@ -64,7 +64,7 @@ async function loadSightings(map) {
       popupContent.className = 'sighting-popup';
       popupContent.innerHTML = `
         <h3>${sighting.SightingName}</h3>
-        ${sighting.SightingPicture ? `<img src="${'/posting'}${sighting.SightingPicture}" class="popup-image" />` : ''}
+        ${sighting.SightingPicture ? `<img src="${sighting.SightingPicture}" class="popup-image" />` : ''}
         <button class="open-page-btn" data-id="${sighting.SightingId}">Open Page</button>
       `;
 
@@ -84,7 +84,7 @@ async function loadSightings(map) {
 
 async function checkUserStatus() {
   try {
-    const response = await fetch(`/posting/user-status`, {
+    const response = await fetch(`/api/posting/user-status`, {
       credentials: "include"
     });
     if (response.ok) {
@@ -98,7 +98,7 @@ async function checkUserStatus() {
 
 onMounted(async() =>{
   try {
-    const response = await fetch(`/auth/protected`, {
+    const response = await fetch(`/api/auth/protected`, {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
@@ -168,7 +168,7 @@ function goToAddSighting() {
 async function Logout() {
     
     try {
-        const response = await fetch(`/auth/logout`, {
+        const response = await fetch(`/api/auth/logout`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

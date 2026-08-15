@@ -38,10 +38,10 @@ func main() {
 	mux := http.NewServeMux()
 
 	fileServer := http.FileServer(http.Dir("./uploads"))
-	mux.Handle("/uploads/", http.StripPrefix("/uploads/", fileServer))
-	mux.HandleFunc("/user-status", handlers.GetUserStatusHandler(db))
+	mux.Handle("/api/posting/uploads/", http.StripPrefix("/api/posting/uploads/", fileServer))
+	mux.HandleFunc("/api/posting/user-status", handlers.GetUserStatusHandler(db))
 
-	mux.HandleFunc("/sightings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/posting/sightings", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			handlers.GetSightings(db)(w, r)
@@ -52,8 +52,8 @@ func main() {
 		}
 	})
 
-	mux.HandleFunc("/sighting", handlers.GetSightingByID(db))
-	mux.HandleFunc("/seen-too", handlers.AddSeenToo(db)) // <-- New endpoint registered
+	mux.HandleFunc("/api/posting/sighting", handlers.GetSightingByID(db))
+	mux.HandleFunc("/api/posting/seen-too", handlers.AddSeenToo(db))
 
 	log.Println("Listening on :8085")
 	log.Fatal(http.ListenAndServe(":8085", enableCORS(mux)))
