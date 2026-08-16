@@ -93,7 +93,7 @@ ingress:
       pathType: Prefix
       service:
         name: backend-service
-        port: 8080
+        port: 8000
   tls: []
     # - secretName: chart-example-tls
     #   hosts:

@@ -23,17 +23,17 @@ spec:
       - name: backend-container
         image: {{ .Values.backendImage }}
         env:
+
           - name: FRONTEND_SERVICE_URL
             valueFrom:
-              secretKeyRef: app-aws-secrets-map
-              name: app-aws-secrets-map
-              key: FRONTEND_SERVICE_URL
-
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: FRONTEND_SERVICE_URL
           - name: MAIL_SERVICE_URL
             valueFrom:
-              secretKeyRef: app-aws-secrets-map
-              name: app-aws-secrets-map
-              key: MAIL_SERVICE_URL
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: MAIL_SERVICE_URL
           - name: USERS_DB_HOST
             valueFrom:
               secretKeyRef:
