@@ -25,7 +25,7 @@ export default defineConfig({
       '/backend': {
         target: DJANGO_API_BASE,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/backend/, '')
+        rewrite: (path) => path.replace(/^\/api\/backend/, '')
       },
       '/voting': {
         target: VOTING_API_BASE,

@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: masonicapp
+    microservice: backend
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      microservice: backend
+  template:
+    metadata:
+      name: masonic-backend
+      labels:
+        app: masonicapp
+        microservice: backend
+    spec:
+      serviceAccount: app-service-account
+      containers:
+      - name: backend-container
+        image: {{ .Values.backendImage }}
+        env:
+
+          - name: FRONTEND_SERVICE_URL
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: FRONTEND_SERVICE_URL
+          - name: MAIL_SERVICE_URL
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: MAIL_SERVICE_URL
+          - name: USERS_DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: USERS_DB_HOST
+          - name: USERS_DB_PORT
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: USERS_DB_PORT
+          - name: USERS_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: USERS_DB_USER
+          - name: USERS_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: USERS_DB_PASSWORD
+          - name: USERS_DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: USERS_DB_NAME
+          - name: MAP_DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: MAP_DB_HOST
+          - name: MAP_DB_PORT
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: MAP_DB_PORT
+          - name: MAP_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: MAP_DB_USER
+          - name: MAP_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: MAP_DB_PASSWORD
+          - name: MAP_DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: MAP_DB_NAME
+          - name: VOTING_DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: VOTING_DB_HOST
+          - name: VOTING_DB_PORT
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: VOTING_DB_PORT
+          - name: VOTING_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: VOTING_DB_USER
+          - name: VOTING_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: VOTING_DB_PASSWORD
+          - name: VOTING_DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: VOTING_DB_NAME
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: SECRET_KEY
+      volumes:
+      - name: secrets-volume
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "aws-secrets-all"

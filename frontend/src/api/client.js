@@ -1,6 +1,6 @@
 
 async function request(path, options = {}) {
-    const res = await fetch(`/backend${path}`, {
+    const res = await fetch(`/api/backend${path}`, {
         headers: { "Content-Type": "application/json" },
         ...options,
     });
