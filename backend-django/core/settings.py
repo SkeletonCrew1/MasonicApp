@@ -5,7 +5,7 @@ from pathlib import Path
 FRONTEND_PAGE = os.getenv("FRONTEND_SERVICE_URL")
 MAIL_SERVICE_URL = os.getenv("MAIL_SERVICE_URL")
 
-
+SECRET_KEY = os.environ["SECRET_KEY"]
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = True

@@ -109,6 +109,11 @@ spec:
               secretKeyRef:
                 name: app-aws-secrets-map
                 key: VOTING_DB_NAME
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: SECRET_KEY
       volumes:
       - name: secrets-volume
         csi:
