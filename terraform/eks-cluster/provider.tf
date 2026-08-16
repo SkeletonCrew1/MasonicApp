@@ -11,12 +11,12 @@ terraform {
 
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.23.0"
+      version = ">= 3.2.1"
     }
 
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.12.0"
+      version = ">= 3.2.0"
     }
   }
 

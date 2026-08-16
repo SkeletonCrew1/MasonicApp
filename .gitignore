@@ -50,3 +50,6 @@ config.env
 # IDE / OS
 .vscode/
 .idea/
+
+# Temporar file
+csi-patch.json
