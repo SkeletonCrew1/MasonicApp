@@ -22,7 +22,7 @@ resource "helm_release" "argocd" {
       }
       controller = {
         metrics = {
-          enabled = true
+          enabled = false
         }
       }
     })
