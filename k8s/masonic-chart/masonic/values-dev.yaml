@@ -4,14 +4,13 @@
 
 namespace: application
 
-authImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-auth:latest
-frontendImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-frontend:latest
-inquisitorImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-inquisitor:latest
-mailImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-mail:latest
-passwordImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-password:latest
+authImage: 239635360279.dkr.ecr.us-east-1.amazonaws.com/dev/masonic-auth:latest
+frontendImage: 239635360279.dkr.ecr.us-east-1.amazonaws.com/dev/masonic-frontend:latest
+inquisitorImage: 239635360279.dkr.ecr.us-east-1.amazonaws.com/dev/masonic-inquisitor:latest
+mailImage: 239635360279.dkr.ecr.us-east-1.amazonaws.com/dev/masonic-mail:latest
+passwordImage: 239635360279.dkr.ecr.us-east-1.amazonaws.com/dev/masonic-password:latest
 postingImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-posting:latest
-backendImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-backend:latest
-votingImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-voting:latest
+backendImage: 239635360279.dkr.ecr.us-east-1.amazonaws.com/dev/masonic-backend:latest
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
 
@@ -95,11 +94,16 @@ ingress:
       service:
         name: backend-service
         port: 8000
+    - path: /api/backend
+      pathType: Prefix
+      service:
+        name: backend-service
+        port: 8000
     - path: /api/voting
       pathType: Prefix
       service:
         name: voting-service
-        port: 4242
+        port: 8000
   tls: []
     # - secretName: chart-example-tls
     #   hosts:

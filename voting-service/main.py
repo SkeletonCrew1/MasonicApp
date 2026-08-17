@@ -23,7 +23,7 @@ db.init_app(app)
 
 scheduler = BackgroundScheduler()
 
-@app.route("/create_voting", methods=['POST'])
+@app.route("/api/voting/create_voting", methods=['POST'])
 def create_voting():
     data = request.get_json()
     voting_subject = data.get("voting_subject")
@@ -55,7 +55,7 @@ def create_voting():
     return make_response({"message": "New voting was created"}, 200)
 
 
-@app.route("/vote", methods=['POST'])
+@app.route("/api/voting/vote", methods=['POST'])
 def add_vote():
     data = request.get_json()
     voting_id = data.get("voting_id")
@@ -70,7 +70,7 @@ def add_vote():
     return make_response({"message": "Your vote was added"}, 200)
 
 
-@app.route("/get_votings", methods=['POST'])
+@app.route("/api/voting/get_votings", methods=['POST'])
 def get_all_votings():
     data = request.get_json()
     user_id = data.get("user_id")

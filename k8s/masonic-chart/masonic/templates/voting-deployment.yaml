@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voting-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: masonicapp
+    microservice: voting
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      microservice: voting
+  template:
+    metadata:
+      name: masonic-voting
+      labels:
+        app: masonicapp
+        microservice: voting
+    spec:
+      serviceAccount: app-service-account
+      containers:
+      - name: voting-container
+        image: {{ .Values.votingImage }}
+        env:
+
+          - name: FRONTEND_SERVICE_URL
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: FRONTEND_SERVICE_URL
+          - name: MAIL_SERVICE_URL
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: MAIL_SERVICE_URL
+          - name: PROMOTION_URL
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: PROMOTION_URL
+          - name: USERS_DB_URL
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: USERS_DB_URL
+          - name: VOTING_DB_URL
+            valueFrom:
+              secretKeyRef:
+                name: app-aws-secrets-map
+                key: VOTING_DB_URL
+                
+
+      volumes:
+      - name: secrets-volume
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "aws-secrets-all"
