@@ -47,13 +47,6 @@ export function listBans() {
     return request("/bans/");
 }
 
-export function promoteUser(userDisplayName) {
-    return request("/promotion/", {
-        method: "POST",
-        body: JSON.stringify({ userdisplayname: userDisplayName }),
-    });
-}
-
 export function deleteAllData() {
     return request("/delete-all/", { method: "POST" });
 }

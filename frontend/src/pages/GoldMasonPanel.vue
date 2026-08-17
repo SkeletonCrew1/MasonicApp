@@ -34,13 +34,6 @@
                 </div>
                 <div class="col right-col">
                     <div class="box">
-                        <div class="box-header">Promotion <span>G</span></div>
-                        <input v-model="promoteUsername" type="text" placeholder="Username" />
-                        <button class="action-btn right-align mt-auto" :disabled="!promoteUsername"
-                            @click="doPromote">Promote</button>
-                        <p v-if="promotionMsg" class="feedback">{{ promotionMsg }}</p>
-                    </div>
-                    <div class="box">
                         <div class="box-header">Invite <span>G</span></div>
                         <input v-model="inviteEmail" type="text" placeholder="Email" />
                         <button class="action-btn right-align" :disabled="!inviteEmail" @click="doInvite">Send</button>
@@ -112,21 +105,6 @@ async function doBan() {
         banMsg.value = e.message || "Error banning user"; 
     }
 }
-
-
-const promoteUsername = ref("");
-const promotionMsg = ref("");
-
-async function doPromote() {
-    if (!promoteUsername.value) return;
-    try {
-        const data = await promoteUser(promoteUsername.value);
-        promotionMsg.value = data.message || "User sucessfully promoted!";
-    } catch (e) {
-        promotionMsg.value = e.message || "Error!";
-    }
-}
-
 
 const inviteEmail = ref("");
 const inviteMsg = ref("");
