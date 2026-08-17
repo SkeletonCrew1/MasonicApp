@@ -1,0 +1,92 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: flyway-migrations-job
+  namespace: application
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      serviceAccountName: app-service-account
+      restartPolicy: Never
+      volumes:
+        - name: secrets-volume
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "aws-secrets-all"
+      containers:
+        # -- Main DB --
+        - name: flyway-main
+          image: paranormal-repo/masonic-migrations:v1
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              export DB_HOST=$(cat /mnt/secrets/USERS_DB_HOST)
+              export POSTGRES_USER=$(cat /mnt/secrets/USERS_DB_USER)
+              export POSTGRES_PASSWORD=$(cat /mnt/secrets/USERS_DB_PASSWORD)
+
+              flyway -url=jdbc:postgresql://${DB_HOST}:5432/main_db \
+                     -user=${POSTGRES_USER} \
+                     -password=${POSTGRES_PASSWORD} \
+                     -locations=filesystem:/flyway/sql/main \
+                     -baselineOnMigrate=true \
+                     -baselineVersion=0 \
+                     -validateMigrationNaming=true \
+                     migrate
+          volumeMounts: 
+            - name: secrets-volume
+              mountPath: "/mnt/secrets"
+              readOnly: true
+
+        # -- Map DB --
+        - name: flyway-map
+          image: paranormal-repo/masonic-migrations:v1
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              export DB_HOST=$(cat /mnt/secrets/MAP_DB_HOST)
+              export POSTGRES_USER=$(cat /mnt/secrets/MAP_DB_USER)
+              export POSTGRES_PASSWORD=$(cat /mnt/secrets/MAP_DB_PASSWORD)
+
+              flyway -url=jdbc:postgresql://${DB_HOST}:5432/map_db \
+                     -user=${POSTGRES_USER} \
+                     -password=${POSTGRES_PASSWORD} \
+                     -locations=filesystem:/flyway/sql/map \
+                     -baselineOnMigrate=true \
+                     -baselineVersion=0 \
+                     -validateMigrationNaming=true \
+                     migrate
+        
+          volumeMounts:
+            - name: secrets-volume
+              mountPath: "/mnt/secrets"
+              readOnly: true
+
+        # -- Voting DB -- 
+        - name: flyway-voting
+          image: paranormal-repo/masonic-migrations:v1
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              export DB_HOST=$(cat /mnt/secrets/VOTING_DB_HOST)
+              export POSTGRES_USER=$(cat /mnt/secrets/VOTING_DB_USER)
+              export POSTGRES_PASSWORD=$(cat /mnt/secrets/VOTING_DB_PASSWORD)
+
+              flyway -url=jdbc:postgresql://${DB_HOST}:5432/voting_db \
+                     -user=${POSTGRES_USER} \
+                     -password=${POSTGRES_PASSWORD} \
+                     -locations=filesystem:/flyway/sql/voting \
+                     -baselineOnMigrate=true \
+                     -baselineVersion=0 \
+                     -validateMigrationNaming=true \
+                     migrate
+          
+          volumeMounts:
+            - name: secrets-volume
+              mountPath: "/mnt/secrets"
+              readOnly: true
