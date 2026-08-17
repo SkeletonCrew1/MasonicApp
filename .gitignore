@@ -46,6 +46,7 @@ frontend/.vite/
 config.env
 passwords.json
 config.env
+app_access_key.json
 
 # IDE / OS
 .vscode/
