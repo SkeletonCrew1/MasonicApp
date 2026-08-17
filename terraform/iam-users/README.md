@@ -12,6 +12,7 @@ This documentation describes how to create IAM users for teammates using Terrafo
 - `main.tf` creates users and defines policies for them.
 - `locals.tf` defines local variables(names of users).
 - `outputs.tf` checks the result of this Terraform code.
+- `application-iam-user.tf` creates a user and an access key for our application.
 
 
 ## Usage
