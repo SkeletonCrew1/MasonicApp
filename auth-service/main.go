@@ -40,6 +40,7 @@ func main() {
 	mux.HandleFunc("/api/auth/login", login)
 	mux.HandleFunc("/api/auth/logout", logout)
 	mux.HandleFunc("/api/auth/protected", protected)
+	mux.HandleFunc("/api/auth/check_inquisitor", check_inquisitor)
 
 	log.Fatal(http.ListenAndServe(":8081", enableCORS(mux)))
 }

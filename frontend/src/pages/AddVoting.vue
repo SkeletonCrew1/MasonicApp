@@ -71,7 +71,7 @@ const submitNewVoting = async () => {
 
 onMounted(async () => {
   try {
-    const response = await fetch('/auth/check_inquisitor', {
+    const response = await fetch('/api/auth/check_inquisitor', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

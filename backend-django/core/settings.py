@@ -5,9 +5,9 @@ from pathlib import Path
 FRONTEND_PAGE = os.getenv("FRONTEND_SERVICE_URL")
 MAIL_SERVICE_URL = os.getenv("MAIL_SERVICE_URL")
 
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["SECRET_KEY"]
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
@@ -51,19 +51,19 @@ WSGI_APPLICATION = "core.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("MAIN_DB_NAME"),
-        "USER": os.environ.get("POSTGRES_USER"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "HOST": os.environ.get("DB_HOST"),
-        "PORT": os.environ.get("DB_PORT"),
+        "NAME": os.environ.get("USERS_DB_NAME"),
+        "USER": os.environ.get("USERS_DB_USER"),
+        "PASSWORD": os.environ.get("USERS_DB_PASSWORD"),
+        "HOST": os.environ.get("USERS_DB_HOST"),
+        "PORT": os.environ.get("USERS_DB_PORT"),
     },
     "map-db": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": os.environ.get("MAP_DB_NAME"),
-        "USER": os.environ.get("POSTGRES_USER"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+        "USER": os.environ.get("MAP_DB_USER"),
+        "PASSWORD": os.environ.get("MAP_DB_PASSWORD"),
         "HOST": os.environ.get("MAP_DB_HOST"),
-        "PORT": os.environ.get("DB_PORT"),
+        "PORT": os.environ.get("MAP_DB_PORT"),
     },
     "voting-db": {
         "ENGINE": "django.db.backends.postgresql",
