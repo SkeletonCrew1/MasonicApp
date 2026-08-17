@@ -57,7 +57,7 @@ const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL;
 
 const checkUserStatus = async () => {
   try {
-    const response = await fetch(`/posting/user-status`, {
+    const response = await fetch(`/api/posting/user-status`, {
       credentials: "include"
     });
     if (response.ok) {
@@ -95,7 +95,7 @@ const goToAddVoting = () => router.push('/add-voting');
 
 const Logout = async () => {
   try {
-    const response = await fetch(`/auth/logout`, {
+    const response = await fetch(`/api/auth/logout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include"
