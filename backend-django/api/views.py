@@ -106,26 +106,3 @@ def delete_all(request):
         cursor.close()
 
     return JsonResponse({"message": "All data deleted sucessfully"}, status=200)
-
-# promotion feature                                                                      
-@csrf_exempt
-@require_http_methods(["POST"])
-def user_promotion(request):
-
-    data = json.loads(request.body)
-    user_name = data.get("userdisplayname")
-
-    try:
-        user = User.objects.get(userdisplayname=user_name)
-    except User.DoesNotExist:
-        return JsonResponse({"error": "User not found"}, status=404)
-
-    if user.userstatus == "bronze":
-        user.userstatus = "silver"
-    elif user.userstatus == "silver":
-        user.userstatus = "gold"
-    else:
-        return JsonResponse({"message": f"{user.userdisplayname} already with 'gold' status"}, status=200)
-
-    user.save(update_fields=["userstatus"])
-    return JsonResponse({"message": f"{user.userdisplayname} promoted to {user.userstatus} status"}, status=200)
