@@ -45,4 +45,5 @@ terraform apply
 
 # Command to output credentials to a json file
 terraform output -json user_passwords > passwords.json
+terraform output -json app_access_key > app_access_key.json
 ```
