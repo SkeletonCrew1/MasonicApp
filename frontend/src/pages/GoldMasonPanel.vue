@@ -23,8 +23,7 @@
                     </div>
                     <div class="box">
                         <div class="box-header">Ban agent <span>G</span></div>
-                        <input v-model="banUserId" type="number" placeholder="User ID (required)" style="margin-bottom: 5px;" />
-                        <input v-model="banIpAddress" type="text" placeholder="IP Address (optional)" />
+                        <input v-model="banIpAddress" type="text" placeholder="IP address" />
                         <button class="action-btn right-align" :disabled="!banUserId" @click="doBan">BAN</button>
                         <p v-if="banMsg" class="feedback">{{ banMsg }}</p>
                     </div>
