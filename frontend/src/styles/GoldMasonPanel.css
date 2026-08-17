@@ -100,6 +100,11 @@
     border-color: #2D2E2F;
 }
 
+.right-col .box {
+    flex: 0 0 auto;
+    min-height: 300px;
+}
+
 .box-header {
     display: flex;
     justify-content: space-between;

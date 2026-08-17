@@ -47,7 +47,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { deleteAllData, inviteUser, promoteUser, sendBroadcast, banIp } from "../api/client";
+import { deleteAllData, inviteUser, sendBroadcast, banIp } from "../api/client";
 const emit = defineEmits(["close"]);
 const statuses = ["bronze", "silver", "gold"];
 
