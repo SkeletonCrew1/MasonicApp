@@ -6,11 +6,6 @@ pipeline {
     }
 
     stages {
-        stage("Cleanup Workspace"){
-            steps {
-                cleanWs()
-            }
-        }
 
         stage("Install ArgoCD CLI") {
             steps{
@@ -53,5 +48,12 @@ pipeline {
                 sh "argocd app sync masonic"
             }
         }
+
+        stage("Cleanup Workspace"){
+            steps {
+                cleanWs()
+            }
+        }
+
     }
 }
