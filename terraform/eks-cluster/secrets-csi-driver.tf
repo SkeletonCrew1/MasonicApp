@@ -88,29 +88,6 @@ resource "aws_eks_pod_identity_association" "app_pod_identity" {
   depends_on = [aws_eks_addon.pod_identity_agent]
 }
 
-resource "local_file" "csi_patch_json" {
-  filename = "${path.module}/csi-patch.json"
-  content  = jsonencode([
-    {
-      op    = "add"
-      path  = "/spec/tokenRequests"
-      value = [
-        {
-          audience = "sts.amazonaws.com"
-        },
-        {
-          audience = "pods.eks.amazonaws.com"
-        }
-      ]
-    },
-    {
-      op    = "add"
-      path  = "/spec/requiresRepublish"
-      value = true
-    }
-  ])
-}
-
 resource "helm_release" "secrets_store_csi_driver_provider_aws" {
   name       = "aws-secrets-provider"
   repository = "https://aws.github.io/secrets-store-csi-driver-provider-aws"

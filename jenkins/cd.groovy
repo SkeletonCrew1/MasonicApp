@@ -6,18 +6,13 @@ pipeline {
     }
 
     stages {
-        stage("Cleanup Workspace"){
-            steps {
-                cleanWs()
-            }
-        }
 
         stage("Install ArgoCD CLI") {
             steps{
                 sh """
-                mkdir -p /var/jenkins_home/.local/bin
-                curl -sSL -o /var/jenkins_home/.local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-                chmod +x /var/jenkins_home/.local/bin/argocd
+                    mkdir -p /var/jenkins_home/.local/bin
+                    curl -sSL -o /var/jenkins_home/.local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+                    chmod +x /var/jenkins_home/.local/bin/argocd
                 """
             }
         }
@@ -53,5 +48,12 @@ pipeline {
                 sh "argocd app sync masonic"
             }
         }
+
+        stage("Cleanup Workspace"){
+            steps {
+                cleanWs()
+            }
+        }
+
     }
 }
