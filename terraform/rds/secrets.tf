@@ -36,7 +36,5 @@ resource "aws_secretsmanager_secret" "db_secrets" {
 resource "aws_secretsmanager_secret_version" "db_password" {
     for_each      = local.db_secrets
     secret_id     = aws_secretsmanager_secret.db_secrets[each.key].id
-    secret_string = jsonencode({
-        (each.key) = each.value
-     })
+    secret_string = each.value
 }

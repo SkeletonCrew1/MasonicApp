@@ -16,6 +16,4 @@ resource "aws_db_instance" "main" {
 
     skip_final_snapshot = true
     multi_az            = false
-
-    publicly_accessible  = true
 }
