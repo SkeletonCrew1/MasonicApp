@@ -11,6 +11,7 @@ mailImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-mail:late
 passwordImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-password:latest
 postingImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-posting:latest
 backendImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-backend:latest
+votingImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-voting:latest
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
 
@@ -94,6 +95,11 @@ ingress:
       service:
         name: backend-service
         port: 8000
+    - path: /api/voting
+      pathType: Prefix
+      service:
+        name: voting-service
+        port: 4242
   tls: []
     # - secretName: chart-example-tls
     #   hosts:
