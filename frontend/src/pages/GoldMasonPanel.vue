@@ -23,8 +23,7 @@
                     </div>
                     <div class="box">
                         <div class="box-header">Ban agent <span>G</span></div>
-                        <input v-model="banUserId" type="number" placeholder="User ID (required)" style="margin-bottom: 5px;" />
-                        <input v-model="banIpAddress" type="text" placeholder="IP Address (optional)" />
+                        <input v-model="banIpAddress" type="text" placeholder="IP address" />
                         <button class="action-btn right-align" :disabled="!banUserId" @click="doBan">BAN</button>
                         <p v-if="banMsg" class="feedback">{{ banMsg }}</p>
                     </div>
@@ -33,13 +32,6 @@
                     <button class="delete-btn" @click="doDeleteAll">Delete all data</button>
                 </div>
                 <div class="col right-col">
-                    <div class="box">
-                        <div class="box-header">Promotion <span>G</span></div>
-                        <input v-model="promoteUsername" type="text" placeholder="Username" />
-                        <button class="action-btn right-align mt-auto" :disabled="!promoteUsername"
-                            @click="doPromote">Promote</button>
-                        <p v-if="promotionMsg" class="feedback">{{ promotionMsg }}</p>
-                    </div>
                     <div class="box">
                         <div class="box-header">Invite <span>G</span></div>
                         <input v-model="inviteEmail" type="text" placeholder="Email" />
@@ -54,7 +46,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { deleteAllData, inviteUser, promoteUser, sendBroadcast, banIp } from "../api/client";
+import { deleteAllData, inviteUser, sendBroadcast, banIp } from "../api/client";
 const emit = defineEmits(["close"]);
 const statuses = ["bronze", "silver", "gold"];
 
@@ -112,21 +104,6 @@ async function doBan() {
         banMsg.value = e.message || "Error banning user"; 
     }
 }
-
-
-const promoteUsername = ref("");
-const promotionMsg = ref("");
-
-async function doPromote() {
-    if (!promoteUsername.value) return;
-    try {
-        const data = await promoteUser(promoteUsername.value);
-        promotionMsg.value = data.message || "User sucessfully promoted!";
-    } catch (e) {
-        promotionMsg.value = e.message || "Error!";
-    }
-}
-
 
 const inviteEmail = ref("");
 const inviteMsg = ref("");
