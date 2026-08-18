@@ -7,4 +7,5 @@ urlpatterns = [
     path("ban/", views.ban_ip),
     path("bans/", views.bans_list),
     path("delete-all/", views.delete_all),
+    path("promotion/", views.user_promotion),
 ]
