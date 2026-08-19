@@ -1,12 +1,12 @@
 resource "aws_security_group" "rds" {
     name   = "${var.env}-rds-paranormal-sg"
-    vpc_id = aws_vpc.main.id
+    vpc_id = data.terraform_remote_state.eks.outputs.vpc_id
 
     ingress {
         from_port   = 5432
         to_port     = 5432
         protocol    = "tcp"
-        cidr_blocks = [var.vpc_cidr] 
+        cidr_blocks = [data.terraform_remote_state.eks.outputs.vpc_cidr_block] 
     }
 
     egress {

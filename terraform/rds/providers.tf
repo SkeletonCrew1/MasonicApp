@@ -9,7 +9,7 @@ terraform {
     }
 
     backend "s3" {
-        bucket       = "masonicapp-terraform-state-stage"
+        bucket       = "masonicapp-terraform-state-dev"
         key          = "rds/terraform.tfstate"
         region       = "eu-north-1"
         encrypt      = true
@@ -19,4 +19,14 @@ terraform {
 
 provider "aws" {
     region = var.aws_region
+}
+
+data "terraform_remote_state" "eks" {
+    backend = "s3"
+
+    config = {
+        bucket = "masonicapp-terraform-state-dev"
+        key    = "state/eks-cluster/terraform.tfstate"
+        region = "eu-north-1"
+    }
 }

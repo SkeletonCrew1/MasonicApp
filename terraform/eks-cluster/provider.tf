@@ -21,7 +21,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "masonicapp-terraform-state-stage"
+    bucket         = "masonicapp-terraform-state-dev"
     key            = "state/eks-cluster/terraform.tfstate"
     use_lockfile = true
     region         = "eu-north-1"
@@ -29,18 +29,9 @@ terraform {
   }
 }
 
-data "aws_eks_cluster" "eks" {
-  name = aws_eks_cluster.eks.name
-}
-
-data "aws_eks_cluster_auth" "eks-auth" {
-  name = aws_eks_cluster.eks.name
-}
-
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.eks.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.eks-auth.token
+  host                   = aws_eks_cluster.eks.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.eks.certificate_authority[0].data)
 
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
@@ -51,9 +42,9 @@ provider "kubernetes" {
 
 provider "helm" {
   kubernetes = {
-    host                   = data.aws_eks_cluster.eks.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
-    token                  = data.aws_eks_cluster_auth.eks-auth.token
+    host                   = aws_eks_cluster.eks.endpoint
+    cluster_ca_certificate = base64decode(aws_eks_cluster.eks.certificate_authority[0].data)
+
 
     exec = {
       api_version = "client.authentication.k8s.io/v1beta1"
