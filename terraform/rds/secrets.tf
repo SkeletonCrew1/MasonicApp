@@ -33,8 +33,14 @@ resource "aws_secretsmanager_secret" "db_secrets" {
     recovery_window_in_days = 0
 }
 
-resource "aws_secretsmanager_secret_version" "db_password" {
+resource "aws_secretsmanager_secret_version" "db_secrets_version" {
     for_each      = local.db_secrets
     secret_id     = aws_secretsmanager_secret.db_secrets[each.key].id
     secret_string = each.value
+
+    lifecycle {
+        ignore_changes = [
+            secret_string
+        ]
+    }
 }
