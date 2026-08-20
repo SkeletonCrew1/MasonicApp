@@ -30,9 +30,9 @@ spec:
                   export DB_HOST=$(cat /mnt/secrets/USERS_DB_HOST)
                   export DB_USER=$(cat /mnt/secrets/USERS_DB_USER)
 
-                  psql -h $DB_HOST -U $DB_USER -d postgres -tc "SELECT 1 FROM pd_database WHERE datname = 'main_db' " | grep -q 1 || psql -h $DB_HOST -U $DB_USER -d postgres -c "CREATE DATABASE main_db;"
-                  psql -h $DB_HOST -U $DB_USER -d postgres -tc "SELECT 1 FROM pd_database WHERE datname = 'map_db' " | grep -q 1 || psql -h $DB_HOST -U $DB_USER -d postgres -c "CREATE DATABASE map_db;"
-                  psql -h $DB_HOST -U $DB_USER -d postgres -tc "SELECT 1 FROM pd_database WHERE datname = 'voting_db' " | grep -q 1 || psql -h $DB_HOST -U $DB_USER -d postgres -c "CREATE DATABASE voting_db;"
+                  psql -h $DB_HOST -U $DB_USER -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'main_db' " | grep -q 1 || psql -h $DB_HOST -U $DB_USER -d postgres -c "CREATE DATABASE main_db;"
+                  psql -h $DB_HOST -U $DB_USER -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'map_db' " | grep -q 1 || psql -h $DB_HOST -U $DB_USER -d postgres -c "CREATE DATABASE map_db;"
+                  psql -h $DB_HOST -U $DB_USER -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'voting_db' " | grep -q 1 || psql -h $DB_HOST -U $DB_USER -d postgres -c "CREATE DATABASE voting_db;"
               volumeMounts:
                 - name: secrets-volume
                   mountPath: "/mnt/secrets"
