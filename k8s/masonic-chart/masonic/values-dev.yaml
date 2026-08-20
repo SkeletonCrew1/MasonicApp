@@ -9,7 +9,7 @@ frontendImage: 239635360279.dkr.ecr.us-east-1.amazonaws.com/dev/masonic-frontend
 inquisitorImage: 239635360279.dkr.ecr.us-east-1.amazonaws.com/dev/masonic-inquisitor:latest
 mailImage: 239635360279.dkr.ecr.us-east-1.amazonaws.com/dev/masonic-mail:latest
 passwordImage: 239635360279.dkr.ecr.us-east-1.amazonaws.com/dev/masonic-password:latest
-postingImage: 984546305184.dkr.ecr.eu-north-1.amazonaws.com/stage/masonic-posting:latest
+postingImage: 239635360279.dkr.ecr.eu-north-1.amazonaws.com/masonic-posting
 backendImage: 239635360279.dkr.ecr.us-east-1.amazonaws.com/dev/masonic-backend:latest
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 1
