@@ -34,24 +34,24 @@ To run follow the next steps:
 * Login in AWS acconut with `aws configure`.
 
 ## Create bucket for state files:
-* Run 'cd terraform/s3-bucket-for-state'
-* Run 'terraform init'
-* Run 'terraform plan'
-* Run 'terraform apply' ,check for any errors and approve if everything is okey
+* Run `cd terraform/s3-bucket-for-state`
+* Run `terraform init`
+* Run `terraform plan`
+* Run `terraform apply` ,check for any errors and approve if everything is okay
 
-## Create bucket for photos  
-* Run 'cd ../s3-bucket-for-app'
-* Run 'terraform init'
-* Run 'terraform plan'
-* Run 'terraform apply' ,check for any errors and approve if everything is okey
+## Create bucket for photos:
+* Run `cd ../s3-bucket-for-app`
+* Run `terraform init`
+* Run `terraform plan`
+* Run `terraform apply` ,check for any errors and approve if everything is okay
 
-## Create RDS :
-* Run '.cd ../rds'
-* Run 'terraform init'
-* Run 'terraform plan'
-* Run 'terraform apply' ,check for any errors and approve if everything is okey
+## Create RDS:
+* Run `cd ../rds`
+* Run `terraform init`
+* Run `terraform plan`
+* Run `terraform apply` ,check for any errors and approve if everything is okay
 
-## Change credentials :
+## Change credentials:
 - FLASK_VOTING_DATABASE_URL
 - FLASK_MAIN_DATABASE_URL
 - AUTH_URL
@@ -63,10 +63,12 @@ To run follow the next steps:
 - USERS_DB_PASSWORD
 
 ## Create EKS cluster:
-* Run 'cd ../eks-cluster'
-* Run 'terraform init'
-* Run 'terraform plan'
-* Run 'terraform apply' ,check for any errors and approve if everything is okey
+* Run `cd ../eks-cluster`
+* Run `terraform init`
+* Run `terraform plan`
+* Run `terraform apply` ,check for any errors and approve if everything is okay
+
+## Start the application with helm:
 
 * Make sure images are in ECR reposetories.If not,push images to ECR.
 
