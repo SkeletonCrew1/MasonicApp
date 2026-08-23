@@ -27,4 +27,57 @@ To run this application you will need to have `Git`, `Docker` and `Docker Compos
 To run follow the next steps:
 * Run `git clone https://github.com/SkeletonCrew1/MasonicApp.git` and wait for the repository to be downloaded.
 * Run `cd MasonicApp`.
-* Run `docker compose up --build`.
+
+
+
+* Check for all credentials in AWS Secret manager.
+* Login in AWS acconut with `aws configure`.
+
+## Create bucket for state files:
+* Run `cd terraform/s3-bucket-for-state`
+* Run `terraform init`
+* Run `terraform plan`
+* Run `terraform apply` ,check for any errors and approve if everything is okay
+
+## Create bucket for photos:
+* Run `cd ../s3-bucket-for-app`
+* Run `terraform init`
+* Run `terraform plan`
+* Run `terraform apply` ,check for any errors and approve if everything is okay
+
+## Create RDS:
+* Run `cd ../rds`
+* Run `terraform init`
+* Run `terraform plan`
+* Run `terraform apply` ,check for any errors and approve if everything is okay
+
+## Change credentials:
+- FLASK_VOTING_DATABASE_URL
+- FLASK_MAIN_DATABASE_URL
+- AUTH_URL
+- PROMOTION_URL
+- VOTING_DB_URL
+- USERS_DB_URL
+- VOTING_DB_PASSWORD
+- MAP_DB_PASSWORD
+- USERS_DB_PASSWORD
+
+## Create EKS cluster:
+* Run `cd ../eks-cluster`
+* Run `terraform init`
+* Run `terraform plan`
+* Run `terraform apply` ,check for any errors and approve if everything is okay
+
+## Start the application with helm:
+
+* Make sure images are in ECR reposetories.If not,push images to ECR.
+
+* Check if ECR repositories in MasonicApp/k8s/masonic-chart/masonic/values-stage.yaml
+
+* Log into AWS EKS Cluster using (do not forget to change account id to actual value):
+```
+aws sts assume-role   --role-arn arn:aws:iam::<account id>:role/eks-admin   --role-session-name session
+aws eks update-kubeconfig   --region eu-north-1   --name eks-cluster   --role-arn arn:aws:iam::<account id>:role/eks-admin
+```
+* Given you are inside project repostitory, run `cd k8s` and then run `helm install masonic ./masonic-chart/masonic/ --namespace application --create-namespace --values ./masonic-chart/masonic/values-stage.yaml` to start our whole application, If you make a deployment to production or dev stage change `./masonic-chart/masonic/values-stage.yaml` to the respective values file.
+
