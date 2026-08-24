@@ -1,5 +1,5 @@
 resource "aws_subnet" "db_zone1" {
-    vpc_id            = aws_vpc.main.id
+    vpc_id            = data.terraform_remote_state.eks.outputs.vpc_id
     cidr_block        = var.subnet_cidr1
     availability_zone = "${var.aws_region}a"
 
@@ -9,7 +9,7 @@ resource "aws_subnet" "db_zone1" {
 }
 
 resource "aws_subnet" "db_zone2" {
-    vpc_id            = aws_vpc.main.id
+    vpc_id            = data.terraform_remote_state.eks.outputs.vpc_id
     cidr_block        = var.subnet_cidr2
     availability_zone = "${var.aws_region}b"
 

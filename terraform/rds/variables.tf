@@ -8,11 +8,6 @@ variable "env" {
     type        = string
 }
 
-variable "vpc_cidr" {
-    description = "CIDR block for the VPC"
-    type        = string
-}
-
 variable "subnet_cidr1" {
     description = "CIDR block for the first subnet"
     type        = string
